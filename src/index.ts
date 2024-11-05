@@ -20,33 +20,37 @@ fastify.addHook('onRequest', (request, reply, done) => {
     console.log(request.headers);
     const apiKey = request.headers['x-api-key'];
     if (!apiKey) {
-        const error : any = new Error('API key is missing');
+        const error: any = new Error('API key is missing');
         error.statusCode = 401;
         console.error(error)
         return done(error);
     }
 
     if (apiKey !== API_KEY) {
-        const error : any= new Error('Invalid API key provided. Please ensure you are using the correct API key.');
+        const error: any = new Error('Invalid API key provided. Please ensure you are using the correct API key.');
         error.statusCode = 403;
         console.error(error)
         return done(error);
     }
+    else {
+        console.log('API key is valid');
+        done();
 
-    done();
+    }
+
 });
 
-fastify.setErrorHandler((error, request, reply) => {
-    fastify.log.error(error);
+// fastify.setErrorHandler((error, request, reply) => {
+//     fastify.log.error(error);
 
-    const response = {
-        statusCode: error.statusCode || 500,
-        error: error.name || 'Internal Server Error',
-        message: error.message || 'An unexpected error occurred',
-    };
+//     const response = {
+//         statusCode: error.statusCode || 500,
+//         error: error.name || 'Internal Server Error',
+//         message: error.message || 'An unexpected error occurred',
+//     };
 
-    reply.status(response.statusCode).send(response);
-});
+//     reply.status(response.statusCode).send(response);
+// });
 
 const start = async () => {
     try {
@@ -55,8 +59,7 @@ const start = async () => {
             host: "0.0.0.0",
             listen: true,
         });
-
-        fastify.log.info(`Server is running on port ${PORT}`);
+        console.log(`Server is running on port ${PORT}`);
     } catch (err) {
         fastify.log.error("Error starting server:", err);
         process.exit(1);

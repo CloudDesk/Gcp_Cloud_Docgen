@@ -4,10 +4,14 @@ import fs from "fs";
 import { SF_CLIENT_ID,SF_ORG_ID ,SF_USERNAME} from "../config/config.js";
 
 
-
-const SF_PRIVATE_KEY = fs.readFileSync("privateKey.pem", "utf8");
-
-
+let SF_PRIVATE_KEY : string;
+try {
+  SF_PRIVATE_KEY = fs.readFileSync("privateKey.pem", "utf8");
+} catch (error) {
+  console.error("Error loading private key:", error.message);
+  throw new Error("Private key not found. Please ensure privateKey.pem exists in the correct path.");
+}
+console.log(SF_PRIVATE_KEY, "SF_PRIVATE_KEY is ");
 const config = {
   SALESFORCE_AUTH_URL: "https://login.salesforce.com/services/oauth2/token",
   PRIVATE_KEY: SF_PRIVATE_KEY,
@@ -15,10 +19,8 @@ const config = {
   USERNAME: SF_USERNAME,
   ORG_ID: SF_ORG_ID,
 };
-
-// In-memory token storage (consider Redis for production)
+console.log(config, "config is ");
 let accessToken = null;
-let tokenExpiry = null;
 
 const generateJWT = () => {
   const claims = {
@@ -42,16 +44,15 @@ const getNewAccessToken = async () => {
     const response = await axios.post(config.SALESFORCE_AUTH_URL, params);
     console.log(response.data, "response.data is ");
     accessToken = response.data.access_token;
-    tokenExpiry = Date.now() + response.data.expires_in * 1000;
-    console.log(tokenExpiry, "tokenExpiry is ");
     return { accessToken };
   } catch (error) {
-    throw new Error(`Salesforce authentication failed: ${error.message}`);
+    //throw new Error(`Salesforce authentication failed: ${error.message}`);
+    return { error: `Salesforce authentication failed: ${error.message}` };
   }
 };
 
 const getValidToken = async () => {
-  if (!accessToken || !tokenExpiry || Date.now() >= tokenExpiry) {
+  if (!accessToken) {
     await getNewAccessToken();
   }
   return { accessToken };
@@ -59,7 +60,6 @@ const getValidToken = async () => {
 
 const clearToken = () => {
   accessToken = null;
-  tokenExpiry = null;
 };
 
 export const sfauthService = {
