@@ -5,10 +5,10 @@ export const sfauthController = {
     try {
       //   let Payload = request.body;
       //   console.log(Payload, "payload is ");
-      let validationsalsforce = await sfauthService.getValidToken();
-      console.log(validationsalsforce, "validationsalsforce");
-      reply.send(validationsalsforce);
-      return "sfauthController";
+      let validationsalesforce = await sfauthService.getValidToken();
+      console.log(validationsalesforce, "validationsalesforce is ");
+      reply.send({ data: validationsalesforce });
+      //   return "sfauthController";
     } catch (error) {
       return error.message;
     }
