@@ -17,6 +17,10 @@ fastify.register(cors, {
 
 
 fastify.addHook('onRequest', (request, reply, done) => {
+    console.log(request.url);
+    if (request.url === '/') {
+        return done(); // Skip validation for this route
+    }
     console.log(request.headers);
     const apiKey = request.headers['x-api-key'];
     if (!apiKey) {

@@ -7,6 +7,12 @@ export const DocGenRouter = (fastify, options, done) => {
     console.log('Yeah !!!!');
     reply.send('Successfully Worked')
   })
+
+
+  fastify.get('/test', (request, reply) => {
+    console.log('Yeah !!!!');
+    reply.send('Successfully Worked')
+  })
   fastify.post('/api/v1/salesforce', { preHandler: [validateRequestBody(validateSalesforceData)] }, sfvalidationController.sfvalidation)
 
   fastify.post("/v1/gettoken", sfauthController.sfauth);
