@@ -1,15 +1,12 @@
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import fs from "fs";
-import { SF_CLIENT_ID, SF_ORG_ID, SF_USERNAME } from "../config/config";
+import { SF_CLIENT_ID,SF_ORG_ID ,SF_USERNAME} from "../config/config.js";
 
-// const SF_PRIVATE_KEY =
-//   "FF475B4D775DDD62BABB722D4A6C61E4856F860846B6133C5A7064B01AC8537E";
+
+
 const SF_PRIVATE_KEY = fs.readFileSync("privateKey.pem", "utf8");
-// const SF_ORG_ID = "00DWU00000BoiXu";
-// const SF_USERNAME = "cddev@org.com";
-// const SF_CLIENT_ID =
-//   "3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6";
+
 
 const config = {
   SALESFORCE_AUTH_URL: "https://login.salesforce.com/services/oauth2/token",
