@@ -8,7 +8,7 @@
     // "sourceMap": true,
     // "outDir": "build",
     // "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "target": "ES2020",
