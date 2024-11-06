@@ -14,7 +14,7 @@ export const DocGenRouter = (fastify, options, done) => {
   });
 
   fastify.post(
-    "/api/v1/salesforceids",
+    "/api/v1/salesforce/ids",
     {
       schema: sforgclientidswagger,
       preHandler: [validateRequestBody(sforgidclientidvalidation)],
@@ -22,13 +22,14 @@ export const DocGenRouter = (fastify, options, done) => {
     sfvalidationController.sfvalidation
   );
 
-  fastify.post("/api/v1/salesforce/process-document",
+  fastify.post(
+    "/api/v1/salesforce/process-document",
     {
       schema: processDocumentswagger,
       preHandler: [validateRequestBody(sfvalidateuserdata)],
-
     },
-    processDocumentController.processDocument);
+    processDocumentController.processDocument
+  );
 
   fastify.post("/v1/gettoken", sfauthController.sfauth);
 
