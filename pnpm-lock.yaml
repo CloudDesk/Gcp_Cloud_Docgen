@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fastify/cors':
+        specifier: ^10.0.1
+        version: 10.0.1
       '@fastify/jwt':
         specifier: ^9.0.1
         version: 9.0.1
@@ -90,6 +93,9 @@ packages:
 
   '@fastify/ajv-compiler@4.0.1':
     resolution: {integrity: sha512-DxrBdgsjNLP0YM6W5Hd6/Fmj43S8zMKiFJYgi+Ri3htTGAowPVG/tG1wpnWLMjufEnehRivUCKZ1pLDIoZdTuw==}
+
+  '@fastify/cors@10.0.1':
+    resolution: {integrity: sha512-O8JIf6448uQbOgzSkCqhClw6gFTAqrdfeA6R3fc/3gwTJGUp7gl8/3tbNB+6INuu4RmgVOq99BmvdGbtu5pgOA==}
 
   '@fastify/error@4.0.0':
     resolution: {integrity: sha512-OO/SA8As24JtT1usTUTKgGH7uLvhfwZPwlptRi2Dp5P4KKmJI3gvsZ8MIHnNwDs4sLf/aai5LzTyl66xr7qMxA==}
@@ -918,6 +924,11 @@ snapshots:
       ajv-formats: 3.0.1(ajv@8.17.1)
       fast-uri: 3.0.3
 
+  '@fastify/cors@10.0.1':
+    dependencies:
+      fastify-plugin: 5.0.1
+      mnemonist: 0.39.8
+
   '@fastify/error@4.0.0': {}
 
   '@fastify/fast-json-stringify-compiler@5.0.1':
@@ -1377,6 +1388,7 @@ snapshots:
 
   'gcp_cloud_docgen@file:':
     dependencies:
+      '@fastify/cors': 10.0.1
       '@fastify/jwt': 9.0.1
       '@types/node': 22.9.0
       ajv: 8.17.1
