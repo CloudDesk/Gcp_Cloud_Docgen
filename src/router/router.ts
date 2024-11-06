@@ -8,13 +8,13 @@ export const DocGenRouter = (fastify, options, done) => {
     console.log('Yeah !!!!');
     reply.send('Successfully Worked')
   })
-
+console.log('router');
 
   // fastify.post('/api/v1/salesforce', { preHandler: [validateRequestBody(validateSalesforceData)] }, sfvalidationController.sfvalidation)
 
   fastify.post('/api/v1/salesforce',
      {
-    schema: sforgclientidschema,
+     schema: sforgclientidschema,
     preHandler: [validateRequestBody(validateSalesforceData)]
   }, 
   sfvalidationController.sfvalidation);

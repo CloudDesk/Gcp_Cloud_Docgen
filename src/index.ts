@@ -16,8 +16,8 @@ fastify.register(swagger, {
         },
         servers: [
             {
-                // url: 'http://localhost:4350', 
-                url: 'https://docgen-1027746116534.us-central1.run.app',
+                url: 'http://localhost:4350',
+                //url: 'https://docgen-1027746116534.us-central1.run.app',
             },
         ],
         components: {
@@ -38,7 +38,7 @@ fastify.register(swaggerUi, {
     routePrefix: '/docs',
     staticCSP: true,
     transformStaticCSP: (header) => {
-        console.log(JSON.stringify(header) ,'header is ');
+        console.log(JSON.stringify(header), 'header is ');
         return header
     },
     uiConfig: {
@@ -75,14 +75,14 @@ fastify.addHook('onRequest', (request, reply, done) => {
         const error: any = new Error('API key is missing');
         error.statusCode = 401;
         console.error(error)
-        return done(error);
+        return done('API key is missing');
     }
 
     if (apiKey !== API_KEY) {
         const error: any = new Error('Invalid API key provided. Please ensure you are using the correct API key.');
         error.statusCode = 403;
         console.error(error)
-        return done(error);
+        return done('Invalid API key provided. Please ensure you are using the correct API key.');
     }
     else {
         console.log('API key is valid');
