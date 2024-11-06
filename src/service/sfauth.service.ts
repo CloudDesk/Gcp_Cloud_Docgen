@@ -1,15 +1,16 @@
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import fs from "fs";
-import { SF_CLIENT_ID,SF_ORG_ID ,SF_USERNAME} from "../config/config.js";
+import { SF_CLIENT_ID, SF_ORG_ID, SF_USERNAME } from "../config/config.js";
 
-
-let SF_PRIVATE_KEY : string;
+let SF_PRIVATE_KEY: string;
 try {
   SF_PRIVATE_KEY = fs.readFileSync("privateKey.pem", "utf8");
 } catch (error) {
   console.error("Error loading private key:", error.message);
-  throw new Error("Private key not found. Please ensure privateKey.pem exists in the correct path.");
+  throw new Error(
+    "Private key not found. Please ensure privateKey.pem exists in the correct path."
+  );
 }
 const config = {
   SALESFORCE_AUTH_URL: "https://login.salesforce.com/services/oauth2/token",
@@ -19,6 +20,7 @@ const config = {
   ORG_ID: SF_ORG_ID,
 };
 let accessToken = null;
+let instanceUrl = null;
 
 const generateJWT = () => {
   const claims = {
@@ -42,7 +44,8 @@ const getNewAccessToken = async () => {
     const response = await axios.post(config.SALESFORCE_AUTH_URL, params);
     console.log(response.data, "response.data is ");
     accessToken = response.data.access_token;
-    return { accessToken };
+    instanceUrl = response.data.instance_url;
+    return { accessToken, instanceUrl };
   } catch (error) {
     //throw new Error(`Salesforce authentication failed: ${error.message}`);
     return { error: `Salesforce authentication failed: ${error.message}` };
@@ -53,7 +56,7 @@ const getValidToken = async () => {
   if (!accessToken) {
     await getNewAccessToken();
   }
-  return { accessToken };
+  return { accessToken, instanceUrl };
 };
 
 const clearToken = () => {

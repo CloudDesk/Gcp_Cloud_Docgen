@@ -6,6 +6,7 @@ export const sfauthController = {
       //   let Payload = request.body;
       //   console.log(Payload, "payload is ");
       let validationsalesforce = await sfauthService.getValidToken();
+
       console.log(validationsalesforce, "validationsalesforce is ");
       reply.send({ data: validationsalesforce });
       //   return "sfauthController";

@@ -1,3 +1,4 @@
+import { uploadFile } from "./../../uploadpdf.js";
 import { validateRequestBody } from "../ajv/validation.js";
 import { sfvalidationController } from "../controller/sfvalidation.controller.js";
 import { sforgidclientidvalidation } from "../schema/validateSalesforceData.js";
@@ -6,6 +7,7 @@ import { sforgclientidswagger } from "../swager/sforgidclientid.swagger.js";
 import { sfvalidateuserdata } from "../schema/sfuserdatavalidation.js";
 import { processDocumentController } from "../controller/document.controller.js";
 import { processDocumentswagger } from "../swager/processdocument.swager.js";
+import { templateController } from "../controller/template.controller.js";
 
 export const DocGenRouter = (fastify, options, done) => {
   fastify.get("/", (request, reply) => {
@@ -33,5 +35,8 @@ export const DocGenRouter = (fastify, options, done) => {
 
   fastify.post("/v1/gettoken", sfauthController.sfauth);
 
+  fastify.get("/v1/salesforce/gettemplate", {}, templateController.getTemplate);
+
+  fastify.post("/uploadpdf", uploadFile);
   done();
 };
