@@ -1,52 +1,112 @@
-import fastify from 'fastify';
+import Fastify from 'fastify';
 import { DocGenRouter } from './router/router.js';
-import { PORTDOCGEN } from './config/config.js';
+import { API_KEY, PORT } from './config/config.js';
 import cors from "@fastify/cors";
-const Fastify = fastify({ logger: false });
-Fastify.register(DocGenRouter);
-console.log(PORTDOCGEN);
-await Fastify.register(cors, {
-    origin: true, // Allow all origins
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
+const fastify = Fastify({ logger: false });
+fastify.register(swagger, {
+    openapi: {
+        info: {
+            title: 'Doc Gen Api Documentation',
+            description: 'API documentation with API key authentication',
+            version: '1.0.0'
+        },
+        servers: [
+            {
+                // url: 'http://localhost:4350', 
+                url: 'https://docgen-1027746116534.us-central1.run.app',
+            },
+        ],
+        components: {
+            securitySchemes: {
+                ApiKeyAuth: {
+                    type: 'apiKey',
+                    name: 'x-api-key',
+                    in: 'header',
+                    description: 'API key required for protected endpoints.'
+                }
+            }
+        },
+        paths: {}
+    }
+});
+fastify.register(swaggerUi, {
+    routePrefix: '/docs',
+    staticCSP: true,
+    transformStaticCSP: (header) => {
+        console.log(JSON.stringify(header), 'header is ');
+        return header;
+    },
+    uiConfig: {
+        docExpansion: 'full',
+        deepLinking: false,
+        tagsSorter: 'alpha',
+        operationsSorter: 'alpha',
+    },
+});
+fastify.register(DocGenRouter);
+fastify.register(cors, {
+    origin: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     credentials: true,
-    maxAge: 86400, // 24 hours
+    maxAge: 86400,
     exposedHeaders: ["set-cookie"],
 });
-const API_KEY = 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY';
-Fastify.addHook('onRequest', (request, reply, done) => {
+fastify.addHook('onRequest', (request, reply, done) => {
+    console.log(request.url);
+    if (request.url === '/') {
+        return done();
+    }
+    const swaggerRoutes = ['/docs', '/docs/*'];
+    if (swaggerRoutes.some(route => request.url?.startsWith(route))) {
+        return done();
+    }
+    console.log(request.headers);
     const apiKey = request.headers['x-api-key'];
+    if (!apiKey) {
+        const error = new Error('API key is missing');
+        error.statusCode = 401;
+        console.error(error);
+        return done(error);
+    }
     if (apiKey !== API_KEY) {
-        // Log unauthorized access
-        console.error(`Unauthorized access attempt on ${new Date().toISOString()} from IP: ${request.ip}`);
-        reply.code(403).send({ error: 'Forbidden' });
+        const error = new Error('Invalid API key provided. Please ensure you are using the correct API key.');
+        error.statusCode = 403;
+        console.error(error);
+        return done(error);
     }
     else {
+        console.log('API key is valid');
         done();
     }
 });
-Fastify.setErrorHandler((error, request, reply) => {
-    reply.code(error.statusCode || 500).send({ error: error.message });
-});
-// Add 404 handler
-Fastify.setNotFoundHandler((request, reply) => {
-    reply.code(404).send({ error: `Route ${request.url} not found` });
-});
+// fastify.setErrorHandler((error, request, reply) => {
+//     fastify.log.error(error);
+//     const response = {
+//         statusCode: error.statusCode || 500,
+//         error: error.name || 'Internal Server Error',
+//         message: error.message || 'An unexpected error occurred',
+//     };
+//     reply.status(response.statusCode).send(response);
+// });
 const start = async () => {
     try {
-        await Fastify.listen({
-            port: PORTDOCGEN,
+        await fastify.listen({
+            port: PORT,
             host: "0.0.0.0",
             listen: true,
         });
-        console.log(`Server is running on ${Fastify.server.address().port}`);
+        console.log(`Server is running on port ${PORT}`);
     }
     catch (err) {
-        return err;
+        fastify.log.error("Error starting server:", err);
+        process.exit(1);
     }
 };
 start().catch((err) => {
-    console.error("Error starting server:", err);
+    fastify.log.error("Unhandled error starting server:", err);
     process.exit(1);
 });
 //# sourceMappingURL=index.js.map

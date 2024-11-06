@@ -1,7 +1,7 @@
 export const validateSalesforceData = {
     type: 'object',
     properties: {
-        clientid: {
+        clientId: {
             type: 'string',
             pattern: '^[A-Za-z0-9._-]{85}$',
             errorMessage: {
@@ -18,7 +18,7 @@ export const validateSalesforceData = {
             },
         },
     },
-    required: ['clientid', 'orgId'],
+    required: ['clientId', 'orgId'],
     additionalProperties: false,
     errorMessage: {
         required: {

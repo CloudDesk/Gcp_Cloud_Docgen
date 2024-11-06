@@ -11,7 +11,6 @@ try {
   console.error("Error loading private key:", error.message);
   throw new Error("Private key not found. Please ensure privateKey.pem exists in the correct path.");
 }
-console.log(SF_PRIVATE_KEY, "SF_PRIVATE_KEY is ");
 const config = {
   SALESFORCE_AUTH_URL: "https://login.salesforce.com/services/oauth2/token",
   PRIVATE_KEY: SF_PRIVATE_KEY,
@@ -19,7 +18,6 @@ const config = {
   USERNAME: SF_USERNAME,
   ORG_ID: SF_ORG_ID,
 };
-console.log(config, "config is ");
 let accessToken = null;
 
 const generateJWT = () => {
