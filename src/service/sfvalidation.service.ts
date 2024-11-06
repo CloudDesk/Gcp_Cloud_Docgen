@@ -6,7 +6,7 @@ export const sfvalidationService = {
           if(Payload.clientId && Payload.orgId){
             let storeclientidresult = await storeSecret(Payload.clientId, Payload.orgId);  
             console.log(storeclientidresult ,'Store client id result');
-            return { message: 'Success' };
+            return { success: storeclientidresult };
           }else{
             return { error: 'Failed' };
           }

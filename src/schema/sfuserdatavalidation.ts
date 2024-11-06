@@ -1,4 +1,4 @@
-export const sfuservalidationdata = {
+export const sfvalidateuserdata = {
   type: "object",
   properties: {
     orgID: {
@@ -36,7 +36,7 @@ export const sfuservalidationdata = {
     },
     templateURL: {
       type: "string",
-      format: "uri",
+      // format: "uri",
       errorMessage: {
         type: "Template URL must be a string.",
         format: "Template URL must be a valid URL.",

@@ -1,14 +1,20 @@
-export const sforgclientidschema = {
-    description: 'Salesforce validation route that requires an API key',
-    tags: ['Salesforce Org id and Client id validation'],
+export const processDocumentswagger = {
+    description: 'Salesforce Document processing route that requires an API key',
+    tags: ['Salesforce Document processing'],
     security: [{ ApiKeyAuth: [] }],
     body: {
         type: 'object',
         properties: {
-            clientId: { type: 'string' },
-            orgId: { type: 'string' }
+            orgId: { type: 'string' },
+            userName: { type: 'string' },   
+            recordID: { type: 'string' },
+            fileName: { type: 'string' },
+            templateURL: { type: 'string' },
+            fieldData: { type: 'object' 
+            }
+
         },
-        required: ['clientId', 'orgId']
+        required: ['orgID', 'userName','recordID','fileName','templateURL','fieldData']
     },
     response: {
         200: {

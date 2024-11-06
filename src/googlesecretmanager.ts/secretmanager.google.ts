@@ -25,13 +25,13 @@ export async function storeSecret(secretName : string , orgId : string) {
             },
           },
         });
-      } catch (createError) {
-        console.error('Error creating secret:', createError);
-        throw createError;
+      } catch (error) {
+        console.error('Error creating secret:', error);
+       return { error: error };
       }
     } else {
       console.error('Unexpected error:', err);
-      throw err;
+      return { error: err };
     }
   }
 
@@ -46,6 +46,6 @@ export async function storeSecret(secretName : string , orgId : string) {
     return version.name;
   } catch (versionError) {
     console.error('Error storing secret value:', versionError);
-    throw versionError;
+    return { error: versionError };
   }
 }

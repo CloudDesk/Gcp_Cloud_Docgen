@@ -1,9 +1,11 @@
 import { validateRequestBody } from "../ajv/validation.js";
 import { sfvalidationController } from "../controller/sfvalidation.controller.js";
-import { validateSalesforceData } from "../schema/validateSalesforceData.js";
+import { sforgidclientidvalidation } from "../schema/validateSalesforceData.js";
 import { sfauthController } from "../controller/sfauth.controller.js";
-import { sforgclientidschema } from "../swager/sforgidclientid.js";
-import { sfuservalidationdata } from "../schema/sfuserdatavalidation.js";
+import { sforgclientidswagger } from "../swager/sforgidclientid.swagger.js";
+import { sfvalidateuserdata } from "../schema/sfuserdatavalidation.js";
+import { processDocumentController } from "../controller/document.controller.js";
+import { processDocumentswagger } from "../swager/processdocument.swager.js";
 
 export const DocGenRouter = (fastify, options, done) => {
   fastify.get("/", (request, reply) => {
@@ -11,20 +13,22 @@ export const DocGenRouter = (fastify, options, done) => {
     reply.send("Successfully Worked");
   });
 
-  // fastify.post('/api/v1/salesforce', { preHandler: [validateRequestBody(validateSalesforceData)] }, sfvalidationController.sfvalidation)
-
   fastify.post(
-    "/api/v1/salesforce",
+    "/api/v1/salesforceids",
     {
-      schema: sforgclientidschema,
-      preHandler: [validateRequestBody(validateSalesforceData)],
+      schema: sforgclientidswagger,
+      preHandler: [validateRequestBody(sforgidclientidvalidation)],
     },
     sfvalidationController.sfvalidation
   );
 
-  fastify.post("/api/v1/salesforce/process-document", {
-    preHandler: [validateRequestBody(sfuservalidationdata)],
-  });
+  fastify.post("/api/v1/salesforce/process-document",
+    {
+      schema: processDocumentswagger,
+      preHandler: [validateRequestBody(sfvalidateuserdata)],
+
+    },
+    processDocumentController.processDocument);
 
   fastify.post("/v1/gettoken", sfauthController.sfauth);
 

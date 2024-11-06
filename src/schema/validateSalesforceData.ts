@@ -1,4 +1,4 @@
-export const validateSalesforceData = {
+export const sforgidclientidvalidation = {
 type: 'object',
   properties: {
     clientId: {
