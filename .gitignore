@@ -2,3 +2,7 @@
 node_modules
 uploads
 privateKey.pem
+.DS_Store
+*pnpm*
+.vscode/settings.json
+pnpm-lock.yaml
