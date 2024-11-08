@@ -6,13 +6,13 @@ ajvErrors(ajv); // Initialize ajv-errors with the ajv instance
 export const validateRequestBody = (schema) => {
     return async (request, reply) => {
         try {
-            console.log('validation', JSON.stringify(request.body));
+            console.log("validation", JSON.stringify(request.body));
             const valid = ajv.validate(schema, request.body);
             console.log(valid);
-            if (!valid) {
-                console.log(ajv.errors, 'AJV Errors');
-                reply.status(400).send({ error: ajv.errors });
-            }
+            // if (!valid) {
+            //   console.log(ajv.errors, 'AJV Errors');
+            //   reply.status(400).send({ error: ajv.errors });
+            // }
         }
         catch (error) {
             reply.status(500).send(error);

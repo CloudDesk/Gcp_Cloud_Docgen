@@ -1,16 +1,20 @@
-import { sfauthService } from "../service/sfauth.service.js";
-export const sfauthController = {
-    async sfauth(request, reply) {
+import { sfAuthService } from "../service/sf/auth.service.js";
+export const sfAuthController = {
+    /**
+     * Authenticates a user with Salesforce.
+     * @param {string} orgId - The organization ID.
+     * @param {string} userName - The username.
+     * @returns {Promise<Object>} The authentication result.
+     */
+    async authenticate(orgId, userName) {
         try {
-            //   let Payload = request.body;
-            //   console.log(Payload, "payload is ");
-            let validationsalesforce = await sfauthService.getValidToken();
-            console.log(validationsalesforce, "validationsalesforce is ");
-            reply.send({ data: validationsalesforce });
-            //   return "sfauthController";
+            const salesforceToken = await sfAuthService.getAccessToken(orgId, userName);
+            console.log(salesforceToken, "Valid Salesforce token");
+            return { data: salesforceToken };
         }
         catch (error) {
-            return error.message;
+            console.error("Error during Salesforce authentication:", error);
+            return { error: "Internal Server Error" };
         }
     },
 };
