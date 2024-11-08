@@ -1,7 +1,7 @@
 export const sfValidateTemplateData = {
   type: "object",
   properties: {
-    orgID: {
+    orgId: {
       type: "string",
       pattern: "^00D[A-Za-z0-9]{12}(?:[A-Za-z0-9]{3})?$",
       errorMessage: {
@@ -18,7 +18,7 @@ export const sfValidateTemplateData = {
         minLength: "User Name cannot be empty.",
       },
     },
-    recordID: {
+    recordId: {
       type: "string",
       pattern: "^[A-Za-z0-9]{15,18}$",
       errorMessage: {
@@ -34,7 +34,7 @@ export const sfValidateTemplateData = {
         minLength: "File Name cannot be empty.",
       },
     },
-    templateURL: {
+    contentVersionId: {
       type: "string",
       // format: "uri",
       errorMessage: {
@@ -43,21 +43,29 @@ export const sfValidateTemplateData = {
       },
     },
     fieldData: {
-      type: "object",
+      type: "array",
       errorMessage: {
-        type: "Field Data must be an object.",
+        type: "Field Data must be an Array.",
       },
     },
   },
-  required: ["orgID", "userName", "recordID", "fileName", "templateURL"],
+  required: [
+    "orgId",
+    "userName",
+    "recordId",
+    "fileName",
+    "contentVersionId",
+    "fieldData",
+  ],
   additionalProperties: false,
   errorMessage: {
     required: {
-      orgID: "Org ID is required.",
+      orgId: "Org ID is required.",
       userName: "User Name is required.",
-      recordID: "Record ID is required.",
+      recordId: "Record ID is required.",
       fileName: "File Name is required.",
-      templateURL: "Template URL is required.",
+      contentVersionId: "Template URL is required.",
+      fieldData: "Field Data is required.",
     },
   },
 };

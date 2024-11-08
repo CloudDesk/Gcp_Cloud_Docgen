@@ -18,6 +18,7 @@ async function getApiKey() {
 }
 
 const API_KEY = await getApiKey();
+console.log(API_KEY, "API_KEY");
 
 fastify.register(swagger, {
   openapi: {
