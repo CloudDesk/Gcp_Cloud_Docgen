@@ -1,74 +1,161 @@
 import jwt from "jsonwebtoken";
-import axios from "axios";
-import fs from "fs";
-import { SF_CLIENT_ID, SF_ORG_ID, SF_USERNAME } from "../../config/config.js";
+import axios, { AxiosError } from "axios";
+import fs from "fs/promises";
+import path from "path";
+import { getSecretValue } from "../gcp/secretManager.service.js";
 
-const PRIVATE_KEY_PATH = "privateKey.pem";
-const SALESFORCE_AUTH_URL = "https://login.salesforce.com/services/oauth2/token";
-
-let SF_PRIVATE_KEY: string;
-try {
-    SF_PRIVATE_KEY = fs.readFileSync(PRIVATE_KEY_PATH, "utf8");
-} catch (error) {
-    console.error("Error loading private key:", error.message);
-    throw new Error(
-        "Private key not found. Please ensure privateKey.pem exists in the correct path."
-    );
-}
-
-const config = {
-    SALESFORCE_AUTH_URL,
-    PRIVATE_KEY: SF_PRIVATE_KEY,
-    CLIENT_ID: SF_CLIENT_ID,
-    USERNAME: SF_USERNAME,
-    ORG_ID: SF_ORG_ID,
+// Types
+type AuthResult = {
+  accessToken: string | null;
+  instanceUrl: string | null;
+  error?: string;
 };
 
-let accessToken: string | null = null;
-let instanceUrl: string | null = null;
+type SalesforceConfig = {
+  authUrl: string;
+  privateKeyPath: string;
+};
 
-const generateJWT = (): string => {
-    const claims = {
-        iss: config.CLIENT_ID,
-        sub: config.USERNAME,
-        aud: "https://login.salesforce.com",
-        exp: Math.floor(Date.now() / 1000) + 180, // 3 minutes expiry
+// Configuration Template
+const baseConfig: SalesforceConfig = {
+  authUrl: "https://login.salesforce.com/services/oauth2/token",
+  privateKeyPath: path.resolve(
+    process.env.SF_PRIVATE_KEY_PATH || "privateKey.pem"
+  ),
+};
+
+// In-memory storage
+let privateKeyCache: string | null = null;
+let accessTokenCache: string | null = null;
+let instanceUrlCache: string | null = null;
+
+/**
+ * Retrieves clientId for the given orgId from Google Secret Manager.
+ * @param {string} orgId - The organization ID.
+ * @returns {Promise<string>} - The clientId retrieved from Google Secret Manager.
+ */
+const getClientIdFromSecretManager = async (orgId: string): Promise<string> => {
+  console.log(orgId, "orgId from getClientIdFromSecretManager");
+  try {
+    let clientId = await getSecretValue(orgId);
+    if (typeof clientId === "string") {
+      console.log(clientId, "Client ID");
+      return clientId;
+    } else {
+      throw new Error(`Failed to fetch client ID: ${clientId.error}`);
+    }
+  } catch (error) {
+    console.error("Error fetching client ID:", error);
+  }
+};
+
+/**
+ * Loads and caches the private key from the file system.
+ * @returns {Promise<string>} The private key.
+ */
+const loadPrivateKey = async (): Promise<string> => {
+  if (!privateKeyCache) {
+    privateKeyCache = await fs.readFile(baseConfig.privateKeyPath, "utf8");
+  }
+  return privateKeyCache;
+};
+
+/**
+ * Generates a JWT token for Salesforce authentication.
+ * @param {string} privateKey - The private key to sign the JWT.
+ * @param {string} clientId - The client ID for Salesforce.
+ * @returns {string} The generated JWT token.
+ */
+const generateJWT = (
+  privateKey: string,
+  clientId: string,
+  userName: string
+): string => {
+  const claims = {
+    iss: clientId,
+    sub: userName,
+    aud: "https://login.salesforce.com",
+    exp: Math.floor(Date.now() / 1000) + 180, // 3 minutes expiry
+  };
+
+  return jwt.sign(claims, privateKey, { algorithm: "RS256" });
+};
+
+/**
+ * Requests a new access token from Salesforce.
+ * @param {string} orgId - The organization ID.
+ * @returns {Promise<AuthResult>} The authentication result containing the access token and instance URL.
+ */
+const requestNewAccessToken = async (
+  orgId: string,
+  userName: string
+): Promise<AuthResult> => {
+  console.log(orgId, "orgId from requestNewAccessToken");
+  try {
+    const clientId = await getClientIdFromSecretManager(orgId);
+    const privateKey = await loadPrivateKey();
+    const jwtToken = generateJWT(privateKey, clientId, userName);
+    console.log(jwtToken, "generated token");
+    const params = new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwtToken,
+    });
+    console.log(params, "params");
+    const response = await axios.post(baseConfig.authUrl, params);
+    console.log(response.data, "response data");
+    accessTokenCache = response.data.access_token;
+    instanceUrlCache = response.data.instance_url;
+
+    return {
+      accessToken: accessTokenCache,
+      instanceUrl: instanceUrlCache,
     };
+  } catch (error) {
+    // Clear caches on error
+    accessTokenCache = null;
+    instanceUrlCache = null;
 
-    return jwt.sign(claims, config.PRIVATE_KEY, { algorithm: "RS256" });
+    const errorMessage =
+      error instanceof AxiosError
+        ? error.response?.data?.error_description || error.message
+        : "Unknown error occurred";
+
+    return {
+      accessToken: null,
+      instanceUrl: null,
+      error: `Salesforce authentication failed: ${errorMessage}`,
+    };
+  }
 };
 
-const getNewAccessToken = async (): Promise<{ accessToken: string | null; instanceUrl: string | null; error?: string }> => {
-    try {
-        const assertion = generateJWT();
-        const params = new URLSearchParams({
-            grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            assertion,
-        });
+/**
+ * Gets the current access token or requests a new one if needed.
+ * @param {string} orgId - The organization ID.
+ * @returns {Promise<AuthResult>} The authentication result containing the access token and instance URL.
+ */
+const getAccessToken = async (
+  orgId?: string,
+  userName?: string
+): Promise<AuthResult> => {
+  if (!accessTokenCache) {
+    return requestNewAccessToken(orgId, userName);
+  }
 
-        const response = await axios.post(config.SALESFORCE_AUTH_URL, params);
-        accessToken = response.data.access_token;
-        instanceUrl = response.data.instance_url;
-        return { accessToken, instanceUrl };
-    } catch (error) {
-        return { accessToken: null, instanceUrl: null, error: `Salesforce authentication failed: ${error.message}` };
-    }
+  return {
+    accessToken: accessTokenCache,
+    instanceUrl: instanceUrlCache,
+  };
 };
 
-const getValidToken = async (): Promise<{ accessToken: string | null; instanceUrl: string | null; error?: string }> => {
-    if (!accessToken) {
-        return await getNewAccessToken();
-    }
-    return { accessToken, instanceUrl };
+/**
+ * Clears the current access token and instance URL.
+ */
+const clearAccessToken = (): void => {
+  accessTokenCache = null;
+  instanceUrlCache = null;
 };
 
-const clearToken = (): void => {
-    accessToken = null;
-    instanceUrl = null;
-};
-
-export const sfauthService = {
-    getValidToken,
-    clearToken,
-    config,
+export const sfAuthService = {
+  getAccessToken,
+  clearAccessToken,
 };

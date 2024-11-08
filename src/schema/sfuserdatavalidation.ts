@@ -1,4 +1,4 @@
-export const sfvalidateuserdata = {
+export const sfValidateTemplateData = {
   type: "object",
   properties: {
     orgID: {

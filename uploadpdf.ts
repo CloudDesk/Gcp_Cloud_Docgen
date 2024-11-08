@@ -1,71 +1,104 @@
 import axios from "axios";
 import fs from "fs";
-import { sfauthService } from "./src/service/sfauth.service.js";
-
-const auth = await sfauthService.getValidToken();
-console.log(auth, "auth is ");
+import { sfAuthService } from "./src/service/sf/auth.service.js";
 
 const filePath = "templates/sample.pdf";
 const recordId = "001WU00000Tv8bLYAR";
 
-export async function uploadFile() {
+async function getAuthToken() {
+  return await sfAuthService.getAccessToken();
+}
+
+function readFileAsBase64(filePath: string): string {
   const fileContent = fs.readFileSync(filePath);
-  const base64FileContent = fileContent.toString("base64");
-  const fileName = filePath.split("/").pop();
+  return fileContent.toString("base64");
+}
 
-  try {
-    // Step 1: Create the ContentVersion
-    const response = await axios.post(
-      `${auth.instanceUrl}/services/data/v57.0/sobjects/ContentVersion/`,
-      {
-        Title: fileName,
-        PathOnClient: fileName,
-        VersionData: base64FileContent,
+async function createContentVersion(
+  auth: any,
+  base64FileContent: string,
+  fileName: string
+) {
+  const response = await axios.post(
+    `${auth.instanceUrl}/services/data/v57.0/sobjects/ContentVersion/`,
+    {
+      Title: fileName,
+      PathOnClient: fileName,
+      VersionData: base64FileContent,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${auth.accessToken}`,
+        "Content-Type": "application/json",
       },
-      {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    }
+  );
+  return response.data.id;
+}
 
-    // Step 2: Retrieve ContentDocumentId from ContentVersion
-    const contentVersionId = response.data.id;
+async function getContentDocumentId(auth: any, contentVersionId: string) {
+  const response = await axios.get(
+    `${auth.instanceUrl}/services/data/v57.0/sobjects/ContentVersion/${contentVersionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${auth.accessToken}`,
+      },
+    }
+  );
+  return response.data.ContentDocumentId;
+}
+
+async function createContentDocumentLink(
+  auth: any,
+  contentDocumentId: string,
+  recordId: string
+) {
+  const response = await axios.post(
+    `${auth.instanceUrl}/services/data/v57.0/sobjects/ContentDocumentLink/`,
+    {
+      ContentDocumentId: contentDocumentId,
+      LinkedEntityId: recordId,
+      ShareType: "V",
+      Visibility: "AllUsers",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${auth.accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data.id;
+}
+
+export async function uploadFile() {
+  try {
+    const auth = await getAuthToken();
+    console.log(auth, "auth is ");
+
+    const base64FileContent = readFileAsBase64(filePath);
+    const fileName = filePath.split("/").pop();
+
+    const contentVersionId = await createContentVersion(
+      auth,
+      base64FileContent,
+      fileName
+    );
     console.log("ContentVersion ID:", contentVersionId);
 
-    // Fetch the ContentDocumentId associated with the ContentVersion
-    const contentVersionDetails = await axios.get(
-      `${auth.instanceUrl}/services/data/v57.0/sobjects/ContentVersion/${contentVersionId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-        },
-      }
+    const contentDocumentId = await getContentDocumentId(
+      auth,
+      contentVersionId
     );
-
-    const contentDocumentId = contentVersionDetails.data.ContentDocumentId;
     console.log("ContentDocumentId:", contentDocumentId);
 
-    // Step 3: Create the ContentDocumentLink
-    const linkResponse = await axios.post(
-      `${auth.instanceUrl}/services/data/v57.0/sobjects/ContentDocumentLink/`,
-      {
-        ContentDocumentId: contentDocumentId,
-        LinkedEntityId: recordId, // The ID of the record to associate the file with
-        ShareType: "V", // Can be 'V' for Viewer or 'C' for Collaborator
-        Visibility: "AllUsers", // Can be 'AllUsers' or 'InternalUsers'
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
+    const contentDocumentLinkId = await createContentDocumentLink(
+      auth,
+      contentDocumentId,
+      recordId
     );
-
     console.log("File uploaded successfully and linked to record");
-    console.log("ContentDocumentLink ID:", linkResponse.data.id);
+    console.log("ContentDocumentLink ID:", contentDocumentLinkId);
   } catch (error) {
     console.error(
       "Error uploading file:",

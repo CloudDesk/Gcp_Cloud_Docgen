@@ -7,17 +7,12 @@ const secretClient = new SecretManagerServiceClient({
   keyFilename: "docgen-440809-afae407a4dd7.json",
 });
 
-/**
- * Retrieves a secret from Google Secret Manager.
- *
- * @param fullSecretPath - The full path of the secret.
- * @returns The secret object.
- * @throws Will throw an error if the secret is not found or any other error occurs.
- */
 async function getSecret(fullSecretPath: string) {
   console.log(fullSecretPath, "Full secret path");
   try {
-    const [secret] = await secretClient.getSecret({ name: fullSecretPath });
+    const [secret] = await secretClient.getSecret({
+      name: fullSecretPath,
+    });
     console.log(secret, "Secret");
     return secret;
   } catch (err) {
@@ -25,18 +20,11 @@ async function getSecret(fullSecretPath: string) {
   }
 }
 
-/**
- * Creates a new secret in Google Secret Manager.
- *
- * @param parent - The parent resource name.
- * @param secretId - The ID of the secret to create.
- * @throws Will throw an error if the secret creation fails.
- */
-async function createSecret(parent: string, secretId: string) {
+async function createSecret(parent: string, orgId: string) {
   try {
     await secretClient.createSecret({
       parent,
-      secretId,
+      secretId: orgId,
       secret: {
         replication: {
           automatic: {},
@@ -48,20 +36,12 @@ async function createSecret(parent: string, secretId: string) {
   }
 }
 
-/**
- * Adds a new version to an existing secret in Google Secret Manager.
- *
- * @param fullSecretPath - The full path of the secret.
- * @param secretValue - The value of the secret to add.
- * @returns The name of the new secret version.
- * @throws Will throw an error if adding the secret version fails.
- */
-async function addSecretVersion(fullSecretPath: string, secretValue: string) {
+async function addSecretVersion(fullSecretPath: string, secretName: string) {
   try {
     const [version] = await secretClient.addSecretVersion({
       parent: fullSecretPath,
       payload: {
-        data: Buffer.from(secretValue),
+        data: Buffer.from(secretName),
       },
     });
     return version.name;
@@ -77,23 +57,25 @@ async function addSecretVersion(fullSecretPath: string, secretValue: string) {
  * it logs a message indicating so. If the secret does not exist, it creates a new secret and then
  * stores the secret value.
  *
- * @param secretValue - The value of the secret to store.
+ * @param secretName - The name of the secret to store.
  * @param orgId - The ID of the organization for which the secret is being stored.
  * @returns The version name of the stored secret, or an error object if an error occurred.
  */
-export async function storeSecret(secretValue: string, orgId: string) {
+export async function storeSecret(secretName: string, orgId: string) {
   const parent = PROJECT_ID;
   const fullSecretPath = `${parent}/secrets/${orgId}`;
 
   try {
-    await getSecret(fullSecretPath);
+    let secret = await getSecret(fullSecretPath);
+    console.log(secret, "Secret");
     console.log(`Secret for organization ${orgId} already exists.`);
   } catch (err) {
+    console.log(err, "Error");
+    console.log(err.code, "Error code");
     if (err.code === ERROR_CODE_SECRET_NOT_FOUND) {
       console.log(`Creating new secret for organization ${orgId}...`);
       try {
         await createSecret(parent, orgId);
-        return { success: true };
       } catch (error) {
         console.error("Error creating secret:", error);
         return { error: error };
@@ -105,7 +87,7 @@ export async function storeSecret(secretValue: string, orgId: string) {
   }
 
   try {
-    const versionName = await addSecretVersion(fullSecretPath, secretValue);
+    const versionName = await addSecretVersion(fullSecretPath, secretName);
     console.log(`Stored secret for organization ${orgId}`);
     return versionName;
   } catch (versionError) {
@@ -113,7 +95,6 @@ export async function storeSecret(secretValue: string, orgId: string) {
     return { error: versionError };
   }
 }
-
 /**
  * Retrieves and returns the value of a secret from Google Secret Manager.
  *
@@ -121,46 +102,74 @@ export async function storeSecret(secretValue: string, orgId: string) {
  * @returns The value of the secret, or an error object if an error occurred.
  */
 export async function getSecretValue(orgId: string) {
-  const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+  console.log(orgId, "orgId from getSecretValue");
+  console.log("inside getsecretvalue");
+  const parent = PROJECT_ID;
+  const fullSecretPath = `${parent}/secrets/${orgId}/versions/latest`;
 
   try {
     const [accessResponse] = await secretClient.accessSecretVersion({
       name: fullSecretPath,
     });
+    console.log(accessResponse, "Access response");
     const secretPayload = accessResponse.payload?.data?.toString();
+    console.log(secretPayload, "secretPayload");
     return secretPayload;
   } catch (err) {
     console.error("Error accessing secret value:", err);
     return { error: err };
   }
 }
-// Cache for storing secrets to reduce the number of API calls
-const secretCache: { [key: string]: string } = {};
+// import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
-/**
- * Retrieves and returns the value of a secret from the cache or Google Secret Manager.
- *
- * @param orgId - The ID of the organization for which the secret is being retrieved.
- * @returns The value of the secret, or an error object if an error occurred.
- */
-export async function getSecretValueWithCache(orgId: string) {
-  if (secretCache[orgId]) {
-    return secretCache[orgId];
-  }
+// const secretClient = new SecretManagerServiceClient({
+//   keyFilename: "docgen-440809-afae407a4dd7.json",
+// });
 
-  const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+// export async function storeSecret(secretName: string, orgId: string) {
+//   const parent = "projects/docgen-440809";
+//   const fullSecretPath = `${parent}/secrets/${orgId}`;
 
-  try {
-    const [accessResponse] = await secretClient.accessSecretVersion({
-      name: fullSecretPath,
-    });
-    const secretPayload = accessResponse.payload?.data?.toString();
-    if (secretPayload) {
-      secretCache[orgId] = secretPayload;
-    }
-    return secretPayload;
-  } catch (err) {
-    console.error("Error accessing secret value:", err);
-    return { error: err };
-  }
-}
+//   try {
+//     const [secret] = await secretClient.getSecret({
+//       name: fullSecretPath,
+//     });
+//     console.log(`Secret for organization ${orgId} already exists.`);
+//   } catch (err) {
+//     console.log(err);
+//     if (err.code === 5) {
+//       console.log(`Creating new secret for organization ${orgId}...`);
+//       try {
+//         await secretClient.createSecret({
+//           parent,
+//           secretId: orgId,
+//           secret: {
+//             replication: {
+//               automatic: {},
+//             },
+//           },
+//         });
+//       } catch (error) {
+//         console.error("Error creating secret:", error);
+//         return { error: error };
+//       }
+//     } else {
+//       console.error("Unexpected error:", err);
+//       return { error: err };
+//     }
+//   }
+
+//   try {
+//     const [version] = await secretClient.addSecretVersion({
+//       parent: fullSecretPath,
+//       payload: {
+//         data: Buffer.from(secretName),
+//       },
+//     });
+//     console.log(`Stored secret for organization ${orgId}`);
+//     return version.name;
+//   } catch (versionError) {
+//     console.error("Error storing secret value:", versionError);
+//     return { error: versionError };
+//   }
+// }

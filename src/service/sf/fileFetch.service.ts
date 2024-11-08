@@ -2,60 +2,94 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 
-export const templateService = {
-    async downloadAndSaveTemplate(
-        contentVersionId: string,
-        accessToken: string,
-        instanceUrl: string
-    ) {
-        const __dirname = path.resolve();
-        console.log("Instance URL:", instanceUrl);
-        console.log("Access Token:", accessToken);
+export const fileFetchService = {
+  /**
+   * Downloads a template file from Salesforce and saves it locally.
+   * @param contentVersionId - The ID of the content version in Salesforce.
+   * @param accessToken - The access token for Salesforce API.
+   * @param instanceUrl - The base URL of the Salesforce instance.
+   * @returns A promise that resolves to an object indicating success or failure.
+   */
+  async downloadAndSaveTemplate(
+    fileName: string,
+    contentVersionId: string,
+    accessToken: string,
+    instanceUrl: string
+  ) {
+    const __dirname = path.resolve();
+    const apiVersion = "v57.0";
+    const requestUrl = this.constructSalesforceUrl(
+      instanceUrl,
+      apiVersion,
+      contentVersionId
+    );
 
-        try {
-            const apiVersion = "v57.0";
-            const url = this.constructUrl(instanceUrl, apiVersion, contentVersionId);
+    try {
+      const response = await this.fetchFileFromSalesforce(
+        requestUrl,
+        accessToken
+      );
 
-            console.log("Request URL:", url);
+      const filePath = path.join(__dirname, "templates", `${fileName}.docx`);
+      const relativeFilePath = path.join("templates", `${fileName}.docx`);
+      await this.ensureDirectoryExists(filePath);
 
-            const response = await this.fetchFile(url, accessToken);
+      fs.writeFileSync(filePath, response.data);
+      return {
+        success: true,
+        message: "File downloaded and saved as .docx successfully!",
+        relativeFilePath,
+      };
+    } catch (error) {
+      console.error(
+        "Error downloading file:",
+        error.response ? error.response.data : error.message
+      );
+      return {
+        success: false,
+        message: "Failed to download and save the file.",
+      };
+    }
+  },
 
-            console.log(response, "response is ");
-            console.log(response.data, "response.data is ");
+  /**
+   * Constructs the URL for the Salesforce API request.
+   * @param instanceUrl - The base URL of the Salesforce instance.
+   * @param apiVersion - The API version to use.
+   * @param contentVersionId - The ID of the content version in Salesforce.
+   * @returns The constructed URL as a string.
+   */
+  constructSalesforceUrl(
+    instanceUrl: string,
+    apiVersion: string,
+    contentVersionId: string
+  ): string {
+    return `${instanceUrl}/services/data/${apiVersion}/sobjects/ContentVersion/${contentVersionId}/VersionData`;
+  },
 
-            const filePath = path.join(__dirname, "templates", "downloadedTemplate.docx");
-            await this.ensureDirectoryExistence(filePath);
+  /**
+   * Fetches the file from Salesforce using the provided URL and access token.
+   * @param url - The URL to fetch the file from.
+   * @param accessToken - The access token for Salesforce API.
+   * @returns A promise that resolves to the Axios response.
+   */
+  async fetchFileFromSalesforce(url: string, accessToken: string) {
+    return axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      responseType: "arraybuffer",
+    });
+  },
 
-            fs.writeFileSync(filePath, response.data);
-            return {
-                success: true,
-                message: "File downloaded and saved as .docx successfully!",
-            };
-        } catch (error) {
-            console.error(
-                "Error downloading file:",
-                error.response ? error.response.data : error.message
-            );
-        }
-    },
-
-    constructUrl(instanceUrl: string, apiVersion: string, contentVersionId: string): string {
-        return `${instanceUrl}/services/data/${apiVersion}/sobjects/ContentVersion/${contentVersionId}/VersionData`;
-    },
-
-    async fetchFile(url: string, accessToken: string) {
-        return axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-            responseType: "arraybuffer",
-        });
-    },
-
-    async ensureDirectoryExistence(filePath: string) {
-        const dir = path.dirname(filePath);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-    },
+  /**
+   * Ensures that the directory for the given file path exists.
+   * @param filePath - The file path for which to ensure directory existence.
+   */
+  async ensureDirectoryExists(filePath: string) {
+    const directory = path.dirname(filePath);
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
+  },
 };
