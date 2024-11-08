@@ -3,6 +3,8 @@ import { documentController } from "../controller/document.controller.js";
 import { sfCredentialController } from "../controller/sfcredential.controller.js";
 import { sfOrgIdClientIdValidation } from "../schema/validateSalesforceData.js";
 import { sfValidateTemplateData } from "../schema/sfuserdatavalidation.js";
+import { sfOrgClientIdSwagger } from "../swager/sforgidclientid.swagger.js";
+import { processDocumentSwagger } from "../swager/processdocument.swager.js";
 
 export const docGenRouter = (fastify, options, done) => {
   // Root route
@@ -15,7 +17,7 @@ export const docGenRouter = (fastify, options, done) => {
   fastify.post(
     "/api/v1/salesforce/ids",
     {
-      // schema: sfOrgClientIdSwagger,
+      schema: sfOrgClientIdSwagger,
       preHandler: [validateRequestBody(sfOrgIdClientIdValidation)],
     },
     sfCredentialController.validateSalesforceCredentials
@@ -25,7 +27,7 @@ export const docGenRouter = (fastify, options, done) => {
   fastify.post(
     "/api/v1/salesforce/process-document",
     {
-      //schema: processDocumentSwagger,
+      schema: processDocumentSwagger,
       preHandler: [validateRequestBody(sfValidateTemplateData)],
     },
     documentController.processDocument

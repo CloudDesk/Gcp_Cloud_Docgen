@@ -1,11 +1,14 @@
 import Fastify from "fastify";
 import { docGenRouter } from "./router/router.js";
-import { API_KEY, PORT } from "./config/config.js";
+import { PORT } from "./config/config.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
+import { getSecretValue } from "./service/gcp/secretManager.service.js";
 
 const fastify: any = Fastify({ logger: false });
+
+const API_KEY = await getSecretValue("docgen_apikey");
 
 fastify.register(swagger, {
   openapi: {
