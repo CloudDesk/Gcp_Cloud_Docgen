@@ -4,7 +4,7 @@ import { sfAuthService } from "../service/sf/auth.service.js";
  * Controller for Salesforce authentication.
  */
 
-interface sfConn {
+interface SfConn {
   accessToken: string;
   instanceUrl: string;
 }
@@ -18,7 +18,7 @@ export const sfAuthController = {
   async authenticate(
     orgId: string,
     userName: string
-  ): Promise<{ data?: sfConn; error?: string }> {
+  ): Promise<{ data?: SfConn; error?: string }> {
     try {
       const salesforceToken = await sfAuthService.getAccessToken(
         orgId,

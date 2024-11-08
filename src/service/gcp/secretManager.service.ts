@@ -21,7 +21,7 @@ async function getSecret(fullSecretPath: string) {
     console.log(secret, "Secret");
     return secret;
   } catch (err) {
-    throw err;
+    return err;
   }
 }
 
@@ -44,7 +44,7 @@ async function createSecret(parent: string, secretId: string) {
       },
     });
   } catch (error) {
-    throw error;
+    return error;
   }
 }
 
@@ -66,7 +66,7 @@ async function addSecretVersion(fullSecretPath: string, secretValue: string) {
     });
     return version.name;
   } catch (versionError) {
-    throw versionError;
+    return versionError;
   }
 }
 
