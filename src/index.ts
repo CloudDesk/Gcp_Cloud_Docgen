@@ -29,7 +29,7 @@ fastify.register(swagger, {
     },
     servers: [
       {
-        url: "http://localhost:4350",
+        url: "https://docgen-1027746116534.us-central1.run.app",
       },
     ],
     components: {
@@ -89,7 +89,10 @@ fastify.addHook("onRequest", (request, reply, done) => {
         'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
     });
   }
-
+console.log(apiKey , 'api key is');
+console.log(API_KEY , 'api key is 2');
+console.log(apiKey !== API_KEY , 'api key is 3');
+console.log(apiKey === API_KEY , 'api key is 4');
   if (apiKey !== API_KEY) {
     return reply.status(403).send({
       error:

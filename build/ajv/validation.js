@@ -9,10 +9,10 @@ export const validateRequestBody = (schema) => {
             console.log("validation", JSON.stringify(request.body));
             const valid = ajv.validate(schema, request.body);
             console.log(valid);
-            // if (!valid) {
-            //   console.log(ajv.errors, 'AJV Errors');
-            //   reply.status(400).send({ error: ajv.errors });
-            // }
+            if (!valid) {
+                console.log(ajv.errors, "AJV Errors");
+                reply.status(400).send({ error: ajv.errors });
+            }
         }
         catch (error) {
             reply.status(500).send(error);

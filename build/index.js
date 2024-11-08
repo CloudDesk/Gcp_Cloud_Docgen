@@ -25,7 +25,7 @@ fastify.register(swagger, {
         },
         servers: [
             {
-                url: "http://localhost:4350",
+                url: "https://docgen-1027746116534.us-central1.run.app",
             },
         ],
         components: {
