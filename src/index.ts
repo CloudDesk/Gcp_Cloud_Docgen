@@ -6,9 +6,18 @@ import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
 
-const fastify: any = Fastify({ logger: false });
+const fastify = Fastify({ logger: false });
 
-const API_KEY = await getSecretValue("docgen_apikey");
+async function getApiKey() {
+  try {
+    return await getSecretValue("docgen_apikey");
+  } catch (error) {
+    fastify.log.error("Error fetching API key:", error);
+    process.exit(1);
+  }
+}
+
+const API_KEY = await getApiKey();
 
 fastify.register(swagger, {
   openapi: {
@@ -20,7 +29,6 @@ fastify.register(swagger, {
     servers: [
       {
         url: "http://localhost:4350",
-        //url: 'https://docgen-1027746116534.us-central1.run.app',
       },
     ],
     components: {
@@ -51,6 +59,7 @@ fastify.register(swaggerUi, {
     operationsSorter: "alpha",
   },
 });
+
 fastify.register(docGenRouter);
 
 fastify.register(cors, {
@@ -68,52 +77,34 @@ fastify.addHook("onRequest", (request, reply, done) => {
     return done();
   }
   const swaggerRoutes = ["/docs", "/docs/*"];
-  if (
-    swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
-    request.url === "/"
-  ) {
+  if (swaggerRoutes.some((route) => request.url?.startsWith(route))) {
     return done();
   }
   console.log(request.headers);
   const apiKey = request.headers["x-api-key"];
   if (!apiKey) {
-    reply
-      .status(401)
-      .send(
-        'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint'
-      );
+    return reply.status(401).send({
+      error:
+        'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
+    });
   }
 
   if (apiKey !== API_KEY) {
-    reply
-      .status(403)
-      .send(
-        "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route."
-      );
-  } else {
-    console.log("API key is valid");
-    done();
+    return reply.status(403).send({
+      error:
+        "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
+    });
   }
+
+  console.log("API key is valid");
+  done();
 });
-
-// fastify.setErrorHandler((error, request, reply) => {
-//     fastify.log.error(error);
-
-//     const response = {
-//         statusCode: error.statusCode || 500,
-//         error: error.name || 'Internal Server Error',
-//         message: error.message || 'An unexpected error occurred',
-//     };
-
-//     reply.status(response.statusCode).send(response);
-// });
 
 const start = async () => {
   try {
     await fastify.listen({
       port: PORT,
       host: "0.0.0.0",
-      listen: true,
     });
     console.log(`Server is running on port ${PORT}`);
   } catch (err) {

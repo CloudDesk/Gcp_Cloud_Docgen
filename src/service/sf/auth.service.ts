@@ -35,17 +35,17 @@ let instanceUrlCache: string | null = null;
  * @returns {Promise<string>} - The clientId retrieved from Google Secret Manager.
  */
 const getClientIdFromSecretManager = async (orgId: string): Promise<string> => {
-  console.log(orgId, "orgId from getClientIdFromSecretManager");
+  // console.log(orgId, "orgId from getClientIdFromSecretManager");
   try {
     let clientId = await getSecretValue(orgId);
     if (typeof clientId === "string") {
-      console.log(clientId, "Client ID");
+      // console.log(clientId, "Client ID");
       return clientId;
     } else {
       throw new Error(`Failed to fetch client ID: ${clientId.error}`);
     }
   } catch (error) {
-    console.error("Error fetching client ID:", error);
+    throw new Error(`Error fetching client ID: ${error.message}`);
   }
 };
 
@@ -90,19 +90,19 @@ const requestNewAccessToken = async (
   orgId: string,
   userName: string
 ): Promise<AuthResult> => {
-  console.log(orgId, "orgId from requestNewAccessToken");
+  // console.log(orgId, "orgId from requestNewAccessToken");
   try {
     const clientId = await getClientIdFromSecretManager(orgId);
     const privateKey = await loadPrivateKey();
     const jwtToken = generateJWT(privateKey, clientId, userName);
-    console.log(jwtToken, "generated token");
+    // console.log(jwtToken, "generated token");
     const params = new URLSearchParams({
       grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
       assertion: jwtToken,
     });
-    console.log(params, "params");
+    // console.log(params, "params");
     const response = await axios.post(baseConfig.authUrl, params);
-    console.log(response.data, "response data");
+    // console.log(response.data, "response data");
     accessTokenCache = response.data.access_token;
     instanceUrlCache = response.data.instance_url;
 
