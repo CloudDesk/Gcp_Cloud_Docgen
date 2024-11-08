@@ -30,6 +30,7 @@ fastify.register(swagger, {
     servers: [
       {
         url: "https://docgen-1027746116534.us-central1.run.app",
+       // url: "http://localhost:4350",
       },
     ],
     components: {
@@ -50,7 +51,6 @@ fastify.register(swaggerUi, {
   routePrefix: "/docs",
   staticCSP: true,
   transformStaticCSP: (header) => {
-    console.log(JSON.stringify(header), "header is ");
     return header;
   },
   uiConfig: {
@@ -73,15 +73,11 @@ fastify.register(cors, {
 });
 
 fastify.addHook("onRequest", (request, reply, done) => {
-  console.log(request.url);
-  if (request.url === "/") {
-    return done();
-  }
   const swaggerRoutes = ["/docs", "/docs/*"];
-  if (swaggerRoutes.some((route) => request.url?.startsWith(route))) {
+  if (swaggerRoutes.some((route) => request.url?.startsWith(route)) || request.url === "/") {
     return done();
   }
-  console.log(request.headers);
+  console.log(request.headers ,'Headers ');
   const apiKey = request.headers["x-api-key"];
   if (!apiKey) {
     return reply.status(401).send({
@@ -89,10 +85,6 @@ fastify.addHook("onRequest", (request, reply, done) => {
         'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
     });
   }
-console.log(apiKey , 'api key is');
-console.log(API_KEY , 'api key is 2');
-console.log(apiKey !== API_KEY , 'api key is 3');
-console.log(apiKey === API_KEY , 'api key is 4');
   if (apiKey !== API_KEY) {
     return reply.status(403).send({
       error:

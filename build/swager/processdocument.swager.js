@@ -11,7 +11,10 @@ export const processDocumentSwagger = {
             recordId: { type: "string" },
             fileName: { type: "string" },
             contentVersionId: { type: "string" },
-            fieldData: { type: "array" },
+            fieldData: {
+                type: "array",
+                items: { type: "object" },
+            },
         },
         required: [
             "orgId",
@@ -29,11 +32,11 @@ export const processDocumentSwagger = {
             properties: {
                 message: {
                     type: "string",
-                    example: "Salesforce client and organization IDs are validated successfully.",
+                    example: "Document processing successful. Document has been created in Salesforce.",
                 },
             },
         },
-        400: errorResponse("Required Body is missing Or Validation Failed", 'Client ID must be an 85-character alphanumeric string with allowed symbols (.-_) and Org ID must start with "00D" and be 15 or 18 alphanumeric characters.'),
+        400: errorResponse("Required Body is missing Or Validation Failed", 'Error Happend'),
         401: errorResponse("Unauthorized - API key missing or invalid", 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint.'),
         403: errorResponse("Forbidden - Invalid API key", "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route."),
     },
