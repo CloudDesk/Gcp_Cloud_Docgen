@@ -1,8 +1,9 @@
+import { OBJECT, STRING } from "../utils/datatype/datatype.utils.js";
 export const sfOrgIdClientIdValidation = {
-    type: "object",
+    type: OBJECT,
     properties: {
         clientId: {
-            type: "string",
+            type: STRING,
             pattern: "^[A-Za-z0-9._-]{85}$",
             errorMessage: {
                 type: "Client ID must be a string.",
@@ -10,7 +11,7 @@ export const sfOrgIdClientIdValidation = {
             },
         },
         orgId: {
-            type: "string",
+            type: STRING,
             pattern: "^00D[A-Za-z0-9]{12}(?:[A-Za-z0-9]{3})?$",
             errorMessage: {
                 type: "Org ID must be a string.",

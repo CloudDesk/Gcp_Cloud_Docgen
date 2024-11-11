@@ -1,3 +1,4 @@
+import { ARRAY, OBJECT, STRING } from "../utils/datatype/datatype.utils.js";
 // Define reusable error message generators
 const generateErrorMessage = (name, options) => ({
     type: `${name} must be a string.`,
@@ -9,38 +10,38 @@ const generateErrorMessage = (name, options) => ({
 const requiredErrorMessage = (fields) => Object.fromEntries(fields.map((field) => [field, `${field} is required.`]));
 // Schema definition with dynamic defaults
 export const sfValidateTemplateData = {
-    type: "object",
+    type: OBJECT,
     properties: {
         orgId: {
-            type: "string",
+            type: STRING,
             pattern: "^00D[A-Za-z0-9]{12}(?:[A-Za-z0-9]{3})?$",
             errorMessage: generateErrorMessage("Org ID", {
                 pattern: 'start with "00D" and be 15 or 18 alphanumeric characters',
             }),
         },
         userName: {
-            type: "string",
+            type: STRING,
             minLength: 1,
             errorMessage: generateErrorMessage("User Name", { minLength: true }),
         },
         recordId: {
-            type: "string",
+            type: STRING,
             pattern: "^[A-Za-z0-9]{15,18}$",
             errorMessage: generateErrorMessage("Record ID", {
                 pattern: "15 or 18 alphanumeric characters",
             }),
         },
         fileName: {
-            type: "string",
+            type: STRING,
             minLength: 1,
             errorMessage: generateErrorMessage("File Name", { minLength: true }),
         },
         contentVersionId: {
-            type: "string",
+            type: STRING,
             errorMessage: generateErrorMessage("Template URL", { format: "URL" }),
         },
         fieldData: {
-            type: "array",
+            type: ARRAY,
             errorMessage: generateErrorMessage("Field Data", { array: true }),
         },
     },

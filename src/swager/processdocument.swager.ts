@@ -1,3 +1,4 @@
+import { ARRAY, OBJECT, STRING } from "../utils/datatype/datatype.utils.js";
 import { errorResponse } from "./helperMethods/swagger.errorHandler.js";
 
 export const processDocumentSwagger = {
@@ -5,16 +6,16 @@ export const processDocumentSwagger = {
   tags: ["Salesforce Document processing"],
   security: [{ ApiKeyAuth: [] }],
   body: {
-    type: "object",
+    type: OBJECT,
     properties: {
-      orgId: { type: "string" },
-      userName: { type: "string" },
-      recordId: { type: "string" },
-      fileName: { type: "string" },
-      contentVersionId: { type: "string" },
+      orgId: { type: STRING },
+      userName: { type: STRING },
+      recordId: { type: STRING },
+      fileName: { type: STRING },
+      contentVersionId: { type: STRING },
       fieldData: {
-        type: "array",
-        items: { type: "object" },
+        type: ARRAY,
+        items: { type: OBJECT },
       },
     },
     required: [
@@ -29,10 +30,10 @@ export const processDocumentSwagger = {
   response: {
     200: {
       description: "Validation successful",
-      type: "object",
+      type: OBJECT,
       properties: {
         message: {
-          type: "string",
+          type: STRING,
           example:
             "Document processing successful. Document has been created in Salesforce.",
         },
