@@ -1,5 +1,4 @@
-import Fastify from "fastify";
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { fastify,FastifyRequest, FastifyReply} from 'fastify';
 import { docGenRouter } from "./router/router.js";
 import { PORT } from "./config/config.js";
 import cors from "@fastify/cors";
@@ -7,7 +6,7 @@ import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
 
-const fastify = Fastify({ logger: false });
+const Fastify = fastify({ logger: false });
 
 async function getApiKey() {
   try {
@@ -84,39 +83,37 @@ async function apiKeyValidationHook(request: FastifyRequest, reply: FastifyReply
     reply.status(401).send({
       error: 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
     });
-    return;
   }
 
   if (apiKey !== API_KEY) {
     reply.status(403).send({
       error: "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
     });
-    return;
   }
 }
 
 // Register the hook
-fastify.addHook("onRequest", apiKeyValidationHook);
+Fastify.addHook("onRequest", apiKeyValidationHook);
 
-setupSwagger(fastify);
-setupCors(fastify);
+setupSwagger(Fastify);
+setupCors(Fastify);
 
-fastify.register(docGenRouter);
+Fastify.register(docGenRouter);
 
 const start = async () => {
   try {
-    await fastify.listen({
+    await Fastify.listen({
       port: PORT,
       host: "0.0.0.0",
     });
     console.log(`Server is running on port ${PORT}`);
   } catch (err) {
-    fastify.log.error("Error starting server:", err);
+    Fastify.log.error("Error starting server:", err);
     process.exit(1);
   }
 };
 
 start().catch((err) => {
-  fastify.log.error("Unhandled error starting server:", err);
+  Fastify.log.error("Unhandled error starting server:", err);
   process.exit(1);
 });
