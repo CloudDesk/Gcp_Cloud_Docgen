@@ -1,4 +1,4 @@
-import { fastify,FastifyRequest, FastifyReply} from 'fastify';
+import { fastify, FastifyRequest, FastifyReply } from "fastify";
 import { docGenRouter } from "./router/router.js";
 import { PORT } from "./config/config.js";
 import cors from "@fastify/cors";
@@ -18,7 +18,7 @@ async function getApiKey() {
 }
 
 const API_KEY = await getApiKey();
-console.log(API_KEY, "API_KEY");
+// console.log(API_KEY, "API_KEY");
 
 function setupSwagger(fastifyInstance) {
   fastifyInstance.register(swagger, {
@@ -72,22 +72,30 @@ function setupCors(fastifyInstance) {
   });
 }
 
-async function apiKeyValidationHook(request: FastifyRequest, reply: FastifyReply) {
+async function apiKeyValidationHook(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
   const swaggerRoutes = ["/docs", "/docs/*"];
-  if (swaggerRoutes.some((route) => request.url?.startsWith(route)) || request.url === "/") {
+  if (
+    swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
+    request.url === "/"
+  ) {
     return; // Allow requests to Swagger documentation without API key
   }
 
   const apiKey = request.headers["x-api-key"];
   if (!apiKey) {
     reply.status(401).send({
-      error: 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
+      error:
+        'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
     });
   }
 
   if (apiKey !== API_KEY) {
     reply.status(403).send({
-      error: "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
+      error:
+        "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
     });
   }
 }

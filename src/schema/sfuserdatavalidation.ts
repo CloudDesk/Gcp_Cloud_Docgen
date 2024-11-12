@@ -38,8 +38,8 @@ export const sfValidateTemplateData = {
       type: "string",
       // format: "uri",
       errorMessage: {
-        type: "Template URL must be a string.",
-        format: "Template URL must be a valid URL.",
+        type: "ContentVersion Id must be a string.",
+        format: "ContentVersion Id must be a valid URL.",
       },
     },
     fieldData: {
