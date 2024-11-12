@@ -87,7 +87,5 @@ export const processDocumentService = {
       console.error("Failed to upload document to Salesforce", error);
       return { error: "Failed to upload document to Salesforce" };
     }
-
-    return { success: documentData };
   },
 };
