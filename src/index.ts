@@ -30,8 +30,8 @@ function setupSwagger(fastifyInstance) {
       },
       servers: [
         {
-          url: "https://docgen-1027746116534.us-central1.run.app",
-          // url: "http://localhost:4350",
+         // url: "https://docgen-1027746116534.us-central1.run.app",
+           url: "http://localhost:4350",
         },
       ],
       components: {
@@ -85,6 +85,7 @@ async function apiKeyValidationHook(
   }
 
   const apiKey = request.headers["x-api-key"];
+  console.log(apiKey,'apiKey API_KEY');
   if (!apiKey) {
     reply.status(401).send({
       error:
@@ -125,3 +126,5 @@ start().catch((err) => {
   Fastify.log.error("Unhandled error starting server:", err);
   process.exit(1);
 });
+
+export { Fastify };
