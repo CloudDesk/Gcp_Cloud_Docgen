@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
@@ -127,22 +127,14 @@
 <a name='L62'></a><a href='#L62'>62</a>
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -191,68 +183,97 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { OBJECT, STRING,ARRAY } from "../utils/datatype/datatype.utils.js";
-&nbsp;
-// Define reusable error message generators
-const generateErrorMessage = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(n</span>ame: string, options: any) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-  type: `${name} must be a string.`,
-  ...(options.pattern &amp;&amp; { pattern: `${name} must be ${options.pattern}.` }),
-  ...(options.minLength &amp;&amp; { minLength: `${name} cannot be empty.` }),
-  ...(options.format &amp;&amp; { format: `${name} must be a valid ${options.format}.` }),
-  ...(options.array &amp;&amp; { type: `${name} must be an array.` }),
-});
-&nbsp;
-const requiredErrorMessage = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(f</span>ields) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >  Object.fromEntries(fields.map(<span class="fstat-no" title="function not covered" >(f</span>ield) =&gt; <span class="cstat-no" title="statement not covered" >[field, `${field} is required.`])</span>);</span>
-&nbsp;
-// Schema definition with dynamic defaults
-export const sfValidateTemplateData = <span class="cstat-no" title="statement not covered" >{</span>
-  type: OBJECT,
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export const sfValidateTemplateData = <span class="cstat-no" title="statement not covered" >{</span>
+  type: "object",
   properties: {
     orgId: {
-      type: STRING,
+      type: "string",
       pattern: "^00D[A-Za-z0-9]{12}(?:[A-Za-z0-9]{3})?$",
-      errorMessage: generateErrorMessage("Org ID", {
-        pattern: 'start with "00D" and be 15 or 18 alphanumeric characters',
-      }),
+      errorMessage: {
+        type: "Org ID must be a string.",
+        pattern:
+          'Org ID must start with "00D" and be 15 or 18 alphanumeric characters.',
+      },
     },
     userName: {
-      type: STRING,
+      type: "string",
       minLength: 1,
-      errorMessage: generateErrorMessage("User Name", { minLength: true }),
+      errorMessage: {
+        type: "User Name must be a string.",
+        minLength: "User Name cannot be empty.",
+      },
     },
     recordId: {
-      type: STRING,
+      type: "string",
       pattern: "^[A-Za-z0-9]{15,18}$",
-      errorMessage: generateErrorMessage("Record ID", {
-        pattern: "15 or 18 alphanumeric characters",
-      }),
+      errorMessage: {
+        type: "Record ID must be a string.",
+        pattern: "Record ID must be 15 or 18 alphanumeric characters.",
+      },
     },
     fileName: {
-      type: STRING,
+      type: "string",
       minLength: 1,
-      errorMessage: generateErrorMessage("File Name", { minLength: true }),
+      errorMessage: {
+        type: "File Name must be a string.",
+        minLength: "File Name cannot be empty.",
+      },
     },
     contentVersionId: {
-      type: STRING,
-      errorMessage: generateErrorMessage("Template URL", { format: "URL" }),
+      type: "string",
+      // format: "uri",
+      errorMessage: {
+        type: "ContentVersion Id must be a string.",
+        format: "ContentVersion Id must be a valid URL.",
+      },
     },
     fieldData: {
-      type: ARRAY,
-      errorMessage: generateErrorMessage("Field Data", { array: true }),
+      type: "array",
+      errorMessage: {
+        type: "Field Data must be an Array.",
+      },
     },
   },
-  required: ["orgId", "userName", "recordId", "fileName", "contentVersionId", "fieldData"],
+  required: [
+    "orgId",
+    "userName",
+    "recordId",
+    "fileName",
+    "contentVersionId",
+    "fieldData",
+  ],
   additionalProperties: false,
   errorMessage: {
-    required: requiredErrorMessage([
-      "orgId",
-      "userName",
-      "recordId",
-      "fileName",
-      "contentVersionId",
-      "fieldData",
-    ]),
+    required: {
+      orgId: "Org ID is required.",
+      userName: "User Name is required.",
+      recordId: "Record ID is required.",
+      fileName: "File Name is required.",
+      contentVersionId: "Template URL is required.",
+      fieldData: "Field Data is required.",
+    },
   },
 };
 &nbsp;</pre></td></tr></table></pre>
@@ -262,7 +283,7 @@ export const sfValidateTemplateData = <span class="cstat-no" title="statement no
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-12T05:12:37.557Z
+                at 2024-11-12T05:56:23.583Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

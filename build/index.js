@@ -1,4 +1,4 @@
-import { fastify } from 'fastify';
+import { fastify } from "fastify";
 import { docGenRouter } from "./router/router.js";
 import { PORT } from "./config/config.js";
 import cors from "@fastify/cors";
@@ -16,7 +16,7 @@ async function getApiKey() {
     }
 }
 const API_KEY = await getApiKey();
-console.log(API_KEY, "API_KEY");
+// console.log(API_KEY, "API_KEY");
 function setupSwagger(fastifyInstance) {
     fastifyInstance.register(swagger, {
         openapi: {
@@ -27,8 +27,8 @@ function setupSwagger(fastifyInstance) {
             },
             servers: [
                 {
-                    url: "https://docgen-1027746116534.us-central1.run.app",
-                    // url: "http://localhost:4350",
+                    // url: "https://docgen-1027746116534.us-central1.run.app",
+                    url: "http://localhost:4350",
                 },
             ],
             components: {
@@ -68,10 +68,12 @@ function setupCors(fastifyInstance) {
 }
 async function apiKeyValidationHook(request, reply) {
     const swaggerRoutes = ["/docs", "/docs/*"];
-    if (swaggerRoutes.some((route) => request.url?.startsWith(route)) || request.url === "/") {
+    if (swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
+        request.url === "/") {
         return; // Allow requests to Swagger documentation without API key
     }
     const apiKey = request.headers["x-api-key"];
+    console.log(apiKey, 'apiKey API_KEY');
     if (!apiKey) {
         reply.status(401).send({
             error: 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
@@ -105,4 +107,5 @@ start().catch((err) => {
     Fastify.log.error("Unhandled error starting server:", err);
     process.exit(1);
 });
+export { Fastify };
 //# sourceMappingURL=index.js.map
