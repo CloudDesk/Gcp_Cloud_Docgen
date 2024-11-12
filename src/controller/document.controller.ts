@@ -19,7 +19,7 @@ export const documentController = {
       // Check the result and send appropriate response
       if (result.success) {
         console.log("Document processed successfully:", result);
-        return reply.code(200).send(result.success);
+        return reply.code(200).send(result);
       } else {
         console.error("Error processing document:", result.error);
         return reply.code(400).send(result.error);
@@ -27,7 +27,7 @@ export const documentController = {
     } catch (error) {
       // Log the error and rethrow it
       request.log.error("Exception occurred while processing document:", error);
-      throw error;
+      return error;
     }
   },
 };

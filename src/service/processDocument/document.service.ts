@@ -79,6 +79,10 @@ export const processDocumentService = {
       if (uploadResults.every((result) => result.success)) {
         fs.unlinkSync(template.relativeFilePath);
       }
+      return {
+        success: true,
+        message: "Document uploaded to Salesforce successfully",
+      };
     } catch (error) {
       console.error("Failed to upload document to Salesforce", error);
       return { error: "Failed to upload document to Salesforce" };

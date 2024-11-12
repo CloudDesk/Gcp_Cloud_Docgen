@@ -1,64 +1,71 @@
-import { OBJECT, STRING,ARRAY } from "../utils/datatype/datatype.utils.js";
-
-// Define reusable error message generators
-const generateErrorMessage = (name: string, options: any) => ({
-  type: `${name} must be a string.`,
-  ...(options.pattern && { pattern: `${name} must be ${options.pattern}.` }),
-  ...(options.minLength && { minLength: `${name} cannot be empty.` }),
-  ...(options.format && { format: `${name} must be a valid ${options.format}.` }),
-  ...(options.array && { type: `${name} must be an array.` }),
-});
-
-const requiredErrorMessage = (fields) =>
-  Object.fromEntries(fields.map((field) => [field, `${field} is required.`]));
-
-// Schema definition with dynamic defaults
 export const sfValidateTemplateData = {
-  type: OBJECT,
+  type: "object",
   properties: {
     orgId: {
-      type: STRING,
+      type: "string",
       pattern: "^00D[A-Za-z0-9]{12}(?:[A-Za-z0-9]{3})?$",
-      errorMessage: generateErrorMessage("Org ID", {
-        pattern: 'start with "00D" and be 15 or 18 alphanumeric characters',
-      }),
+      errorMessage: {
+        type: "Org ID must be a string.",
+        pattern:
+          'Org ID must start with "00D" and be 15 or 18 alphanumeric characters.',
+      },
     },
     userName: {
-      type: STRING,
+      type: "string",
       minLength: 1,
-      errorMessage: generateErrorMessage("User Name", { minLength: true }),
+      errorMessage: {
+        type: "User Name must be a string.",
+        minLength: "User Name cannot be empty.",
+      },
     },
     recordId: {
-      type: STRING,
+      type: "string",
       pattern: "^[A-Za-z0-9]{15,18}$",
-      errorMessage: generateErrorMessage("Record ID", {
-        pattern: "15 or 18 alphanumeric characters",
-      }),
+      errorMessage: {
+        type: "Record ID must be a string.",
+        pattern: "Record ID must be 15 or 18 alphanumeric characters.",
+      },
     },
     fileName: {
-      type: STRING,
+      type: "string",
       minLength: 1,
-      errorMessage: generateErrorMessage("File Name", { minLength: true }),
+      errorMessage: {
+        type: "File Name must be a string.",
+        minLength: "File Name cannot be empty.",
+      },
     },
     contentVersionId: {
-      type: STRING,
-      errorMessage: generateErrorMessage("Template URL", { format: "URL" }),
+      type: "string",
+      // format: "uri",
+      errorMessage: {
+        type: "Template URL must be a string.",
+        format: "Template URL must be a valid URL.",
+      },
     },
     fieldData: {
-      type: ARRAY,
-      errorMessage: generateErrorMessage("Field Data", { array: true }),
+      type: "array",
+      errorMessage: {
+        type: "Field Data must be an Array.",
+      },
     },
   },
-  required: ["orgId", "userName", "recordId", "fileName", "contentVersionId", "fieldData"],
+  required: [
+    "orgId",
+    "userName",
+    "recordId",
+    "fileName",
+    "contentVersionId",
+    "fieldData",
+  ],
   additionalProperties: false,
   errorMessage: {
-    required: requiredErrorMessage([
-      "orgId",
-      "userName",
-      "recordId",
-      "fileName",
-      "contentVersionId",
-      "fieldData",
-    ]),
+    required: {
+      orgId: "Org ID is required.",
+      userName: "User Name is required.",
+      recordId: "Record ID is required.",
+      fileName: "File Name is required.",
+      contentVersionId: "Template URL is required.",
+      fieldData: "Field Data is required.",
+    },
   },
 };

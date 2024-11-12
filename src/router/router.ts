@@ -24,6 +24,7 @@ export const docGenRouter = (fastify, options, done) => {
   );
 
   // Salesforce process document route
+  // console.log(processDocumentSwagger);
   fastify.post(
     "/api/v1/salesforce/process-document",
     {
