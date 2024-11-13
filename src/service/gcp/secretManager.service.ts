@@ -21,7 +21,8 @@ async function getSecret(fullSecretPath: string) {
     console.log(secret, "Secret");
     return secret;
   } catch (err) {
-    return err;
+    console.log(err.code ,'Error whne getting secret');
+    return err.code;
   }
 }
 
@@ -86,9 +87,19 @@ export async function storeSecret(secretValue: string, orgId: string) {
   const fullSecretPath = `${parent}/secrets/${orgId}`;
 
   try {
-    await getSecret(fullSecretPath);
+   let secretValue =  await getSecret(fullSecretPath);
+   if (secretValue === ERROR_CODE_SECRET_NOT_FOUND) {
+    try {
+      await createSecret(parent, orgId);
+      return { success: true };
+    } catch (error) {
+      console.error("Error creating secret:", error);
+      return { error: error };
+    }
+  }
     console.log(`Secret for organization ${orgId} already exists.`);
   } catch (err) {
+    console.log(err.code ,'ERROR CODE IS ');
     if (err.code === ERROR_CODE_SECRET_NOT_FOUND) {
       console.log(`Creating new secret for organization ${orgId}...`);
       try {
