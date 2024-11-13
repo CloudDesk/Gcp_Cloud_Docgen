@@ -66,6 +66,25 @@ describe('POST /api/v1/salesforce/ids', () => {
 
   });
 
+  it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
+    const requestBody = JSON.stringify({
+      clientId: '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6',
+      orgId: '00DWU00000BoiXu',
+    });
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/salesforce/ids',
+      payload: requestBody,
+      headers: {
+        'Content-Type': 'application/json',  // Ensure Content-Type is set to application/json
+        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+      },
+    });
+    console.log(response, 'Response for salesfroce credentila');
+    expect(response.statusCode).toBe(200);
+
+  });
+
   it('should return 400 for invalid request body', async () => {
     const invalidRequestBody = {
       clientId: 'INVALID_CLIENT_ID',
@@ -168,7 +187,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
 
   });
 
-  it('should validate the Body and process the document Return 401 status code', async () => {
+  it('should validate the Body and process the document Return 400 status code', async () => {
     const requestBody = {
       "orgId": "00DWU00000BoiX",
       "userName": "cddev@org.com",
