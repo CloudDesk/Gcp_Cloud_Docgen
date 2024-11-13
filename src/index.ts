@@ -5,7 +5,7 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
-let PORT_DOCGEN = Number(process.env.PORT) || PORT || 4350;
+let PORT_DOCGEN = 4350;
 const Fastify = fastify({ logger: false });
 
 async function getApiKey() {
