@@ -112,7 +112,7 @@ Fastify.register(docGenRouter);
 const start = async () => {
   try {
     await Fastify.listen({
-      port: PORT,
+      port: PORT || 4350,
       host: "0.0.0.0",
     });
     console.log(`Server is running on port ${PORT}`);
