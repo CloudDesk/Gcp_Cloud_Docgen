@@ -54,7 +54,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       url: '/api/v1/salesforce/ids',
       payload: requestBody,
       headers: {
-        'X-API-KEY': API_KEY,
+        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
       },
     });
 
