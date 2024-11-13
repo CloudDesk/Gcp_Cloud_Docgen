@@ -44,12 +44,9 @@ describe('POST /api/v1/salesforce/ids', () => {
 
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
-    console.log(process.env.SF_CLIENT_ID, 'process.env.SF_CLIENT_ID');
-    console.log(process.env.SF_ORG_ID, 'process.env.SF_ORG_ID');
-    console.log(process.env.API_KEY, 'process.env.API_KEY');
     const requestBody = {
-      clientId: process.env.SF_CLIENT_ID,
-      orgId: process.env.SF_ORG_ID,
+      clientId:'3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6',
+      orgId:'00DWU00000BoiXu',
     };
 
     const response = await fastify.inject({
@@ -57,7 +54,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       url: '/api/v1/salesforce/ids',
       payload: requestBody,
       headers: {
-        'X-API-KEY': process.env.API_KEY,
+        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
       },
     });
 console.log(response ,'Response for salesfroce credentila');
