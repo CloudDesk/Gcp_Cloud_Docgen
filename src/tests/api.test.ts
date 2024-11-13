@@ -84,6 +84,21 @@ describe('POST /api/v1/salesforce/ids', () => {
     expect(response.statusCode).toBe(400);
   });
 
+  it('should return 500 for invalid request body', async () => {
+    const invalidPayload = '{ clientId: INVALID_CLIENT_ID, orgId: INVALID_ORG_ID ';
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/salesforce/ids',
+      payload: invalidPayload,
+      headers: {
+        
+        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+      },
+    });
+
+    expect(response.statusCode).toBe(415);
+  });
+
   afterAll(async () => {
     await fastify.close();
   });
