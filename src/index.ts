@@ -5,7 +5,7 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
-
+let PORT_DOCGEN = Number(process.env.PORT) || PORT || 4350;
 const Fastify = fastify({ logger: false });
 
 async function getApiKey() {
@@ -112,10 +112,10 @@ Fastify.register(docGenRouter);
 const start = async () => {
   try {
     await Fastify.listen({
-      port: PORT || 4350,
+      port: PORT_DOCGEN,
       host: "0.0.0.0",
     });
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT_DOCGEN}`);
   } catch (err) {
     Fastify.log.error("Error starting server:", err);
     process.exit(1);
