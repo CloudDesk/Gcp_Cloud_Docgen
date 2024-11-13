@@ -14,7 +14,7 @@ export const sfCredentialController = {
    * @param request - Fastify request object
    * @param reply - Fastify reply object
    */
-  async validateSalesforceCredentials(
+  async validateAndStoreSalesforceCredentials(
     request: FastifyRequest,
     reply: FastifyReply
   ) {

@@ -7,6 +7,7 @@ const config = {
   testMatch: ['**/tests/**/*.test.ts'],
   collectCoverage: true,
   coverageDirectory: './coverage',
+  coverageReporters: ['lcov', 'text'],
   collectCoverageFrom: [
     'src/**/*.ts',    
     '!src/**/app.ts' 

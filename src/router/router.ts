@@ -20,7 +20,7 @@ export const docGenRouter = (fastify, options, done) => {
       schema: sfOrgClientIdSwagger,
       preHandler: [validateRequestBody(sfOrgIdClientIdValidation)],
     },
-    sfCredentialController.validateSalesforceCredentials
+    sfCredentialController.validateAndStoreSalesforceCredentials
   );
 
   // Salesforce process document route
