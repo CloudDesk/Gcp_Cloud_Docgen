@@ -69,7 +69,7 @@ describe('POST /api/v1/salesforce/ids', () => {
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
       clientId: '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6',
-      orgId: '00DWU00000BoiXz',
+      orgId: '00DKU00000AoiXz',
     };
 
     const response = await fastify.inject({
