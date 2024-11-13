@@ -17,15 +17,24 @@ jobs:
         with:
           fetch-depth: 0  # Ensures the full history for better analysis
 
-      # Step 2: Install dependencies
+      # Step 2: Set environment variables (using GitHub Secrets)
+      - name: Set environment variables
+        run: |
+          echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
+          echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
+          echo "SF_ORG_ID=${{ secrets.SF_ORG_ID }}" >> $GITHUB_ENV
+          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
+          echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
+
+      # Step 3: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 3: Run Jest Tests with Coverage
+      # Step 4: Run Jest Tests with Coverage
       - name: Run Jest Tests
         run: npm test -- --coverage
 
-      # Step 4: Run SonarCloud Scan
+      # Step 5: Run SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
