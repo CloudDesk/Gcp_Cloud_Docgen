@@ -5,9 +5,6 @@ import { sfOrgIdClientIdValidation } from '../schema/validateSalesforceData.js';
 import { sfCredentialController } from '../controller/sfcredential.controller.js';
 import { API_KEY, SF_CLIENT_ID, SF_ORG_ID } from '../config/config.js';
 
-// const API_KEY = process.env.API_KEY;
-// const SF_ORG_ID = process.env.SF_ORG_ID;
-// const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
 
 
 describe('API Endpoints', () => {
