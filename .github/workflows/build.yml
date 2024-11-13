@@ -20,11 +20,18 @@ jobs:
       # Step 2: Set environment variables (using GitHub Secrets)
       - name: Set environment variables
         run: |
-          echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
-          echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
-          echo "SF_ORG_ID=${{ secrets.SF_ORG_ID }}" >> $GITHUB_ENV
-          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
-          echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
+            echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
+        echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
+        echo "SF_ORG_ID=${{ secrets.SF_ORG_ID }}" >> $GITHUB_ENV
+        echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
+        echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
+
+          # Debugging step
+      - name: Print environment variables
+        run: |
+          echo "PORT=$PORT"
+          echo "API_KEY=$API_KEY"
+          echo "SF_ORG_ID=$SF_ORG_ID"
 
       # Step 3: Install dependencies
       - name: Install Dependencies

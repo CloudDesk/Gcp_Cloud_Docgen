@@ -1,9 +1,14 @@
 import Fastify from 'fastify';
-import { API_KEY, SF_CLIENT_ID, SF_ORG_ID } from '../config/config.js';
 import { sfOrgClientIdSwagger } from '../swager/sforgidclientid.swagger.js';
 import { validateRequestBody } from '../ajv/validation.js';
 import { sfOrgIdClientIdValidation } from '../schema/validateSalesforceData.js';
 import { sfCredentialController } from '../controller/sfcredential.controller.js';
+import { API_KEY, SF_CLIENT_ID, SF_ORG_ID } from '../config/config.js';
+
+// const API_KEY = process.env.API_KEY;
+// const SF_ORG_ID = process.env.SF_ORG_ID;
+// const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
+
 
 describe('API Endpoints', () => {
   it('should return 200', async () => {
@@ -45,8 +50,8 @@ describe('POST /api/v1/salesforce/ids', () => {
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
-      clientId:'3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6',
-      orgId:'00DWU00000BoiXu',
+      clientId:SF_CLIENT_ID,
+      orgId:SF_ORG_ID,
     };
 
     const response = await fastify.inject({
@@ -54,7 +59,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       url: '/api/v1/salesforce/ids',
       payload: requestBody,
       headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
 console.log(response ,'Response for salesfroce credentila');
