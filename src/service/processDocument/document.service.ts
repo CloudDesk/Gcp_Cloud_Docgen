@@ -1,6 +1,7 @@
 import fs from "fs";
-import path from "path";
-import { templateController } from "../../controller/fileFetch.controller.js";
+import { fileURLToPath } from 'url';
+
+import path,{dirname} from "path";import { templateController } from "../../controller/fileFetch.controller.js";
 import { sfAuthController } from "../../controller/sfauth.controller.js";
 import { generatePdfsFromTemplate } from "./helperMethods/generateDocument.js";
 import { uploadFile } from "../sf/fileupload2.service.js";
@@ -12,7 +13,9 @@ export const processDocumentService = {
    * @returns {Promise<Object>} - The result of the document generation and upload process.
    */
   async generateDocument(documentData) {
-    const __dirname = path.resolve();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.join(dirname(__filename), '../../../templates');
+    console.log(__dirname, "Current directory path");
     console.log("Starting document generation...");
 
     const { orgId, userName, recordId, fileName, contentVersionId, fieldData } =
@@ -42,8 +45,8 @@ export const processDocumentService = {
       console.error("Failed to fetch template", error);
       return { error: "Failed to fetch template" };
     }
-
-    const templateFilePath = path.join(__dirname, template.relativeFilePath);
+console.log(__dirname, "Current directory path");
+const templateFilePath = path.join(__dirname, '..', template.relativeFilePath);
     console.log(templateFilePath, "Template file path resolved");
 
     // Generate the document from the template

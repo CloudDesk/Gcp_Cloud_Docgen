@@ -1,31 +1,25 @@
-// jest.config.mjs
-
 /** @type {import('jest').Config} */
 const config = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.test.ts'],
-  collectCoverage: true,
-  coverageDirectory: './coverage',
-  coverageReporters: ['lcov', 'text'],
-  collectCoverageFrom: [
-    'src/**/*.ts',    
-    '!src/**/app.ts' 
-  ],
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleFileExtensions: ['ts', 'js'],
   transform: {
-    "^.+\\.ts$": [
-      "ts-jest",
+    '^.+\\.ts$': [
+      'ts-jest',
       {
-        useESM: true // Enable ESM support in ts-jest
-      }
-    ]
+        useESM: true,
+        tsconfig: 'tsconfig.json'
+      },
+    ],
   },
-  moduleFileExtensions: ["ts", "js"],
-  extensionsToTreatAsEsm: [".ts"],
   moduleNameMapper: {
-    "^(\\.{1,2}/.*)\\.js$": "$1" // Map paths to handle TypeScript/ESM resolution
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  testMatch: ['**/tests/**/*.test.ts', '**/__tests__/**/*.ts'],
   testTimeout: 20000,
+  detectOpenHandles: true,
+  forceExit: true
 };
 
 export default config;

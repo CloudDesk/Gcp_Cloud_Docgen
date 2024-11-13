@@ -1,12 +1,16 @@
 import fs from "fs/promises";
-import path from "path";
+import { fileURLToPath } from 'url';
+
+import path,{dirname} from "path";
 import { exec } from "child_process";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import { promisify } from "util";
 
 const execAsync = promisify(exec);
-const __dirname = path.resolve();
+const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
+const __dirname = path.join(dirname(__filename),'../../../../templates');
 
 /**
  * Generates a DOCX file from a template with provided data.
@@ -55,7 +59,7 @@ const convertDocxBufferToPdf = async (
     await fs.writeFile(tempDocxPath, docxBuffer);
 
     await execAsync(
-      `soffice --headless --convert-to pdf ${tempDocxPath} --outdir ${outputDir}`
+      `soffice --headless --convert-to pdf "${tempDocxPath}" --outdir "${outputDir}"`
     );
 
     if (!(await fs.stat(tempPdfPath))) {
@@ -86,8 +90,8 @@ export const generatePdfsFromTemplate = async (
   baseFileName: string
 ): Promise<{ pdfFilePaths: string[] }> => {
   try {
-    const outputDir = path.join(__dirname, "templates");
-
+    const outputDir = path.join(__dirname, '..', "templates");
+console.log(outputDir, "output directory path");
     try {
       await fs.mkdir(outputDir);
     } catch (err) {

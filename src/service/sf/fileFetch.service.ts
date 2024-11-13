@@ -1,7 +1,8 @@
 import axios from "axios";
 import fs from "fs";
-import path from "path";
+import { fileURLToPath } from 'url';
 
+import path,{dirname} from "path";
 export const fileFetchService = {
   /**
    * Downloads a template file from Salesforce and saves it locally.
@@ -16,7 +17,8 @@ export const fileFetchService = {
     accessToken: string,
     instanceUrl: string
   ) {
-    const __dirname = path.resolve();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
     const apiVersion = "v57.0";
     const requestUrl = this.constructSalesforceUrl(
       instanceUrl,
@@ -30,11 +32,14 @@ export const fileFetchService = {
         accessToken
       );
 
-      const filePath = path.join(__dirname, "templates", `${fileName}.docx`);
+      const filePath = path.join(__dirname, "../../../templates", `${fileName}.docx`);
+      console.log(filePath ,'file path data fetched');  
       const relativeFilePath = path.join("templates", `${fileName}.docx`);
+      console.log(relativeFilePath ,'relative file path data fetched');
       await this.ensureDirectoryExists(filePath);
 
       fs.writeFileSync(filePath, response.data);
+      console.log(relativeFilePath ,'relative file path data fetched');
       return {
         success: true,
         message: "File downloaded and saved as .docx successfully!",

@@ -85,6 +85,7 @@ async function apiKeyValidationHook(
 
   const apiKey = request.headers["x-api-key"];
   console.log(apiKey,'apiKey API_KEY');
+  console.log(API_KEY,'API');
   if (!apiKey) {
     reply.status(401).send({
       error:
