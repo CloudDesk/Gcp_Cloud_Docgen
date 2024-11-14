@@ -112,6 +112,7 @@ export async function uploadFile(
   | undefined
 > {
   try {
+    console.log(auth.accessToken, "Access token in uploadFile");  
     const base64FileContent = await readFileAsBase64(filePath);
     const fileName = filePath.split("/").pop() || "unknown";
 

@@ -23,6 +23,7 @@ export const templateController = {
       );
 
       console.log("Template fetched successfully:", templateData);
+    
       return templateData;
     } catch (error) {
       console.error("Error fetching template:", error);

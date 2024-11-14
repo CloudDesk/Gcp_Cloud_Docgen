@@ -149,12 +149,12 @@ describe('POST /api/v1/salesforce/process-document', () => {
 
 
   it('should validate the Body and process the document Return 200 status code', async () => {
-    const requestBody = {
+    const requestBody ={
       "orgId": "00DWU00000BoiXu",
       "userName": "cddev@org.com",
       "recordId": "001WU00000Tv8bLYAR",
       "fileName": "Account",
-      "contentVersionId": "068WU0000059BivYAE",
+      "contentVersionId": "068WU000005J3aPYAS",
       "fieldData": [
           {
               "Account": {
@@ -189,7 +189,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
         'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
       },
     });
-    console.log(response ,'Response for process document');
+    console.log(response.statusCode ,'Response for process document');
     expect(response.statusCode).toBe(200);
 
   });

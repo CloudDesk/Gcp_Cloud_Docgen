@@ -46,6 +46,7 @@ export const fileFetchService = {
         relativeFilePath,
       };
     } catch (error) {
+      console.log('ERROR IS ',error.message);
       console.error(
         "Error downloading file:",
         error.response ? error.response.data : error.message
@@ -79,12 +80,22 @@ export const fileFetchService = {
    * @returns A promise that resolves to the Axios response.
    */
   async fetchFileFromSalesforce(url: string, accessToken: string) {
-    return axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      responseType: "arraybuffer",
-    });
+    console.log(url, 'url data fetched');
+    console.log(accessToken, 'access token data fetched');
+    try {
+      let fetchfiledata =   await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        responseType: "arraybuffer",
+      });
+      console.log(fetchfiledata, 'fetched file data');
+      return fetchfiledata
+    } catch (error) {
+      console.log(error.message, 'error data fetched');
+      return error.message
+    }
+  
   },
 
   /**

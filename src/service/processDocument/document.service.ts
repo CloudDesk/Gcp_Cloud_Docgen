@@ -41,6 +41,9 @@ export const processDocumentService = {
         fileName
       );
       console.log(template, "Template fetched successfully");
+      if(!template.success){
+        return { error: "Failed to fetch template" };
+      }
     } catch (error) {
       console.error("Failed to fetch template", error);
       return { error: "Failed to fetch template" };
