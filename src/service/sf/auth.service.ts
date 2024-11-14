@@ -93,16 +93,18 @@ const requestNewAccessToken = async (
   // console.log(orgId, "orgId from requestNewAccessToken");
   try {
     const clientId = await getClientIdFromSecretManager(orgId);
+    console.log(clientId, "Client ID from requestNewAccessToken");
     const privateKey = await loadPrivateKey();
+    console.log(privateKey, "Private key from requestNewAccessToken");  
     const jwtToken = generateJWT(privateKey, clientId, userName);
-    // console.log(jwtToken, "generated token");
+    console.log(jwtToken, "generated token");
     const params = new URLSearchParams({
       grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
       assertion: jwtToken,
     });
-    // console.log(params, "params");
+    console.log(params, "params");
     const response = await axios.post(baseConfig.authUrl, params);
-    // console.log(response.data, "response data");
+    console.log(response.data, "response data");
     accessTokenCache = response.data.access_token;
     instanceUrlCache = response.data.instance_url;
 
