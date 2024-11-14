@@ -9,11 +9,7 @@
   export const validateRequestBody = (schema: any) => {
     return async (request, reply) => {
       try {
-        if (typeof request.body === "string") {
-          request.body = JSON.parse(request.body);
-        }
-        console.log("Request body validation:", request.body);
-
+        console.log(typeof request.body, "Request body type");
         const valid = ajv.validate(schema, request.body);
         console.log(valid);
         if (!valid) {
