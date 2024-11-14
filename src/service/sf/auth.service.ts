@@ -35,11 +35,11 @@ let instanceUrlCache: string | null = null;
  * @returns {Promise<string>} - The clientId retrieved from Google Secret Manager.
  */
 const getClientIdFromSecretManager = async (orgId: string): Promise<string> => {
-  // console.log(orgId, "orgId from getClientIdFromSecretManager");
+  console.log(orgId, "orgId from getClientIdFromSecretManager");
   try {
     let clientId = await getSecretValue(orgId);
     if (typeof clientId === "string") {
-      // console.log(clientId, "Client ID");
+      console.log(clientId, "Client ID");
       return clientId;
     } else {
       throw new Error(`Failed to fetch client ID: ${clientId.error}`);
@@ -56,6 +56,9 @@ const getClientIdFromSecretManager = async (orgId: string): Promise<string> => {
 const loadPrivateKey = async (): Promise<string> => {
   if (!privateKeyCache) {
     privateKeyCache = await fs.readFile(baseConfig.privateKeyPath, "utf8");
+    console.log(privateKeyCache,"Loading private key from file system");
+  } else {
+    console.log("Using cached private key");
   }
   return privateKeyCache;
 };
@@ -92,6 +95,7 @@ const requestNewAccessToken = async (
 ): Promise<AuthResult> => {
   // console.log(orgId, "orgId from requestNewAccessToken");
   try {
+    console.log("inside requestNewAccessToken");
     const clientId = await getClientIdFromSecretManager(orgId);
     console.log(clientId, "Client ID from requestNewAccessToken");
     const privateKey = await loadPrivateKey();
@@ -140,6 +144,7 @@ const getAccessToken = async (
   userName?: string
 ): Promise<AuthResult> => {
   if (!accessTokenCache) {
+    console.log("inside !accessTokenCache");
     return requestNewAccessToken(orgId, userName);
   }
 
