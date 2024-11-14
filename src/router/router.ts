@@ -20,7 +20,7 @@ export const docGenRouter = (fastify, options, done) => {
 
   // Salesforce ID validation route
   fastify.post(
-    "/api/v1/salesforce/ids",
+    "/api/v1/salesforce/store-credentials",
     {
       schema: sfOrgClientIdSwagger,
       preHandler: [validateRequestBody(sfOrgIdClientIdValidation)],

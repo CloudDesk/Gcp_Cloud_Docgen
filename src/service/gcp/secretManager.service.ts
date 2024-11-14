@@ -7,7 +7,6 @@ const secretClient = new SecretManagerServiceClient({
   keyFilename: "docgen-440809-afae407a4dd7.json",
 });
 
-
 /**
  * Retrieves a secret from Google Secret Manager.
  *
@@ -22,7 +21,7 @@ async function getSecret(fullSecretPath: string) {
     console.log(secret, "Secret");
     return secret;
   } catch (err) {
-    console.log(err.code ,'Error whne getting secret');
+    console.log(err.code, "Error whne getting secret");
     return err.code;
   }
 }
@@ -83,45 +82,78 @@ async function addSecretVersion(fullSecretPath: string, secretValue: string) {
  * @param orgId - The ID of the organization for which the secret is being stored.
  * @returns The version name of the stored secret, or an error object if an error occurred.
  */
+// export async function storeSecret(secretValue: string, orgId: string) {
+//   const parent = PROJECT_ID;
+//   const fullSecretPath = `${parent}/secrets/${orgId}`;
+
+//   try {
+//    let secretValue =  await getSecret(fullSecretPath);
+//    if (secretValue === ERROR_CODE_SECRET_NOT_FOUND) {
+//     try {
+//       await createSecret(parent, orgId);
+//       return { success: true };
+//     } catch (error) {
+//       console.error("Error creating secret:", error);
+//       return { error: error };
+//     }
+//   }
+//     console.log(`Secret for organization ${orgId} already exists.`);
+//   } catch (err) {
+//     console.log(err.code ,'ERROR CODE IS ');
+//     if (err.code === ERROR_CODE_SECRET_NOT_FOUND) {
+//       console.log(`Creating new secret for organization ${orgId}...`);
+//       try {
+//         await createSecret(parent, orgId);
+//         return { success: true };
+//       } catch (error) {
+//         console.error("Error creating secret:", error);
+//         return { error: error };
+//       }
+//     } else {
+//       console.error("Unexpected error:", err);
+//       return { error: err };
+//     }
+//   }
+
+//   try {
+//     const versionName = await addSecretVersion(fullSecretPath, secretValue);
+//     console.log(`Stored secret for organization ${orgId}`);
+//     return versionName;
+//   } catch (versionError) {
+//     console.error("Error storing secret value:", versionError);
+//     return { error: versionError };
+//   }
+// }
+
 export async function storeSecret(secretValue: string, orgId: string) {
   const parent = PROJECT_ID;
   const fullSecretPath = `${parent}/secrets/${orgId}`;
 
   try {
-   let secretValue =  await getSecret(fullSecretPath);
-   if (secretValue === ERROR_CODE_SECRET_NOT_FOUND) {
-    try {
-      await createSecret(parent, orgId);
-      return { success: true };
-    } catch (error) {
-      console.error("Error creating secret:", error);
-      return { error: error };
-    }
-  }
-    console.log(`Secret for organization ${orgId} already exists.`);
-  } catch (err) {
-    console.log(err.code ,'ERROR CODE IS ');
-    if (err.code === ERROR_CODE_SECRET_NOT_FOUND) {
+    const existingSecret = await getSecret(fullSecretPath);
+    if (existingSecret === ERROR_CODE_SECRET_NOT_FOUND) {
       console.log(`Creating new secret for organization ${orgId}...`);
       try {
         await createSecret(parent, orgId);
-        return { success: true };
+        console.log(`Secret created for organization ${orgId}`);
       } catch (error) {
         console.error("Error creating secret:", error);
-        return { error: error };
+        return { error };
       }
     } else {
-      console.error("Unexpected error:", err);
-      return { error: err };
+      console.log(`Secret for organization ${orgId} already exists.`);
     }
+  } catch (err) {
+    console.error("Error checking secret existence:", err);
+    return { error: err };
   }
 
   try {
     const versionName = await addSecretVersion(fullSecretPath, secretValue);
-    console.log(`Stored secret for organization ${orgId}`);
-    return versionName;
+    console.log(`Stored secret version for organization ${orgId}`);
+    return { success: true, versionName };
   } catch (versionError) {
-    console.error("Error storing secret value:", versionError);
+    console.error("Error storing secret version:", versionError);
     return { error: versionError };
   }
 }
