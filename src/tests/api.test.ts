@@ -72,27 +72,6 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
   });
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
-    const requestBody = JSON.stringify({
-      clientId: SF_CLIENT_ID,
-      orgId: SF_ORG_ID,
-    });
-    console.log(typeof requestBody, 'requestBody TEsting data jfdsk');
-    const response = await fastify.inject({
-      method: 'POST',
-      url: '/api/v1/salesforce/store-credentials',
-      payload: requestBody,
-      headers: {
-        'X-API-KEY': API_KEY,
-        'Content-Type': 'text/plain',
-      },
-      parsebody: false,
-    });
-    console.log(response, 'Response for stringify credentila');
-    expect(response.statusCode).toBe(200);
-
-  });
-
-  it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
       clientId: SF_CLIENT_ID,
       orgId: SF_ORG_ID,
