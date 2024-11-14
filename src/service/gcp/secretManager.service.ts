@@ -166,11 +166,12 @@ export async function storeSecret(secretValue: string, orgId: string) {
  */
 export async function getSecretValue(orgId: string) {
   const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
-
+console.log(fullSecretPath ,'full secret path')
   try {
     const [accessResponse] = await secretClient.accessSecretVersion({
       name: fullSecretPath,
     });
+    console.log(accessResponse ,'access response')
     const secretPayload = accessResponse.payload?.data?.toString();
     return secretPayload;
   } catch (err) {
