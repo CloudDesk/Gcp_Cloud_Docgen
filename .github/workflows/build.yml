@@ -26,15 +26,21 @@ jobs:
           echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
           echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
 
-      # Step 3: Install dependencies
+      # Step 3: Create GCP credentials file
+      - name: Create GCP credentials file
+        run: |
+          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > "$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json" >> $GITHUB_ENV
+
+      # Step 4: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 4: Run Jest Tests with Coverage
+      # Step 5: Run Jest Tests with Coverage
       - name: Run Jest Tests
         run: npm test -- --coverage
 
-      # Step 5: Run SonarCloud Scan
+      # Step 6: Run SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
