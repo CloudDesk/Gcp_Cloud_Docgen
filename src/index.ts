@@ -6,7 +6,6 @@ import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
 const Fastify = fastify({ logger: false });
-let API_KEY: any | null = null;
 
 async function getApiKey() {
   try {
@@ -17,7 +16,7 @@ async function getApiKey() {
   }
 }
 
- API_KEY = await getApiKey();
+ const API_KEY = await getApiKey();
 // console.log(API_KEY, "API_KEY");
 
 function setupSwagger(fastifyInstance) {
@@ -30,7 +29,7 @@ function setupSwagger(fastifyInstance) {
       },
       servers: [
         {
-         // url: "https://docgen-1027746116534.us-central1.run.app",
+          //url: "https://docgen-1027746116534.us-central1.run.app",
            url: "http://localhost:4350",
         },
       ],

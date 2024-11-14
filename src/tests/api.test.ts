@@ -35,14 +35,14 @@ describe('API Endpoints', () => {
 });
 
 
-describe('POST /api/v1/salesforce/ids', () => {
+describe('POST /api/v1/salesforce/store-credentials', () => {
   let fastify : any;
 
   beforeAll(() => {
     fastify = Fastify();
 
     fastify.post(
-      '/api/v1/salesforce/ids',
+      '/api/v1/salesforce/store-credentials',
       {
         schema: sfOrgClientIdSwagger,
         preHandler: [validateRequestBody(sfOrgIdClientIdValidation)],
@@ -60,7 +60,7 @@ describe('POST /api/v1/salesforce/ids', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/api/v1/salesforce/ids',
+      url: '/api/v1/salesforce/store-credentials',
       payload: requestBody,
       headers: {
         'X-API-KEY': API_KEY,
@@ -79,7 +79,7 @@ describe('POST /api/v1/salesforce/ids', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/api/v1/salesforce/ids',
+      url: '/api/v1/salesforce/store-credentials',
       payload: requestBody,
       headers: {
         'X-API-KEY': API_KEY,
@@ -97,7 +97,7 @@ describe('POST /api/v1/salesforce/ids', () => {
     });
     const response = await fastify.inject({
       method: 'POST',
-      url: '/api/v1/salesforce/ids',
+      url: '/api/v1/salesforce/store-credentials',
       payload: requestBody,
       headers: {
         'Content-Type': 'application/json',  // Ensure Content-Type is set to application/json
@@ -117,7 +117,7 @@ describe('POST /api/v1/salesforce/ids', () => {
 
     const response = await fastify.inject({
       method: 'POST',
-      url: '/api/v1/salesforce/ids',
+      url: '/api/v1/salesforce/store-credentials',
       payload: invalidRequestBody,
       headers: {
         'X-API-KEY': API_KEY,
@@ -131,7 +131,7 @@ describe('POST /api/v1/salesforce/ids', () => {
     const invalidPayload = '{ clientId: INVALID_CLIENT_ID, orgId: INVALID_ORG_ID ';
     const response = await fastify.inject({
       method: 'POST',
-      url: '/api/v1/salesforce/ids',
+      url: '/api/v1/salesforce/store-credentials',
       payload: invalidPayload,
       headers: {
         
