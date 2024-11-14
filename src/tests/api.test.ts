@@ -6,9 +6,11 @@ import { sfCredentialController } from '../controller/sfcredential.controller.js
 import { processDocumentSwagger } from '../swager/processdocument.swager.js';
 import { sfValidateTemplateData } from '../schema/sfuserdatavalidation.js';
 import { documentController } from '../controller/document.controller.js';
-
-
-
+import dotenv from 'dotenv';
+dotenv.config();
+const API_KEY = process.env.API_KEY;
+const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
+const SF_ORG_ID = process.env.SF_ORG_ID;
 describe('API Endpoints', () => {
   it('should return 200', async () => {
     const fastify = Fastify();
@@ -49,8 +51,8 @@ describe('POST /api/v1/salesforce/ids', () => {
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
-      clientId: '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6',
-      orgId: '00DWU00000BoiXu',
+      clientId: SF_CLIENT_ID,
+      orgId: SF_ORG_ID,
     };
 
     const response = await fastify.inject({
@@ -58,7 +60,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       url: '/api/v1/salesforce/ids',
       payload: requestBody,
       headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
     console.log(response, 'Response for salesfroce credentila');
@@ -68,8 +70,8 @@ describe('POST /api/v1/salesforce/ids', () => {
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
-      clientId: '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6',
-      orgId: '00DKU00000AoiXz',
+      clientId: SF_CLIENT_ID,
+      orgId: SF_ORG_ID,
     };
 
     const response = await fastify.inject({
@@ -77,7 +79,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       url: '/api/v1/salesforce/ids',
       payload: requestBody,
       headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
     console.log(response, 'Response for salesfroce credentila');
@@ -87,8 +89,8 @@ describe('POST /api/v1/salesforce/ids', () => {
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = JSON.stringify({
-      clientId: '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6',
-      orgId: '00DWU00000BoiXu',
+      clientId: SF_CLIENT_ID,
+      orgId: SF_ORG_ID,
     });
     const response = await fastify.inject({
       method: 'POST',
@@ -96,7 +98,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       payload: requestBody,
       headers: {
         'Content-Type': 'application/json',  // Ensure Content-Type is set to application/json
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
     console.log(response, 'Response for salesfroce credentila');
@@ -115,7 +117,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       url: '/api/v1/salesforce/ids',
       payload: invalidRequestBody,
       headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
 
@@ -130,7 +132,7 @@ describe('POST /api/v1/salesforce/ids', () => {
       payload: invalidPayload,
       headers: {
         
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
 
