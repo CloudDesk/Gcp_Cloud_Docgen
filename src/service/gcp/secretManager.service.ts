@@ -165,13 +165,13 @@ export async function storeSecret(secretValue: string, orgId: string) {
  * @returns The value of the secret, or an error object if an error occurred.
  */
 export async function getSecretValue(orgId: string) {
-  const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
 console.log(fullSecretPath ,'full secret path')
   try {
     const [accessResponse] = await secretClient.accessSecretVersion({
       name: fullSecretPath,
     });
-    console.log(accessResponse ,'access response')
+     console.log(accessResponse ,'access response')
     const secretPayload = accessResponse.payload?.data?.toString();
     return secretPayload;
   } catch (err) {
