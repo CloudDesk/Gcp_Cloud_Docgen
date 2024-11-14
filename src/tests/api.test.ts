@@ -11,6 +11,9 @@ dotenv.config();
 const API_KEY = process.env.API_KEY;
 const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
 const SF_ORG_ID = process.env.SF_ORG_ID;
+console.log(API_KEY  ,'process env api key');
+console.log(SF_CLIENT_ID ,'process env client id');
+console.log(SF_ORG_ID ,'process env org id');
 describe('API Endpoints', () => {
   it('should return 200', async () => {
     const fastify = Fastify();
