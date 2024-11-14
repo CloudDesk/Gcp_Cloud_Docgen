@@ -7,6 +7,7 @@ const secretClient = new SecretManagerServiceClient({
   keyFilename: "docgen-440809-afae407a4dd7.json",
 });
 
+
 /**
  * Retrieves a secret from Google Secret Manager.
  *
