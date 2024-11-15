@@ -150,7 +150,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
 
   it('should validate the Body and process the document Return 200 status code', async () => {
     const requestBody ={
-      "orgId": "00DWU00000BoiXu",
+      "orgId": "00DSS00000BoiXu",
       "userName": "cddev@org.com",
       "recordId": "001WU00000Tv8bLYAR",
       "fileName": "Account",

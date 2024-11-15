@@ -166,7 +166,7 @@ export async function storeSecret(secretValue: string, orgId: string) {
  */
 export async function getSecretValue(orgId: string) {
 const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
-console.log(fullSecretPath ,'full secret path')
+console.log(fullSecretPath ,'full secret path updated')
   try {
     const [accessResponse] = await secretClient.accessSecretVersion({
       name: fullSecretPath,
