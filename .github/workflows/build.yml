@@ -30,8 +30,8 @@ jobs:
       # Step 3: Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
         run: |
-          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > gcp-credentials.json
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/gcp-credentials.json" >> $GITHUB_ENV
+             echo "${{ secrets.GCP_CREDENTIALS }}" > gcp-credentials.json
+             echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/gcp-credentials.json" >> $GITHUB_ENV
 
       # Step 4: Install dependencies
       - name: Install Dependencies
