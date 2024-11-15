@@ -166,16 +166,45 @@ export async function storeSecret(secretValue: string, orgId: string) {
  * @param orgId - The ID of the organization for which the secret is being retrieved.
  * @returns The value of the secret, or an error object if an error occurred.
  */
+// export async function getSecretValue(orgId: string) {
+// const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+// console.log(fullSecretPath ,'full secret path updated')
+//   try {
+//     const [accessResponse] = await secretClient.accessSecretVersion({
+//       name: fullSecretPath,
+//     });
+//      console.log(accessResponse ,'access response')
+//     const secretPayload = accessResponse.payload?.data?.toString();
+//     return secretPayload;
+//   } catch (err) {
+//     console.error("Error accessing secret value:", err);
+//     return { error: err };
+//   }
+// }
+
+
 export async function getSecretValue(orgId: string) {
-const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
-console.log(fullSecretPath ,'full secret path updated')
+  const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+  console.log(fullSecretPath, 'full secret path updated');
+
   try {
+    // Access the secret version
     const [accessResponse] = await secretClient.accessSecretVersion({
       name: fullSecretPath,
     });
-     console.log(accessResponse ,'access response')
+    console.log('Access Response:', accessResponse);
+
+    // Extract the secret payload (raw data)
     const secretPayload = accessResponse.payload?.data?.toString();
-    return secretPayload;
+    console.log('Raw secret value:', secretPayload); // Log the raw secret value to inspect
+
+    // Try parsing as JSON if expected
+    try {
+      return JSON.parse(secretPayload); // Parse JSON if it’s in JSON format
+    } catch (jsonError) {
+      console.error('Error parsing JSON:', jsonError);
+      return secretPayload; // Return plain text if not JSON
+    }
   } catch (err) {
     console.error("Error accessing secret value:", err);
     return { error: err };
