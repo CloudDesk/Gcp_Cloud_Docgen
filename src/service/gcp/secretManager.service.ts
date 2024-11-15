@@ -187,6 +187,9 @@ export async function storeSecret(secretValue: string, orgId: string) {
 
 export async function getSecretValue(orgId: string) {
   const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+  console.log("Raw GCP_CREDENTIALS:", process.env.GCP_CREDENTIALS);
+  const credentials = JSON.parse(process.env.GCP_CREDENTIALS);
+console.log(credentials ,'cREDENTIALS ')
   console.log(fullSecretPath, 'full secret path updated');
 
   try {
