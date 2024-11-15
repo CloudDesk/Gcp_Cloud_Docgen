@@ -188,8 +188,13 @@ export async function storeSecret(secretValue: string, orgId: string) {
 export async function getSecretValue(orgId: string) {
   const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
   console.log("Raw GCP_CREDENTIALS:", process.env.GCP_CREDENTIALS);
-  const credentials = JSON.parse(process.env.GCP_CREDENTIALS);
-console.log(credentials ,'cREDENTIALS ')
+  try {
+    const credentials = JSON.parse(process.env.GCP_CREDENTIALS);
+    console.log(credentials ,'cREDENTIALS ')
+  } catch (error) {
+    console.log(error.message, 'cREDENTIALS Error message');
+  }
+
   console.log(fullSecretPath, 'full secret path updated');
 
   try {
