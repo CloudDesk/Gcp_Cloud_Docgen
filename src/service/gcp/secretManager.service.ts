@@ -2,6 +2,8 @@ import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
+import dotenv from 'dotenv';
+dotenv.config();
 
 // const secretClient = new SecretManagerServiceClient({
 //   keyFilename: "docgen-440809-afae407a4dd7.json",
