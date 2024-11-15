@@ -1,10 +1,11 @@
 import fs from "fs";
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 
-import path,{dirname} from "path";import { templateController } from "../../controller/fileFetch.controller.js";
-import { sfAuthController } from "../../controller/sfauth.controller.js";
+import path, { dirname } from "path";
 import { generatePdfsFromTemplate } from "./helperMethods/generateDocument.js";
 import { uploadFile } from "../sf/fileupload2.service.js";
+import { sfAuthService } from "../sf/auth.service.js";
+import { fileFetchService } from "../sf/fileFetch.service.js";
 
 export const processDocumentService = {
   /**
@@ -14,7 +15,7 @@ export const processDocumentService = {
    */
   async generateDocument(documentData) {
     const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.join(dirname(__filename), '../../../templates');
+    const __dirname = path.join(dirname(__filename), "../../../templates");
     console.log(__dirname, "Current directory path");
     console.log("Starting document generation...");
 
@@ -25,7 +26,8 @@ export const processDocumentService = {
     // Authenticate with Salesforce
     let sfConn;
     try {
-      sfConn = await sfAuthController.authenticate(orgId, userName);
+      // sfConn = await sfAuthController.authenticate(orgId, userName);
+      sfConn = await sfAuthService.getAccessToken(orgId, userName);
       console.log(sfConn, "Salesforce connection established");
     } catch (error) {
       console.error("Salesforce authentication failed", error);
@@ -35,21 +37,31 @@ export const processDocumentService = {
     // Fetch the template from Salesforce
     let template;
     try {
-      template = await templateController.fetchTemplate(
-        sfConn.data,
+      // template = await templateController.fetchTemplate(
+      //   sfConn.data,
+      //   contentVersionId,
+      //   fileName
+      // );
+      template = await fileFetchService.downloadAndSaveTemplate(
+        fileName,
         contentVersionId,
-        fileName
+        sfConn.accessToken,
+        sfConn.instanceUrl
       );
       console.log(template, "Template fetched successfully");
-      if(!template.success){
+      if (!template.success) {
         return { error: "Failed to fetch template" };
       }
     } catch (error) {
       console.error("Failed to fetch template", error);
       return { error: "Failed to fetch template" };
     }
-console.log(__dirname, "Current directory path");
-const templateFilePath = path.join(__dirname, '..', template.relativeFilePath);
+    console.log(__dirname, "Current directory path");
+    const templateFilePath = path.join(
+      __dirname,
+      "..",
+      template.relativeFilePath
+    );
     console.log(templateFilePath, "Template file path resolved");
 
     // Generate the document from the template
@@ -70,7 +82,7 @@ const templateFilePath = path.join(__dirname, '..', template.relativeFilePath);
     try {
       const uploadResults = await Promise.all(
         generatedDocument.pdfFilePaths.map((filePath: string) =>
-          uploadFile(sfConn.data, filePath, recordId)
+          uploadFile(sfConn, filePath, recordId)
         )
       );
       console.log(

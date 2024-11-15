@@ -56,7 +56,7 @@ const getClientIdFromSecretManager = async (orgId: string): Promise<string> => {
 const loadPrivateKey = async (): Promise<string> => {
   if (!privateKeyCache) {
     privateKeyCache = await fs.readFile(baseConfig.privateKeyPath, "utf8");
-    console.log(privateKeyCache,"Loading private key from file system");
+    console.log(privateKeyCache, "Loading private key from file system");
   } else {
     console.log("Using cached private key");
   }
@@ -99,7 +99,7 @@ const requestNewAccessToken = async (
     const clientId = await getClientIdFromSecretManager(orgId);
     console.log(clientId, "Client ID from requestNewAccessToken");
     const privateKey = await loadPrivateKey();
-    console.log(privateKey, "Private key from requestNewAccessToken");  
+    console.log(privateKey, "Private key from requestNewAccessToken");
     const jwtToken = generateJWT(privateKey, clientId, userName);
     console.log(jwtToken, "generated token");
     const params = new URLSearchParams({
@@ -107,17 +107,17 @@ const requestNewAccessToken = async (
       assertion: jwtToken,
     });
     console.log(params, "params");
+    console.log(baseConfig.authUrl, "baseConfig.authUrl");
     try {
       const response = await axios.post(baseConfig.authUrl, params);
-    console.log(response.data, "response data");
-    
-    accessTokenCache = response.data.access_token;
-    instanceUrlCache = response.data.instance_url;
+      console.log(response.data, "response data");
+
+      accessTokenCache = response.data.access_token;
+      instanceUrlCache = response.data.instance_url;
     } catch (error) {
-      console.log(error ,'Error  in ')
+      console.log(error, "Error  in ");
       return error.message;
     }
-    
 
     return {
       accessToken: accessTokenCache,
