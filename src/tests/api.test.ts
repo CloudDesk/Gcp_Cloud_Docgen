@@ -18,6 +18,7 @@ console.log(SF_CLIENT_ID ,'process env client id');
 console.log(SF_ORG_ID ,'process env org id');
 console.log(GCP_CREDENTIALS ,'process env org id');
 console.log(GCP_CREDENTIALS ,'GCP_CREDENTIALS ');
+console.log(GCP_CREDENTIALS ,'GCP_CREDENTIALS 2 ');
 console.log(TEST ,'process env org id');
 describe('API Endpoints', () => {
   it('should return 200', async () => {
