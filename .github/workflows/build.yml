@@ -30,6 +30,11 @@ jobs:
           echo "${{ secrets.GCP_CREDENTIALS }}" > $GITHUB_WORKSPACE/gcp-credentials.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/gcp-credentials.json" >> $GITHUB_ENV
 
+      - name: Verify GCP Credentials JSON Structure
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          jq empty $GITHUB_WORKSPACE/gcp-credentials.json || (echo "GCP credentials JSON is invalid." && exit 1)
+
       - name: Install Dependencies
         run: npm install
 
@@ -42,16 +47,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Verify GCP Credentials JSON Structure
-        run: |
-          sudo apt-get install -y jq
-          if jq empty $GITHUB_WORKSPACE/gcp-credentials.json; then
-            echo "GCP credentials JSON is valid."
-          else
-            echo "GCP credentials JSON is invalid."
-            exit 1
-          fi
-
-      - name: Debug Environment Variables
+      - name: Debug Environment Variables (Remove in production)
         run: |
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
