@@ -107,10 +107,17 @@ const requestNewAccessToken = async (
       assertion: jwtToken,
     });
     console.log(params, "params");
-    const response = await axios.post(baseConfig.authUrl, params);
+    try {
+      const response = await axios.post(baseConfig.authUrl, params);
     console.log(response.data, "response data");
+    
     accessTokenCache = response.data.access_token;
     instanceUrlCache = response.data.instance_url;
+    } catch (error) {
+      console.log(error ,'Error  in ')
+      return error.message;
+    }
+    
 
     return {
       accessToken: accessTokenCache,
