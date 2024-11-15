@@ -13,13 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Check out the repository
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensures the full history for better analysis
 
       # Step 2: Set environment variables (using GitHub Secrets)
-      - name: Set Environment Variables
+      - name: Set environment variables
         run: |
           echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
           echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
@@ -27,33 +26,23 @@ jobs:
           echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
           echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
 
-      # Step 3: Authenticate with Google Cloud
-      - name: Authenticate with Google Cloud
+      # Step 3: Create GCP credentials file
+      - name: Create GCP credentials file
         run: |
-           echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode > $GITHUB_WORKSPACE/gcp-credentials.json
-           echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/gcp-credentials.json" >> $GITHUB_ENV
-
-        - name: Print the Decoded GCP Credentials JSON (Debugging)
-          run: |
-             cat $GITHUB_WORKSPACE/gcp-credentials.json
+          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > "$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json" >> $GITHUB_ENV
 
       # Step 4: Install dependencies
       - name: Install Dependencies
         run: npm install
 
       # Step 5: Run Jest Tests with Coverage
-      - name: Run Jest Tests with Coverage
+      - name: Run Jest Tests
         run: npm test -- --coverage
 
-      # Step 6: SonarCloud Analysis
+      # Step 6: Run SonarCloud Scan
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1
+        uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # Optional Debugging Step: Verify GCP Credentials File
-      - name: Verify GCP Credentials File
-        run: |
-          ls -la $GITHUB_WORKSPACE
-          cat $GITHUB_WORKSPACE/gcp-credentials.json
