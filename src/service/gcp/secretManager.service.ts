@@ -3,9 +3,11 @@ import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 
-const secretClient = new SecretManagerServiceClient({
-  keyFilename: "docgen-440809-afae407a4dd7.json",
-});
+// const secretClient = new SecretManagerServiceClient({
+//   keyFilename: "docgen-440809-afae407a4dd7.json",
+// });
+
+const secretClient = new SecretManagerServiceClient();
 
 /**
  * Retrieves a secret from Google Secret Manager.
@@ -164,16 +166,52 @@ export async function storeSecret(secretValue: string, orgId: string) {
  * @param orgId - The ID of the organization for which the secret is being retrieved.
  * @returns The value of the secret, or an error object if an error occurred.
  */
+// export async function getSecretValue(orgId: string) {
+// const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+// console.log(fullSecretPath ,'full secret path updated')
+//   try {
+//     const [accessResponse] = await secretClient.accessSecretVersion({
+//       name: fullSecretPath,
+//     });
+//      console.log(accessResponse ,'access response')
+//     const secretPayload = accessResponse.payload?.data?.toString();
+//     return secretPayload;
+//   } catch (err) {
+//     console.error("Error accessing secret value:", err);
+//     return { error: err };
+//   }
+// }
+
+
 export async function getSecretValue(orgId: string) {
-const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
-console.log(fullSecretPath ,'full secret path updated')
+  const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
+  console.log(fullSecretPath, 'full secret path updated');
+
   try {
+    // Access the secret version
     const [accessResponse] = await secretClient.accessSecretVersion({
       name: fullSecretPath,
     });
-     console.log(accessResponse ,'access response')
-    const secretPayload = accessResponse.payload?.data?.toString();
-    return secretPayload;
+    console.log('Access Response:', accessResponse);
+
+    // Extract the secret payload (raw data) and convert it to a string
+    const secretPayload = accessResponse.payload?.data?.toString(); // No 'utf8' argument
+    console.log('Raw secret value:', secretPayload); // Log the raw secret value to inspect
+
+    // Check if the secret payload looks like JSON
+    if (secretPayload && secretPayload.startsWith('{') && secretPayload.endsWith('}')) {
+      try {
+        // Attempt to parse as JSON if it looks like a JSON object
+        return JSON.parse(secretPayload);
+      } catch (jsonError) {
+        console.error('Error parsing JSON:', jsonError);
+        return { error: 'Failed to parse JSON', details: jsonError };
+      }
+    } else {
+      // If not JSON, return the secret as plain text
+      console.log('Returning plain text secret:', secretPayload);
+      return secretPayload;
+    }
   } catch (err) {
     console.error("Error accessing secret value:", err);
     return { error: err };
