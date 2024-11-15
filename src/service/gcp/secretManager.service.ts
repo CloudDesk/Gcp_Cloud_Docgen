@@ -194,16 +194,23 @@ export async function getSecretValue(orgId: string) {
     });
     console.log('Access Response:', accessResponse);
 
-    // Extract the secret payload (raw data)
-    const secretPayload = accessResponse.payload?.data?.toString();
+    // Extract the secret payload (raw data) and convert it to a string
+    const secretPayload = accessResponse.payload?.data?.toString(); // No 'utf8' argument
     console.log('Raw secret value:', secretPayload); // Log the raw secret value to inspect
 
-    // Try parsing as JSON if expected
-    try {
-      return JSON.parse(secretPayload); // Parse JSON if it’s in JSON format
-    } catch (jsonError) {
-      console.error('Error parsing JSON:', jsonError);
-      return secretPayload; // Return plain text if not JSON
+    // Check if the secret payload looks like JSON
+    if (secretPayload && secretPayload.startsWith('{') && secretPayload.endsWith('}')) {
+      try {
+        // Attempt to parse as JSON if it looks like a JSON object
+        return JSON.parse(secretPayload);
+      } catch (jsonError) {
+        console.error('Error parsing JSON:', jsonError);
+        return { error: 'Failed to parse JSON', details: jsonError };
+      }
+    } else {
+      // If not JSON, return the secret as plain text
+      console.log('Returning plain text secret:', secretPayload);
+      return secretPayload;
     }
   } catch (err) {
     console.error("Error accessing secret value:", err);
