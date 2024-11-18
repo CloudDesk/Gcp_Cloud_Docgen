@@ -6,7 +6,7 @@ import { writeFile } from 'fs/promises';
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 import dotenv from 'dotenv';
-import { validateAndParseCredentials } from "@/utils/validateBase";
+import { validateAndParseCredentials } from "../../utils/validateBase.js";
 dotenv.config();
 console.log(process.env.SERVICE_ACCOUNT ,'SERVICE ACCOUNT');
 // Add this temporarily to debug
