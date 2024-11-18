@@ -1,4 +1,4 @@
-import { cleanupCredentials } from "@/utils/clearCrendtials.js";
+import { cleanupCredentials } from "../utils/clearCrendtials.js";
 import { processDocumentService } from "../service/processDocument/document.service.js";
 
 export const documentController = {
