@@ -6,9 +6,12 @@ import { writeFile } from 'fs/promises';
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 import dotenv from 'dotenv';
+import { validateAndParseCredentials } from "@/utils/validateBase";
 dotenv.config();
 console.log(process.env.SERVICE_ACCOUNT ,'SERVICE ACCOUNT');
-
+// Add this temporarily to debug
+console.log('SERVICE_ACCOUNT length:', process.env.SERVICE_ACCOUNT?.length);
+console.log('SERVICE_ACCOUNT first 50 chars:', process.env.SERVICE_ACCOUNT?.substring(0, 50));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -25,7 +28,8 @@ if (!decodedCredentials) {
 }
 let credentialsData;
 try {
-    credentialsData = JSON.parse(decodedCredentials);
+   credentialsData = await validateAndParseCredentials(process.env.SERVICE_ACCOUNT);
+   console.log(credentialsData, "Credentials Data");
 } catch (parseError) {
     throw new Error(`Invalid JSON in SERVICE_ACCOUNT: ${parseError.message}`);
 }
