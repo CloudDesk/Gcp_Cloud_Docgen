@@ -33,23 +33,22 @@ jobs:
           echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > "$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json" >> $GITHUB_ENV
 
-     - name: Install LibreOffice
-       run: |
-        sudo apt-get update
-        sudo apt-get install -y libreoffice
-        sudo apt-get install -y libreoffice-writer
-      # Verify installation
-        soffice --version
-
-      # Step 4: Install dependencies
+      # Step 4: Create GCP credentials file
+      - name: Install LibreOffice
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice
+          sudo apt-get install -y libreoffice-writer
+ 
+      # Step 5: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 5: Run Jest Tests with Coverage
+      # Step 6: Run Jest Tests with Coverage
       - name: Run Jest Tests
         run: npm test -- --coverage
 
-      # Step 6: Run SonarCloud Scan
+      # Step 7: Run SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
