@@ -7,7 +7,7 @@ const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 import dotenv from 'dotenv';
 dotenv.config();
-
+console.log(process.env.SERVICE_ACCOUNT ,'SERVICE ACCOUNT');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
