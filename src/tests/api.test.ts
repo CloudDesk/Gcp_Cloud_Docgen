@@ -111,9 +111,6 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
     expect(response.statusCode).toBe(415);
   });
 
-  afterAll(async () => {
-    await fastify.close();
-  });
 })
 
 
@@ -214,7 +211,5 @@ describe('POST /api/v1/salesforce/process-document', () => {
     expect(response.statusCode).toBe(400);
 
   });
-  afterAll(async () => {
-    await fastify.close();
-  });
+
 })
