@@ -12,7 +12,57 @@ dotenv.config();
 const API_KEY = process.env.API_KEY;
 const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
 const SF_ORG_ID = process.env.SF_ORG_ID;
+describe('POST /api/v1/salesforce/store-credentials', () => {
+  let fastify : any;
 
+  beforeAll(async () => {
+    fastify = await initializeApp(); // Initialize the app instance
+});
+
+it('should return  200 ', async () => {
+
+
+  const response = await fastify.inject({
+    method: 'get',
+    url: '/',
+    headers: {
+      'X-API-KEY': API_KEY,
+    },
+  });
+  console.log(response, 'Response for salesfroce credentila');
+  expect(response.statusCode).toBe(200);
+
+});
+
+it('should return  200 for test route', async () => {
+
+
+  const response = await fastify.inject({
+    method: 'get',
+    url: '/test',
+    headers: {
+      'X-API-KEY': API_KEY,
+    },
+  });
+  console.log(response, 'Response for salesfroce credentila');
+  expect(response.statusCode).toBe(200);
+
+});
+
+it('should return  403  for  wrong API Key ', async () => {
+  const response = await fastify.inject({
+    method: 'get',
+    url: '/test',
+    headers: {
+      'X-API-KEY': 'wrong api key',
+    },
+  });
+  console.log(response, 'Response for salesfroce credentila');
+  expect(response.statusCode).toBe(403);
+
+});
+
+})
 
 describe('POST /api/v1/salesforce/store-credentials', () => {
   let fastify : any;
