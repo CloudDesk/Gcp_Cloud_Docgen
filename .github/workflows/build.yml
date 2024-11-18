@@ -25,6 +25,7 @@ jobs:
           echo "SF_ORG_ID=${{ secrets.SF_ORG_ID }}" >> $GITHUB_ENV
           echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
           echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }}" >> $GITHUB_ENV
 
       # Step 3: Create GCP credentials file
       - name: Create GCP credentials file

@@ -1,17 +1,28 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { writeFile } from 'fs/promises';
 
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 import dotenv from 'dotenv';
 dotenv.config();
 
-// const secretClient = new SecretManagerServiceClient({
-//   keyFilename: "docgen-440809-afae407a4dd7.json",
-// });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const credentialsData = JSON.parse(
+  Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('utf-8')
+);
+const credentialsPath = join(__dirname, 'gcp-credentials.json');
+await writeFile(credentialsPath, JSON.stringify(credentialsData, null, 2));
+const secretClient = new SecretManagerServiceClient({
+  keyFilename: credentialsPath,
+});
 
 
 
- const secretClient = new SecretManagerServiceClient();
+//  const secretClient = new SecretManagerServiceClient();
 
 /**
  * Retrieves a secret from Google Secret Manager.
@@ -189,14 +200,6 @@ export async function storeSecret(secretValue: string, orgId: string) {
 
 export async function getSecretValue(orgId: string) {
   const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
-  console.log("Raw GCP_CREDENTIALS:", process.env.GCP_CREDENTIALS);
-  try {
-    const credentials = JSON.parse(process.env.GCP_CREDENTIALS);
-    console.log(credentials ,'cREDENTIALS ')
-  } catch (error) {
-    console.log(error.message, 'cREDENTIALS Error message');
-  }
-
   console.log(fullSecretPath, 'full secret path updated');
 
   try {
