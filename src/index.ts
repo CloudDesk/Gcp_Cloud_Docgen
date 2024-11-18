@@ -5,6 +5,7 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
+import { cleanupCredentials } from "./utils/clearCrendtials.js";
 const Fastify = fastify({ logger: false });
 
 async function getApiKey() {
