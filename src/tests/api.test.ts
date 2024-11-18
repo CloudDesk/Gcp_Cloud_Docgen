@@ -7,55 +7,19 @@ import { processDocumentSwagger } from '../swager/processdocument.swager.js';
 import { sfValidateTemplateData } from '../schema/sfuserdatavalidation.js';
 import { documentController } from '../controller/document.controller.js';
 import dotenv from 'dotenv';
+import { initializeApp } from '../index.js';
 dotenv.config();
 const API_KEY = process.env.API_KEY;
 const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
 const SF_ORG_ID = process.env.SF_ORG_ID;
-const GCP_CREDENTIALS = process.env.GCP_CREDENTIALS;
-const TEST = process.env.TEST;
-console.log(API_KEY  ,'process env api key');
-console.log(SF_CLIENT_ID ,'process env client id');
-console.log(SF_ORG_ID ,'process env org id');
-console.log(GCP_CREDENTIALS ,'process env org id');
-console.log(GCP_CREDENTIALS ,'GCP_CREDENTIALS ');
-console.log(GCP_CREDENTIALS ,'GCP_CREDENTIALS 2 ');
-console.log(TEST ,'process env org id');
-describe('API Endpoints', () => {
-  it('should return 200', async () => {
-    const fastify = Fastify();
-
-    fastify.get('/', async (request, reply) => {
-      return { message: 'Hello, world!' };
-    });
-
-    await fastify.ready();
-
-    const response = await fastify.inject({
-      method: 'GET',
-      url: '/',
-    });
-
-    expect(response.statusCode).toBe(200);
-    await fastify.close();
-  });
-});
 
 
 describe('POST /api/v1/salesforce/store-credentials', () => {
   let fastify : any;
 
-  beforeAll(() => {
-    fastify = Fastify();
-
-    fastify.post(
-      '/api/v1/salesforce/store-credentials',
-      {
-        schema: sfOrgClientIdSwagger,
-        preHandler: [validateRequestBody(sfOrgIdClientIdValidation)],
-      },
-      sfCredentialController.validateAndStoreSalesforceCredentials
-    );
-  });
+  beforeAll(async () => {
+    fastify = await initializeApp(); // Initialize the app instance
+});;
 
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
@@ -77,7 +41,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
 
   });
 
-  it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
+  it('should validate the Salesforce credentials and return 403 For wrong API KEY', async () => {
     const requestBody = {
       clientId: SF_CLIENT_ID,
       orgId: SF_ORG_ID,
@@ -88,11 +52,11 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
       url: '/api/v1/salesforce/store-credentials',
       payload: requestBody,
       headers: {
-        'X-API-KEY': API_KEY,
+        'X-API-KEY': 'wrong api key',
       },
     });
     console.log(response, 'Response for salesfroce credentila');
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(403);
 
   });
 
@@ -114,6 +78,22 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
     });
 
     expect(response.statusCode).toBe(400);
+  });
+
+  it('should return 401 for Not Giving API KEY', async () => {
+    const invalidRequestBody = {
+      clientId: 'INVALID_CLIENT_ID',
+      orgId: 'INVALID_ORG_ID',
+    };
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/salesforce/store-credentials',
+      payload: invalidRequestBody,
+  
+    });
+
+    expect(response.statusCode).toBe(401);
   });
 
   it('should return 500 for invalid request body', async () => {
@@ -140,18 +120,9 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
 describe('POST /api/v1/salesforce/process-document', () => {
   let fastify : any;
 
-  beforeAll(() => {
-    fastify = Fastify();
-
-    fastify.post(
-      '/api/v1/salesforce/process-document',
-      {
-        schema: processDocumentSwagger,
-        preHandler: [validateRequestBody(sfValidateTemplateData)],
-      },
-      documentController.processDocument
-    );
-  });
+  beforeAll(async () => {
+    fastify = await initializeApp(); // Initialize the app instance
+});;
 
 
   it('should validate the Body and process the document Return 200 status code', async () => {
@@ -188,7 +159,6 @@ describe('POST /api/v1/salesforce/process-document', () => {
     console.log(requestBody ,'requestBody');
     const response = await fastify.inject({
       method: 'POST',
-      // url: '/api/v1/salesforce/process-document',
       url: '/api/v1/salesforce/process-document',
       payload: requestBody,
       headers: {
@@ -234,7 +204,6 @@ describe('POST /api/v1/salesforce/process-document', () => {
     console.log(requestBody ,'requestBody');
     const response = await fastify.inject({
       method: 'POST',
-      // url: '/api/v1/salesforce/process-document',
       url: '/api/v1/salesforce/process-document',
       payload: requestBody,
       headers: {

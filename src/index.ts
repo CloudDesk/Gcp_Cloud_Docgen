@@ -129,4 +129,10 @@ start().catch((err) => {
   process.exit(1);
 });
 
-export { Fastify };
+async function initializeApp() {
+  await Fastify.ready(); // Ensure Fastify is initialized
+  return Fastify;
+}
+
+export const app = Fastify;
+export { initializeApp };

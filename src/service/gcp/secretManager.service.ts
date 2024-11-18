@@ -8,10 +8,6 @@ const ERROR_CODE_SECRET_NOT_FOUND = 5;
 import dotenv from 'dotenv';
 import { validateAndParseCredentials } from "../../utils/validateBase.js";
 dotenv.config();
-console.log(process.env.SERVICE_ACCOUNT ,'SERVICE ACCOUNT');
-// Add this temporarily to debug
-console.log('SERVICE_ACCOUNT length:', process.env.SERVICE_ACCOUNT?.length);
-console.log('SERVICE_ACCOUNT first 50 chars:', process.env.SERVICE_ACCOUNT?.substring(0, 50));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
