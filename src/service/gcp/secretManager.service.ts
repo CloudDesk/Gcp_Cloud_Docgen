@@ -11,9 +11,24 @@ console.log(process.env.SERVICE_ACCOUNT ,'SERVICE ACCOUNT');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const credentialsData = JSON.parse(
-  Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('utf-8')
-);
+
+if (!process.env.SERVICE_ACCOUNT) {
+  console.log('SERVICE_ACCOUNT environment variable is not set')
+  throw new Error('SERVICE_ACCOUNT environment variable is not set');
+}
+
+// Decode base64 and validate it's not empty
+const decodedCredentials = Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('utf-8');
+if (!decodedCredentials) {
+  console.log('Decoded SERVICE_ACCOUNT is empty')
+  throw new Error('Decoded SERVICE_ACCOUNT is empty');
+}
+let credentialsData;
+try {
+    credentialsData = JSON.parse(decodedCredentials);
+} catch (parseError) {
+    throw new Error(`Invalid JSON in SERVICE_ACCOUNT: ${parseError.message}`);
+}
 const credentialsPath = join(__dirname, 'gcp-credentials.json');
 await writeFile(credentialsPath, JSON.stringify(credentialsData, null, 2));
 const secretClient = new SecretManagerServiceClient({
