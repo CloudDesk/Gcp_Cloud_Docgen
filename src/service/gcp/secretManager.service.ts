@@ -5,26 +5,20 @@ import { writeFile } from 'fs/promises';
 
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
-import dotenv from 'dotenv';
 import { validateAndParseCredentials } from "../../utils/validateBase.js";
-dotenv.config();
+import { SERVICE_ACCOUNT } from "../../config/config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-if (!process.env.SERVICE_ACCOUNT) {
-  console.log('SERVICE_ACCOUNT environment variable is not set')
-  throw new Error('SERVICE_ACCOUNT environment variable is not set');
-}
-
+console.log(SERVICE_ACCOUNT, "process.env.SERVICE_ACCOUNT 22 latest");  
 // Decode base64 and validate it's not empty
-const decodedCredentials = Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString('utf-8');
+const decodedCredentials = Buffer.from(SERVICE_ACCOUNT, 'base64').toString('utf-8');
 if (!decodedCredentials) {
   console.log('Decoded SERVICE_ACCOUNT is empty')
   throw new Error('Decoded SERVICE_ACCOUNT is empty');
 }
 let credentialsData;
 try {
-   credentialsData = await validateAndParseCredentials(process.env.SERVICE_ACCOUNT);
+   credentialsData = await validateAndParseCredentials(SERVICE_ACCOUNT);
    console.log(credentialsData, "Credentials Data");
 } catch (parseError) {
     throw new Error(`Invalid JSON in SERVICE_ACCOUNT: ${parseError.message}`);
