@@ -61,6 +61,7 @@ async function getSecret(fullSecretPath: string) {
  */
 async function createSecret(parent: string, secretId: string) {
   try {
+    console.log('insdie create secret');
     await secretClient.createSecret({
       parent,
       secretId,

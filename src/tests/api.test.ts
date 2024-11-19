@@ -90,6 +90,25 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
 
   });
 
+  it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
+    const requestBody = {
+      clientId: SF_CLIENT_ID,
+      orgId: '00DCX00000BoiXu',
+    };
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/salesforce/store-credentials',
+      payload: requestBody,
+      headers: {
+        'X-API-KEY': API_KEY,
+      },
+    });
+    console.log(response, 'Response for salesfroce credentila');
+    expect(response.statusCode).toBe(200);
+
+  });
+
   it('should validate the Salesforce credentials and return 403 For wrong API KEY', async () => {
     const requestBody = {
       clientId: SF_CLIENT_ID,
@@ -308,51 +327,6 @@ let originalServiceAccount
     console.log(response, 'Response for process document');
     expect(response.statusCode).toBe(400);
     process.env.SERVICE_ACCOUNT = originalServiceAccount
-  });
-
-  it('Create new secret Manager Id with new Org id', async () => {
-    const requestBody = {
-      "orgId": "00DFF00000BoiXu",
-      "userName": "cddev@org.com",
-      "recordId": "001WU00000Tv8bLYAR",
-      "fileName": "Account",
-      "contentVersionId": "068WU000005J3aPYAS",
-      "fieldData": [
-        {
-          "Account": {
-            "Name": "Financial Insights LLC",
-            "BillingStreet": "",
-            "BillingCity": "Boston",
-            "BillingCountry": "USA",
-            "Phone": "+1 555-7890"
-          },
-          "ProductDetails": {
-            "Name": "Financial Analysis Tool Investment Strategy Simulator",
-            "Product2": {
-              "Name": "Investment Strategy Simulator"
-            },
-            "Quantity": 6,
-            "UnitPrice": 299,
-            "TotalPrice": 1794,
-            "Discount__c": 10,
-            "DiscountAmtQI__c": 179.4,
-            "DiscountedFinalQIPrice__c": 1614.6
-          }
-        }
-      ]
-    }
-    console.log(requestBody, 'requestBody');
-    const response = await fastify.inject({
-      method: 'POST',
-      url: '/api/v1/salesforce/process-document',
-      payload: requestBody,
-      headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
-      },
-    });
-    console.log(response.statusCode, 'Response for process document');
-    expect(response.statusCode).toBe(200);
-
   });
 
 })
