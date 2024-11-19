@@ -48,25 +48,14 @@ describe('POST Initial test', () => {
     });
     console.log(response, 'Response for salesfroce credentila');
     expect(response.statusCode).toBe(403);
-
   });
-
 })
-
-
-
-
-
-
 
 describe('POST /api/v1/salesforce/store-credentials', () => {
   let fastify: any;
-
   beforeAll(async () => {
     fastify = await initializeApp(); // Initialize the app instance
   });;
-
-
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
       clientId: SF_CLIENT_ID,
@@ -180,11 +169,11 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
 
 describe('POST /api/v1/salesforce/process-document', () => {
   let fastify: any;
-let originalServiceAccount
+  let originalServiceAccount
   beforeAll(async () => {
-     originalServiceAccount = process.env.SERVICE_ACCOUNT;
+    originalServiceAccount = process.env.SERVICE_ACCOUNT;
     process.env.SERVICE_ACCOUNT = 'wrong value';
-    console.log( process.env.SERVICE_ACCOUNT ,'process.env.SERVICE_ACCOUNT');
+    console.log(process.env.SERVICE_ACCOUNT, 'process.env.SERVICE_ACCOUNT');
     fastify = await initializeApp(); // Initialize the app instance
   });;
 
@@ -226,7 +215,7 @@ let originalServiceAccount
       url: '/api/v1/salesforce/process-document',
       payload: requestBody,
       headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
     console.log(response.statusCode, 'Response for process document');
@@ -271,58 +260,12 @@ let originalServiceAccount
       url: '/api/v1/salesforce/process-document',
       payload: requestBody,
       headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
+        'X-API-KEY': API_KEY,
       },
     });
     console.log(response, 'Response for process document');
     expect(response.statusCode).toBe(400);
 
   });
+});
 
-  it('set wrong env key ', async () => {
-   
-    const requestBody = {
-      "orgId": "00DWU00000BoiX",
-      "userName": "cddev@org.com",
-      "recordId": "001WU00000Tv8bLYAR",
-      "fileName": "Account",
-      "contentVersionId": "068WU0000059BivYAE",
-      "fieldData": [
-        {
-          "Account": {
-            "Name": "Financial Insights LLC",
-            "BillingStreet": "",
-            "BillingCity": "Boston",
-            "BillingCountry": "USA",
-            "Phone": "+1 555-7890"
-          },
-          "ProductDetails": {
-            "Name": "Financial Analysis Tool Investment Strategy Simulator",
-            "Product2": {
-              "Name": "Investment Strategy Simulator"
-            },
-            "Quantity": 6,
-            "UnitPrice": 299,
-            "TotalPrice": 1794,
-            "Discount__c": 10,
-            "DiscountAmtQI__c": 179.4,
-            "DiscountedFinalQIPrice__c": 1614.6
-          }
-        }
-      ]
-    }
-    console.log(requestBody, 'requestBody');
-    const response = await fastify.inject({
-      method: 'POST',
-      url: '/api/v1/salesforce/process-document',
-      payload: requestBody,
-      headers: {
-        'X-API-KEY': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY',
-      },
-    });
-    console.log(response, 'Response for process document');
-    expect(response.statusCode).toBe(400);
-    process.env.SERVICE_ACCOUNT = originalServiceAccount
-  });
-
-})
