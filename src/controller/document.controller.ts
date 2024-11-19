@@ -18,6 +18,7 @@ export const documentController = {
       );
 
       // Check the result and send appropriate response
+      console.log(result , 'Result from process document');
       if (result.success) {
         console.log("Document processed successfully:", result);
        await cleanupCredentials('/src/service/gcp/gcp-credentials.json')
