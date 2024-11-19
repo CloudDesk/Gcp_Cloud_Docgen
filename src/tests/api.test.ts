@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { initializeApp } from '../index.js';
+import { SF_ORG_ID_TWO } from '@/config/config.js';
 dotenv.config();
 const API_KEY = process.env.API_KEY;
 const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
@@ -93,7 +94,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
       clientId: SF_CLIENT_ID,
-      orgId: '00DCX00000BoiXu',
+      orgId: SF_ORG_ID_TWO
     };
 
     const response = await fastify.inject({
