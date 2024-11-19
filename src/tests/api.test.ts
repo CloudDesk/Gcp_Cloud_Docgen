@@ -1,12 +1,7 @@
 import dotenv from 'dotenv';
 import { initializeApp } from '../index.js';
-import { SF_ORG_ID_TWO } from '@/config/config.js';
+import { API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
 dotenv.config();
-const API_KEY = process.env.API_KEY;
-const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
-const SF_ORG_ID = process.env.SF_ORG_ID;
-
-
 
 describe('POST Initial test', () => {
   let fastify: any;
