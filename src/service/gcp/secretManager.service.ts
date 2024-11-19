@@ -103,48 +103,6 @@ async function addSecretVersion(fullSecretPath: string, secretValue: string) {
  * @param orgId - The ID of the organization for which the secret is being stored.
  * @returns The version name of the stored secret, or an error object if an error occurred.
  */
-// export async function storeSecret(secretValue: string, orgId: string) {
-//   const parent = PROJECT_ID;
-//   const fullSecretPath = `${parent}/secrets/${orgId}`;
-
-//   try {
-//    let secretValue =  await getSecret(fullSecretPath);
-//    if (secretValue === ERROR_CODE_SECRET_NOT_FOUND) {
-//     try {
-//       await createSecret(parent, orgId);
-//       return { success: true };
-//     } catch (error) {
-//       console.error("Error creating secret:", error);
-//       return { error: error };
-//     }
-//   }
-//     console.log(`Secret for organization ${orgId} already exists.`);
-//   } catch (err) {
-//     console.log(err.code ,'ERROR CODE IS ');
-//     if (err.code === ERROR_CODE_SECRET_NOT_FOUND) {
-//       console.log(`Creating new secret for organization ${orgId}...`);
-//       try {
-//         await createSecret(parent, orgId);
-//         return { success: true };
-//       } catch (error) {
-//         console.error("Error creating secret:", error);
-//         return { error: error };
-//       }
-//     } else {
-//       console.error("Unexpected error:", err);
-//       return { error: err };
-//     }
-//   }
-
-//   try {
-//     const versionName = await addSecretVersion(fullSecretPath, secretValue);
-//     console.log(`Stored secret for organization ${orgId}`);
-//     return versionName;
-//   } catch (versionError) {
-//     console.error("Error storing secret value:", versionError);
-//     return { error: versionError };
-//   }
-// }
 
 export async function storeSecret(secretValue: string, orgId: string) {
   const parent = PROJECT_ID;
@@ -209,33 +167,3 @@ export async function getSecretValue(orgId: string) {
     return { error: err };
   }
 }
-// Cache for storing secrets to reduce the number of API calls
-// const secretCache: { [key: string]: string } = {};
-
-/**
- * Retrieves and returns the value of a secret from the cache or Google Secret Manager.
- *
- * @param orgId - The ID of the organization for which the secret is being retrieved.
- * @returns The value of the secret, or an error object if an error occurred.
- */
-// export async function getSecretValueWithCache(orgId: string) {
-//   if (secretCache[orgId]) {
-//     return secretCache[orgId];
-//   }
-
-//   const fullSecretPath = `${PROJECT_ID}/secrets/${orgId}/versions/latest`;
-
-//   try {
-//     const [accessResponse] = await secretClient.accessSecretVersion({
-//       name: fullSecretPath,
-//     });
-//     const secretPayload = accessResponse.payload?.data?.toString();
-//     if (secretPayload) {
-//       secretCache[orgId] = secretPayload;
-//     }
-//     return secretPayload;
-//   } catch (err) {
-//     console.error("Error accessing secret value:", err);
-//     return { error: err };
-//   }
-// }

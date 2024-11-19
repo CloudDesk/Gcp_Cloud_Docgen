@@ -8,102 +8,94 @@ import { getSecretValue } from "./service/gcp/secretManager.service.js";
 
 const Fastify = fastify({ logger: false });
 
-async function getApiKey() {
-  try {
-    return await getSecretValue("docgen_apikey");
-  } catch (error) {
-    console.error("Error getting API key:", error.message);
-    return null;
-  }
+let API_KEY;
+
+async function initializeApiKey() {
+    try {
+        API_KEY = await getSecretValue("docgen_apikey");
+        console.log(API_KEY, "API_KEY");
+    } catch (error) {
+        console.error("Error getting API key:", error.message);
+    }
 }
 
- const API_KEY = await getApiKey();
-
-// console.log(API_KEY, "API_KEY");
-
 function setupSwagger(fastifyInstance) {
-  fastifyInstance.register(swagger, {
-    openapi: {
-      info: {
-        title: "Doc Gen Api Documentation",
-        description: "API documentation with API key authentication",
-        version: "1.0.0",
-      },
-      servers: [
-        {
-          //url: "https://docgen-1027746116534.us-central1.run.app",
-           url: "http://localhost:4350",
-        },
-      ],
-      components: {
-        securitySchemes: {
-          ApiKeyAuth: {
-            type: "apiKey",
-            name: "x-api-key",
-            in: "header",
-            description: "API key required for protected endpoints.",
-          },
-        },
-      },
-      paths: {},
-    },
-  });
+    const BASE_URL = process.env.BASE_URL || "http://localhost:4350";
 
-  fastifyInstance.register(swaggerUi, {
-    routePrefix: "/docs",
-    staticCSP: true,
-    transformStaticCSP: (header) => header,
-    uiConfig: {
-      docExpansion: "full",
-      deepLinking: false,
-      tagsSorter: "alpha",
-      operationsSorter: "alpha",
-    },
-  });
+    fastifyInstance.register(swagger, {
+        openapi: {
+            info: {
+                title: "Doc Gen Api Documentation",
+                description: "API documentation with API key authentication",
+                version: "1.0.0",
+            },
+            servers: [{ url: BASE_URL }],
+            components: {
+                securitySchemes: {
+                    ApiKeyAuth: {
+                        type: "apiKey",
+                        name: "x-api-key",
+                        in: "header",
+                        description: "API key required for protected endpoints.",
+                    },
+                },
+            },
+            paths: {},
+        },
+    });
+
+    fastifyInstance.register(swaggerUi, {
+        routePrefix: "/docs",
+        staticCSP: true,
+        transformStaticCSP: (header) => header,
+        uiConfig: {
+            docExpansion: "full",
+            deepLinking: false,
+            tagsSorter: "alpha",
+            operationsSorter: "alpha",
+        },
+    });
 }
 
 function setupCors(fastifyInstance) {
-  fastifyInstance.register(cors, {
-    origin: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-    credentials: true,
-    maxAge: 86400,
-    exposedHeaders: ["set-cookie"],
-  });
+    fastifyInstance.register(cors, {
+        origin: true, // Adjust for production
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+        credentials: true,
+        maxAge: 86400,
+        exposedHeaders: ["set-cookie"],
+    });
 }
 
 async function apiKeyValidationHook(
-  request: FastifyRequest,
-  reply: FastifyReply
+    request: FastifyRequest,
+    reply: FastifyReply
 ) {
-  const swaggerRoutes = ["/docs", "/docs/*"];
-  if (
-    swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
-    request.url === "/"
-  ) {
-    return; // Allow requests to Swagger documentation without API key
-  }
+    const swaggerRoutes = ["/docs", "/docs/*"];
+    if (
+        swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
+        request.url === "/"
+    ) {
+        return; // Allow requests to Swagger documentation without API key
+    }
 
-  const apiKey = request.headers["x-api-key"];
-  console.log(apiKey,'apiKey API_KEY');
-  console.log(API_KEY,'API');
-  if (!apiKey) {
-    reply.status(401).send({
-      error:
-        'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint',
-    });
-  }
+    const apiKey = request.headers["x-api-key"];
+    if (!apiKey) {
+        return reply.status(401).send({
+            error:
+                'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint.',
+        });
+    }
 
-  if (apiKey !== API_KEY) {
-    reply.status(403).send({
-      error:
-        "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
-    });
-  }
+    if (apiKey !== API_KEY) {
+        return reply.status(403).send({
+            error:
+                "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
+        });
+    }
 }
 
-// Register the hook
 Fastify.addHook("onRequest", apiKeyValidationHook);
 
 setupSwagger(Fastify);
@@ -112,26 +104,31 @@ setupCors(Fastify);
 Fastify.register(docGenRouter);
 
 const start = async () => {
-  try {
-    await Fastify.listen({
-      port: PORT,
-      host: "0.0.0.0",
-    });
-    console.log(`Server is running on port ${PORT}`);
-  } catch (err) {
-    Fastify.log.error("Error starting server:", err);
-    process.exit(1);
-  }
+    try {
+        await initializeApiKey();
+        await Fastify.listen({ port: PORT, host: "0.0.0.0" });
+        console.log(`Server is running on port ${PORT}`);
+    } catch (err) {
+        console.error("Error starting server:", err.message);
+
+    }
 };
 
 start().catch((err) => {
-  Fastify.log.error("Unhandled error starting server:", err);
-  process.exit(1);
+    console.error("Unhandled error starting server:", err);
+    process.exit(1);
 });
 
 async function initializeApp() {
-  await Fastify.ready(); // Ensure Fastify is initialized
-  return Fastify;
+    await Fastify.ready();
+    if (!API_KEY) {
+      try {
+          API_KEY = await getSecretValue("docgen_apikey");
+      } catch (error) {
+          console.error("Error initializing API key:", error.message);
+      }
+  }
+    return Fastify;
 }
 
 export const app = Fastify;
