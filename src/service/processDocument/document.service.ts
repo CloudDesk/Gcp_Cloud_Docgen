@@ -50,11 +50,11 @@ export const processDocumentService = {
       );
       console.log(template, "Template fetched successfully");
       if (!template.success) {
-        return { error: "Failed to fetch template" };
+        return { error: "Failed to fetch template.Please Provide correct contentVersionId" };
       }
     } catch (error) {
       console.error("Failed to fetch template", error);
-      return { error: "Failed to fetch template" };
+      return { error: "Failed to fetch template" + error.message };
     }
     console.log(__dirname, "Current directory path");
     const templateFilePath = path.join(

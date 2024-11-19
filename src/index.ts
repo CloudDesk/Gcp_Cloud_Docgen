@@ -1,12 +1,11 @@
 import { fastify, FastifyRequest, FastifyReply } from "fastify";
 import { docGenRouter } from "./router/router.js";
-import { PORT } from "./config/config.js";
+import { BASE_URL, PORT } from "./config/config.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
-const Fastify = fastify({ logger: false });
-
+const Fastify = fastify({ logger: { level: 'debug' } });
 let apiKeyFromSecretManager = null;
 
 async function initializeApiKey() {
@@ -23,7 +22,7 @@ async function initializeApiKey() {
 }
 
 function setupSwagger(fastifyInstance) {
-    const BASE_URL = process.env.BASE_URL || "http://localhost:4350";
+    const SWAGGER_URL =BASE_URL || "http://localhost:4350";
 
     fastifyInstance.register(swagger, {
         openapi: {
@@ -32,7 +31,7 @@ function setupSwagger(fastifyInstance) {
                 description: "API documentation with API key authentication",
                 version: "1.0.0",
             },
-            servers: [{ url: BASE_URL }],
+            servers: [{ url: SWAGGER_URL }],
             components: {
                 securitySchemes: {
                     ApiKeyAuth: {

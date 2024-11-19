@@ -14,10 +14,10 @@
         console.log(valid);
         if (!valid) {
           console.log(ajv.errors, "AJV Errors");
-          reply.status(400).send({ error: ajv.errors });
+          reply.status(400).send({ error: ajv.errors[0].message });
         }
       } catch (error) {
-        reply.status(415).send(error);
+        reply.status(500).send(error);
       }
     };
   };
