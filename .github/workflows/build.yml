@@ -34,7 +34,7 @@ jobs:
           echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > "$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json" >> $GITHUB_ENV
 
-      # Step 4: Create GCP credentials file
+      # Step 4: Install libreoffice
       - name: Install LibreOffice
         run: |
           sudo apt-get update
