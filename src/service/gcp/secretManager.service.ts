@@ -10,12 +10,6 @@ import { SERVICE_ACCOUNT } from "../../config/config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 console.log(SERVICE_ACCOUNT, "process.env.SERVICE_ACCOUNT 22 latest");  
-// Decode base64 and validate it's not empty
-const decodedCredentials = Buffer.from(SERVICE_ACCOUNT, 'base64').toString('utf-8');
-if (!decodedCredentials) {
-  console.log('Decoded SERVICE_ACCOUNT is empty')
-  throw new Error('Decoded SERVICE_ACCOUNT is empty');
-}
 let credentialsData;
 try {
    credentialsData = await validateAndParseCredentials(SERVICE_ACCOUNT);
