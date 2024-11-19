@@ -1,11 +1,21 @@
-import { initializeApp } from '../index.js';
+import { initializeApp,initializeApiKey } from '../index.js';
 import { API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
+import { after } from 'node:test';
+import { cleanupCredentials } from '..//utils/clearCrendtials.js';
 
 describe('POST /api/v1/salesforce/store-credentials', () => {
   let fastify: any;
   beforeAll(async () => {
+    await initializeApiKey();
     fastify = await initializeApp(); // Initialize the app instance
   });;
+
+  afterAll(async () => {
+    console.log('After all called')
+    let data = await cleanupCredentials('/src/service/gcp/gcp-credentials.json')
+    console.log(data, 'Data from cleanup');
+    await fastify.close(); // Close the Fastify instance
+});
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
     const requestBody = {
       clientId: SF_CLIENT_ID,
@@ -113,6 +123,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
 
     expect(response.statusCode).toBe(415);
   });
+
 
 })
 

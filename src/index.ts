@@ -5,17 +5,22 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
+import { cleanupCredentials } from "./utils/clearCrendtials.js";
 
 const Fastify = fastify({ logger: false });
 
-let API_KEY;
+let API_KEY = null;
 
 async function initializeApiKey() {
     try {
-        API_KEY = await getSecretValue("docgen_apikey");
-        console.log(API_KEY, "API_KEY");
+        if (!API_KEY) {
+            API_KEY = await getSecretValue("docgen_apikey");
+            console.log("API Key initialized:", API_KEY);
+        }
+        return API_KEY;
     } catch (error) {
         console.error("Error getting API key:", error.message);
+        throw new Error("API key initialization failed");
     }
 }
 
@@ -120,16 +125,10 @@ start().catch((err) => {
 });
 
 async function initializeApp() {
-    await Fastify.ready();
-    if (!API_KEY) {
-      try {
-          API_KEY = await getSecretValue("docgen_apikey");
-      } catch (error) {
-          console.error("Error initializing API key:", error.message);
-      }
-  }
-    return Fastify;
+  await initializeApiKey(); // Ensure the API key is set
+  await Fastify.ready();   // Ensure Fastify is initialized
+  return Fastify;
 }
 
 export const app = Fastify;
-export { initializeApp };
+export { initializeApp, initializeApiKey, API_KEY };

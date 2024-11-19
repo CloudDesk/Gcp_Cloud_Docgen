@@ -1,12 +1,19 @@
-import { initializeApp } from '../index.js';
+import { initializeApp,initializeApiKey } from '../index.js';
 import { API_KEY } from '../config/config.js';
+import { cleanupCredentials } from '../utils/clearCrendtials.js';
 
 describe('POST /api/v1/salesforce/process-document', () => {
     let fastify: any;
     beforeAll(async () => {
+        await initializeApiKey();
         fastify = await initializeApp(); // Initialize the app instance
     });;
-
+    afterAll(async () => {
+        console.log('After all called')
+        let data = await cleanupCredentials('/src/service/gcp/gcp-credentials.json')
+        console.log(data, 'Data from cleanup');
+        await fastify.close(); // Close the Fastify instance
+    });
 
     it('should validate the Body and process the document Return 200 status code', async () => {
         const requestBody = {
@@ -187,4 +194,6 @@ describe('POST /api/v1/salesforce/process-document', () => {
         expect(response.statusCode).toBe(400);
 
     });
+
+
 });

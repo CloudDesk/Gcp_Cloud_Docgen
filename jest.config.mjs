@@ -17,7 +17,7 @@ const config = {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   testMatch: ['**/tests/**/*.test.ts', '**/__tests__/**/*.ts'],
-  testTimeout: 40000,
+  testTimeout: 50000,
   detectOpenHandles: true,
   forceExit: true
 };
