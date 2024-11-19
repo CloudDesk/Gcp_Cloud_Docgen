@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { initializeApp } from '../index.js';
-import { API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
+import { API_KEY, SECRET_JSON, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
 dotenv.config();
 
 describe('POST Initial test', () => {

@@ -9,6 +9,7 @@ export const SF_USERNAME = process.env.SF_USERNAME;
 export const SF_CLIENT_ID = process.env.SF_CLIENT_ID;
 export const SERVICE_ACCOUNT = process.env.SERVICE_ACCOUNT;
 export const SF_ORG_ID_TWO = process.env.SF_ORG_ID_TWO;
+export const SECRET_JSON = process.env.SECRET_JSON;
 
 
 export const PORT = Number(port);
