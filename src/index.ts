@@ -5,19 +5,17 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
-import { cleanupCredentials } from "./utils/clearCrendtials.js";
-
 const Fastify = fastify({ logger: false });
 
-let API_KEY = null;
+let apiKeyFromSecretManager = null;
 
 async function initializeApiKey() {
     try {
-        if (!API_KEY) {
-            API_KEY = await getSecretValue("docgen_apikey");
-            console.log("API Key initialized:", API_KEY);
+        if (!apiKeyFromSecretManager) {
+          apiKeyFromSecretManager = await getSecretValue("docgen_apikey");
+            console.log("API Key initialized:", apiKeyFromSecretManager);
         }
-        return API_KEY;
+        return apiKeyFromSecretManager;
     } catch (error) {
         console.error("Error getting API key:", error.message);
         throw new Error("API key initialization failed");
@@ -93,7 +91,7 @@ async function apiKeyValidationHook(
         });
     }
 
-    if (apiKey !== API_KEY) {
+    if (apiKey !== apiKeyFromSecretManager) {
         return reply.status(403).send({
             error:
                 "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
@@ -131,4 +129,4 @@ async function initializeApp() {
 }
 
 export const app = Fastify;
-export { initializeApp, initializeApiKey, API_KEY };
+export { initializeApp, initializeApiKey, apiKeyFromSecretManager };
