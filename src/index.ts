@@ -11,8 +11,10 @@ let apiKeyFromSecretManager = null;
 async function initializeApiKey() {
     try {
         if (!apiKeyFromSecretManager) {
-          apiKeyFromSecretManager = await getSecretValue("docgen_apikey");
-            console.log("API Key initialized:", apiKeyFromSecretManager);
+            apiKeyFromSecretManager = await getSecretValue("docgen_apike");
+        }
+        if (apiKeyFromSecretManager.error) {
+            throw new Error("API key initialization failed");
         }
         return apiKeyFromSecretManager;
     } catch (error) {
@@ -22,7 +24,7 @@ async function initializeApiKey() {
 }
 
 function setupSwagger(fastifyInstance) {
-    const SWAGGER_URL =BASE_URL || "http://localhost:4350";
+    const SWAGGER_URL = BASE_URL || "http://localhost:4350";
 
     fastifyInstance.register(swagger, {
         openapi: {
@@ -122,9 +124,9 @@ start().catch((err) => {
 });
 
 async function initializeApp() {
-  await initializeApiKey(); // Ensure the API key is set
-  await Fastify.ready();   // Ensure Fastify is initialized
-  return Fastify;
+    await initializeApiKey(); // Ensure the API key is set
+    await Fastify.ready();   // Ensure Fastify is initialized
+    return Fastify;
 }
 
 export const app = Fastify;
