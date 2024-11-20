@@ -7,7 +7,6 @@ import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
 const Fastify = fastify({ logger: { level: 'debug' } });
 let apiKeyFromSecretManager = null;
-console.log('pushed to test ')
 async function initializeApiKey() {
     try {
         if (!apiKeyFromSecretManager) {
