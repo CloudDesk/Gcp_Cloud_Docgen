@@ -62,13 +62,14 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: test
+          branch: dev-to-test
           base: test
+          head: dev
           title: 'Auto PR: Merge dev into test'
           body: 'Automatically created PR to merge dev branch changes into test branch'
-          delete-branch: false
+          delete-branch: true
 
-      # Step 9: Auto-merge PR
+      # Auto-merge step
       - name: Auto-merge PR
         if: success() && github.ref == 'refs/heads/dev'
         uses: pascalgn/automerge-action@v0.15.6
@@ -77,6 +78,6 @@ jobs:
           MERGE_LABELS: ""
           MERGE_METHOD: "merge"
           MERGE_COMMIT_MESSAGE: "Auto-merge dev into test"
-          MERGE_DELETE_BRANCH: "false"
+          MERGE_DELETE_BRANCH: "true"
           MERGE_RETRIES: "6"
           MERGE_RETRY_SLEEP: "10000"
