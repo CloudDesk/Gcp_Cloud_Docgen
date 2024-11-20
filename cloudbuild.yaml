@@ -5,7 +5,7 @@ steps:
     args:
       - '-c'
       - |
-        # Fetch the service account key from Secret Manager
+        # Fetch the service account key from Secret Manager (if needed)
         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
         gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
 
@@ -32,29 +32,28 @@ steps:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 5: Deploy to Cloud Run with environment variables from Secret Manager
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
+  # Step 5: Run the npm build (just to test)
+  - name: 'gcr.io/cloud-builders/npm'
     args:
-      - '-c'
-      - |
-        # Fetch all the environment variables from Secret Manager
-        PORT=$(gcloud secrets versions access latest --secret="PORT")
-        API_KEY=$(gcloud secrets versions access latest --secret="docgen_apikey")
-        SF_ORG_ID=$(gcloud secrets versions access latest --secret="SF_ORG_ID")
-        SF_USERNAME=$(gcloud secrets versions access latest --secret="SF_USERNAME")
-        SF_CLIENT_ID=$(gcloud secrets versions access latest --secret="SF_CLIENT_ID")
-        SERVICE_ACCOUNT=$(gcloud secrets versions access latest --secret="SERVICE_ACCOUNT")
-        SF_ORG_ID_TWO=$(gcloud secrets versions access latest --secret="SF_ORG_ID_TWO")
-        BASE_URL=$(gcloud secrets versions access latest --secret="TEST_BASE_URL")
-        
-        # Deploy to Cloud Run, passing the environment variables
-        gcloud run deploy docgen-service  # Use your service name here
-          --image gcr.io/docgen-440809/docgen-testenv:latest
-          --region us-central1  # Replace with your desired region
-          --platform managed
-          --allow-unauthenticated
-          --set-env-vars PORT=${PORT},API_KEY=${API_KEY},SF_ORG_ID=${SF_ORG_ID},SF_USERNAME=${SF_USERNAME},SF_CLIENT_ID=${SF_CLIENT_ID},SERVICE_ACCOUNT=${SERVICE_ACCOUNT},SF_ORG_ID_TWO=${SF_ORG_ID_TWO},BASE_URL=${BASE_URL}
+      - 'run'
+      - 'build'
+
+  # Step 6: Deploy the image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'docgen-service'  # Use your Cloud Run service name here
+      - '--image'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+      - '--region'
+      - 'us-central1'  # Replace with your desired region
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'  # Optional: Remove if authentication is required
+      - '--port'
+      - '4450'  # Replace with the port your app is listening on
 
 options:
   logging: CLOUD_LOGGING_ONLY  # Ensure proper logging configuration
