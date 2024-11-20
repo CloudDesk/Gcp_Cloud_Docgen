@@ -18,7 +18,33 @@ steps:
       - 'project'
       - 'docgen-440809'  # Replace with your GCP project ID
 
-  # Step 3: Build and push the Docker image to Google Container Registry (GCR)
+  # Step 3: Fetch environment variables from Secret Manager and store them in files for later use
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Fetch secrets from Secret Manager and export as environment variables
+        export PORT=$(gcloud secrets versions access latest --secret="PORT")
+        export API_KEY=$(gcloud secrets versions access latest --secret="docgen_apikey")
+        export SF_ORG_ID=$(gcloud secrets versions access latest --secret="SF_ORG_ID")
+        export SF_USERNAME=$(gcloud secrets versions access latest --secret="SF_USERNAME")
+        export SF_CLIENT_ID=$(gcloud secrets versions access latest --secret="SF_CLIENT_ID")
+        export SERVICE_ACCOUNT=$(gcloud secrets versions access latest --secret="SERVICE_ACCOUNT")
+        export SF_ORG_ID_TWO=$(gcloud secrets versions access latest --secret="SF_ORG_ID_TWO")
+        export BASE_URL=$(gcloud secrets versions access latest --secret="TEST_BASE_URL")
+        
+        # Store the environment variables in a file to use later
+        echo "PORT=$PORT" >> /workspace/env-vars.txt
+        echo "API_KEY=$API_KEY" >> /workspace/env-vars.txt
+        echo "SF_ORG_ID=$SF_ORG_ID" >> /workspace/env-vars.txt
+        echo "SF_USERNAME=$SF_USERNAME" >> /workspace/env-vars.txt
+        echo "SF_CLIENT_ID=$SF_CLIENT_ID" >> /workspace/env-vars.txt
+        echo "SERVICE_ACCOUNT=$SERVICE_ACCOUNT" >> /workspace/env-vars.txt
+        echo "SF_ORG_ID_TWO=$SF_ORG_ID_TWO" >> /workspace/env-vars.txt
+        echo "BASE_URL=$BASE_URL" >> /workspace/env-vars.txt
+
+  # Step 4: Build and push the Docker image to Google Container Registry (GCR)
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -26,13 +52,13 @@ steps:
       - 'gcr.io/docgen-440809/docgen-testenv:latest'  # Replace with your service name
       - '.'
 
-  # Step 4: Push Docker image to Google Container Registry
+  # Step 5: Push Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 5: Deploy the Docker image to Cloud Run
+  # Step 6: Deploy the Docker image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -47,14 +73,14 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'  # Optional: Remove if authentication is required
       - '--set-env-vars'
-      - 'PORT=$(gcloud secrets versions access latest --secret="PORT")'  # Fetch environment variables securely
-      - 'API_KEY=$(gcloud secrets versions access latest --secret="docgen_apikey")'
-      - 'SF_ORG_ID=$(gcloud secrets versions access latest --secret="SF_ORG_ID")'
-      - 'SF_USERNAME=$(gcloud secrets versions access latest --secret="SF_USERNAME")'
-      - 'SF_CLIENT_ID=$(gcloud secrets versions access latest --secret="SF_CLIENT_ID")'
-      - 'SERVICE_ACCOUNT=$(gcloud secrets versions access latest --secret="SERVICE_ACCOUNT")'
-      - 'SF_ORG_ID_TWO=$(gcloud secrets versions access latest --secret="SF_ORG_ID_TWO")'
-      - 'BASE_URL=$(gcloud secrets versions access latest --secret="TEST_BASE_URL")'
+      - 'PORT=$(cat /workspace/env-vars.txt | grep PORT | cut -d "=" -f2)'
+      - 'API_KEY=$(cat /workspace/env-vars.txt | grep API_KEY | cut -d "=" -f2)'
+      - 'SF_ORG_ID=$(cat /workspace/env-vars.txt | grep SF_ORG_ID | cut -d "=" -f2)'
+      - 'SF_USERNAME=$(cat /workspace/env-vars.txt | grep SF_USERNAME | cut -d "=" -f2)'
+      - 'SF_CLIENT_ID=$(cat /workspace/env-vars.txt | grep SF_CLIENT_ID | cut -d "=" -f2)'
+      - 'SERVICE_ACCOUNT=$(cat /workspace/env-vars.txt | grep SERVICE_ACCOUNT | cut -d "=" -f2)'
+      - 'SF_ORG_ID_TWO=$(cat /workspace/env-vars.txt | grep SF_ORG_ID_TWO | cut -d "=" -f2)'
+      - 'BASE_URL=$(cat /workspace/env-vars.txt | grep BASE_URL | cut -d "=" -f2)'
 
 substitutions:
-  _PORT: 4350  # You can use default or fallback values here if you prefer
+  _PORT: "4350"  # Default value, will be replaced by Secret Manager in Step 3
