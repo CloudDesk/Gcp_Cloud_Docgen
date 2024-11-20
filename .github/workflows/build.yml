@@ -56,6 +56,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      # Add cleanup step
+      - name: Cleanup SonarCloud artifacts
+        if: success()
+        run: |
+          sudo rm -rf .scannerwork/
+          git clean -fd
+
+
       # Step 8: Create PR from dev to test
       - name: Create Pull Request
         if: success() && github.ref == 'refs/heads/dev'
