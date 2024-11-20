@@ -55,3 +55,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+       # Step 8: Push to Test Branch
+      - name: Push to Test Branch
+        if: success()  # This ensures the step only runs if all previous steps succeed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b test
+          git push origin test
