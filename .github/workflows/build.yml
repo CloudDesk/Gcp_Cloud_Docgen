@@ -55,6 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        continue-on-error: false  # Optional, to emphasize failure stops the job
 
   sync_to_test:
     name: Sync Dev to Test Branch
@@ -78,12 +79,17 @@ jobs:
         run: |
           git fetch origin test
 
-      # Step 4: Create or update 'test' branch with 'dev' content
-      - name: Sync Dev to Test
-        run: |
-          git checkout test || git checkout -b test origin/test
-          git merge origin/dev --no-edit
-          git push origin test
+      # Step 4: Create a pull request from 'dev' to 'test'
+      - name: Create Pull Request from Dev to Test
+        uses: peter-evans/create-pull-request@v5
+        with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: dev
+        base: test
+        title: "Sync Dev to Test"
+        body: |
+          Automatically created PR to sync changes from `dev` to `test` branch.
+          Please review and merge.
 
       # Step 5: Notify Success
       - name: Notify Sync Success
