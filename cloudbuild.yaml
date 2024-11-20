@@ -73,14 +73,14 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'  # Optional: Remove if authentication is required
       - '--set-env-vars'
-      - 'PORT=$(cat /workspace/env-vars.txt | grep PORT | cut -d "=" -f2)'
-      - 'API_KEY=$(cat /workspace/env-vars.txt | grep API_KEY | cut -d "=" -f2)'
-      - 'SF_ORG_ID=$(cat /workspace/env-vars.txt | grep SF_ORG_ID | cut -d "=" -f2)'
-      - 'SF_USERNAME=$(cat /workspace/env-vars.txt | grep SF_USERNAME | cut -d "=" -f2)'
-      - 'SF_CLIENT_ID=$(cat /workspace/env-vars.txt | grep SF_CLIENT_ID | cut -d "=" -f2)'
-      - 'SERVICE_ACCOUNT=$(cat /workspace/env-vars.txt | grep SERVICE_ACCOUNT | cut -d "=" -f2)'
-      - 'SF_ORG_ID_TWO=$(cat /workspace/env-vars.txt | grep SF_ORG_ID_TWO | cut -d "=" -f2)'
-      - 'BASE_URL=$(cat /workspace/env-vars.txt | grep BASE_URL | cut -d "=" -f2)'
+      - 'PORT=$$(cat /workspace/env-vars.txt | grep PORT | cut -d "=" -f2)'  # Referencing ENV VARS with $$ to expand
+      - 'API_KEY=$$(cat /workspace/env-vars.txt | grep API_KEY | cut -d "=" -f2)'
+      - 'SF_ORG_ID=$$(cat /workspace/env-vars.txt | grep SF_ORG_ID | cut -d "=" -f2)'
+      - 'SF_USERNAME=$$(cat /workspace/env-vars.txt | grep SF_USERNAME | cut -d "=" -f2)'
+      - 'SF_CLIENT_ID=$$(cat /workspace/env-vars.txt | grep SF_CLIENT_ID | cut -d "=" -f2)'
+      - 'SERVICE_ACCOUNT=$$(cat /workspace/env-vars.txt | grep SERVICE_ACCOUNT | cut -d "=" -f2)'
+      - 'SF_ORG_ID_TWO=$$(cat /workspace/env-vars.txt | grep SF_ORG_ID_TWO | cut -d "=" -f2)'
+      - 'BASE_URL=$$(cat /workspace/env-vars.txt | grep BASE_URL | cut -d "=" -f2)'
 
 options:
   logging: CLOUD_LOGGING_ONLY  # Specify logging option to avoid logs_bucket error
