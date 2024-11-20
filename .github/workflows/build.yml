@@ -64,28 +64,33 @@ jobs:
           git clean -fd
 
 
-      # Step 8: Create PR from dev to test
-      - name: Create Pull Request
+       # New approach: Direct merge to test branch with conflict resolution
+      - name: Merge to test branch
         if: success() && github.ref == 'refs/heads/dev'
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: dev-to-test
-          base: test
-          head: dev
-          title: 'Auto PR: Merge dev into test'
-          body: 'Automatically created PR to merge dev branch changes into test branch'
-          delete-branch: true
-
-      # Auto-merge step
-      - name: Auto-merge PR
-        if: success() && github.ref == 'refs/heads/dev'
-        uses: pascalgn/automerge-action@v0.15.6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MERGE_LABELS: ""
-          MERGE_METHOD: "merge"
-          MERGE_COMMIT_MESSAGE: "Auto-merge dev into test"
-          MERGE_DELETE_BRANCH: "true"
-          MERGE_RETRIES: "6"
-          MERGE_RETRY_SLEEP: "10000"
+        run: |
+          # Configure git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # Fetch all branches
+          git fetch origin
+          
+          # Clean any leftover files
+          git clean -fd
+          
+          # Create backup of credentials file if it exists
+          if [ -f "src/service/gcp/gcp-credentials.json" ]; then
+            cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
+          fi
+          
+          # Force reset to dev branch state
+          git reset --hard origin/dev
+          
+          # Restore credentials file if it existed
+          if [ -f "/tmp/gcp-credentials.json" ]; then
+            mkdir -p src/service/gcp/
+            cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
+          fi
+          
+          # Push to test branch
+          git push origin HEAD:test --force
