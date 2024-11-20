@@ -75,16 +75,6 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - "4450"
-      - '--set-env-vars'
-      - |
-        dockgen_apikey=$dockgen_apikey,
-        SF_ORG_ID=$$SF_ORG_ID,
-        SF_ORG_ID_TWO=$$SF_ORG_ID_TWO,
-        SF_USERNAME=$$SF_USERNAME,
-        SF_CLIENT_ID=$$SF_CLIENT_ID,
-        SERVICE_ACCOUNT=$$SERVICE_ACCOUNT,
-        BASE_URL=$$BASE_URL
-
 options:
   logging: CLOUD_LOGGING_ONLY
     
