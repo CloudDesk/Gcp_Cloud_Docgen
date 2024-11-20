@@ -5,49 +5,88 @@ steps:
     args:
       - '-c'
       - |
-        # Fetch the service account key from Secret Manager (if needed)
+        echo "Authenticating with GCP..."
         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
         gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
 
-  # Step 2: Set GCP project
+  # Step 2: Fetch environment variables from Secret Manager and export them
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Fetching secrets and exporting as environment variables..."
+        gcloud secrets versions access latest --secret="PORT" > /workspace/PORT
+        gcloud secrets versions access latest --secret="dockgen_apikey" > /workspace/dockgen_apikey
+        gcloud secrets versions access latest --secret="SF_ORG_ID" > /workspace/SF_ORG_ID
+        gcloud secrets versions access latest --secret="SF_ORG_ID_TWO" > /workspace/SF_ORG_ID_TWO
+        gcloud secrets versions access latest --secret="SF_USERNAME" > /workspace/SF_USERNAME
+        gcloud secrets versions access latest --secret="SF_CLIENT_ID" > /workspace/SF_CLIENT_ID
+        gcloud secrets versions access latest --secret="SERVICE_ACCOUNT" > /workspace/SERVICE_ACCOUNT
+        gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/docgen-service-account-key
+        gcloud secrets versions access latest --secret="TEST_BASE_URL" > /workspace/TEST_BASE_URL
+
+        export PORT=$(cat /workspace/PORT)
+        export dockgen_apikey=$(cat /workspace/dockgen_apikey)
+        export SF_ORG_ID=$(cat /workspace/SF_ORG_ID)
+        export SF_ORG_ID_TWO=$(cat /workspace/SF_ORG_ID_TWO)
+        export SF_USERNAME=$(cat /workspace/SF_USERNAME)
+        export SF_CLIENT_ID=$(cat /workspace/SF_CLIENT_ID)
+        export SERVICE_ACCOUNT=$(cat /workspace/SERVICE_ACCOUNT)
+        export docgen_service_account_key=$(cat /workspace/docgen-service-account-key)
+        export TEST_BASE_URL=$(cat /workspace/TEST_BASE_URL)
+
+        echo "Secrets fetched and exported as environment variables."
+
+  # Step 3: Set GCP project
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
       - 'config'
       - 'set'
       - 'project'
-      - 'docgen-440809'  # Replace with your GCP project ID
+      - 'docgen-440809'
 
-  # Step 3: Build the Docker image
+  # Step 4: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'  # Replace with your image name
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
       - '.'
 
-  # Step 4: Push the Docker image to Google Container Registry
+  # Step 5: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 5: Deploy the image to Cloud Run
+  # Step 6: Deploy the image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
       - 'run'
       - 'deploy'
-      - 'docgen-service'  # Use your Cloud Run service name here
+      - 'docgen-service'
       - '--image'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
       - '--region'
-      - 'us-central1'  # Replace with your desired region
+      - 'us-central1'
       - '--platform'
       - 'managed'
-      - '--allow-unauthenticated'  # Optional: Remove if authentication is required
+      - '--allow-unauthenticated'
       - '--port'
-      - '4450'  # Replace with the port your app is listening on
+      - "$PORT"
+      - '--set-env-vars'
+      - |
+        PORT=$PORT,
+        dockgen_apikey=$dockgen_apikey,
+        SF_ORG_ID=$SF_ORG_ID,
+        SF_ORG_ID_TWO=$SF_ORG_ID_TWO,
+        SF_USERNAME=$SF_USERNAME,
+        SF_CLIENT_ID=$SF_CLIENT_ID,
+        SERVICE_ACCOUNT=$SERVICE_ACCOUNT,
+        TEST_BASE_URL=$TEST_BASE_URL
 
 options:
-  logging: CLOUD_LOGGING_ONLY  # Ensure proper logging configuration
+  logging: CLOUD_LOGGING_ONLY
