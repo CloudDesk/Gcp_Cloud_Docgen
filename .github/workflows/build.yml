@@ -92,14 +92,22 @@ jobs:
             Automatically created PR to sync changes from `dev` to `test` branch.
             Please review and merge.
 
-      # Step 5: Automatically merge the pull request
+      # Step 5: Wait for the PR to be created and get the PR number
+      - name: Get PR Number
+        id: pr_number
+        run: |
+          PR_URL="${{ steps.pr.outputs.pull-request-url }}"
+          PR_NUMBER=$(echo $PR_URL | grep -oE '[0-9]+$')
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+
+      # Step 6: Automatically merge the pull request
       - name: Merge Pull Request
         run: |
-          PR_NUMBER=$(echo "${{ steps.pr.outputs.pull-request-url }}" | grep -oE '[0-9]+$')
+          PR_NUMBER=$GITHUB_ENV.PR_NUMBER
           curl -X PUT -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d '{"commit_title":"Sync Dev to Test","commit_message":"Merging dev into test","merge_method":"merge"}' \
             "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/merge"
-          
-      # Step 6: Notify Success
+
+      # Step 7: Notify Success
       - name: Notify Sync Success
         run: echo "Successfully synced 'dev' branch to 'test' branch!"
