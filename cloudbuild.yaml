@@ -85,5 +85,3 @@ steps:
 options:
   logging: CLOUD_LOGGING_ONLY  # Specify logging option (to avoid logs_bucket error)
 
-substitutions:
-  _PORT: "4350"  # Default value, will be replaced by Secret Manager in Step 3
