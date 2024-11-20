@@ -26,15 +26,15 @@ steps:
         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/docgen-service-account-key
         gcloud secrets versions access latest --secret="TEST_BASE_URL" > /workspace/TEST_BASE_URL
 
-        export PORT=$(cat /workspace/PORT)
-        export dockgen_apikey=$(cat /workspace/dockgen_apikey)
-        export SF_ORG_ID=$(cat /workspace/SF_ORG_ID)
-        export SF_ORG_ID_TWO=$(cat /workspace/SF_ORG_ID_TWO)
-        export SF_USERNAME=$(cat /workspace/SF_USERNAME)
-        export SF_CLIENT_ID=$(cat /workspace/SF_CLIENT_ID)
-        export SERVICE_ACCOUNT=$(cat /workspace/SERVICE_ACCOUNT)
-        export docgen_service_account_key=$(cat /workspace/docgen-service-account-key)
-        export TEST_BASE_URL=$(cat /workspace/TEST_BASE_URL)
+        export PORT=$$(cat /workspace/PORT)
+        export dockgen_apikey=$$(cat /workspace/dockgen_apikey)
+        export SF_ORG_ID=$$(cat /workspace/SF_ORG_ID)
+        export SF_ORG_ID_TWO=$$(cat /workspace/SF_ORG_ID_TWO)
+        export SF_USERNAME=$$(cat /workspace/SF_USERNAME)
+        export SF_CLIENT_ID=$$(cat /workspace/SF_CLIENT_ID)
+        export SERVICE_ACCOUNT=$$(cat /workspace/SERVICE_ACCOUNT)
+        export docgen_service_account_key=$$(cat /workspace/docgen-service-account-key)
+        export TEST_BASE_URL=$$(cat /workspace/TEST_BASE_URL)
 
         echo "Secrets fetched and exported as environment variables."
 
