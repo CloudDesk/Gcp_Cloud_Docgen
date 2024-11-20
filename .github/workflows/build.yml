@@ -1,18 +1,17 @@
-name: Build
+name: Test Deployment
 
 on:
   push:
     branches:
-      - dev
-  pull_request:
-    types: [opened, synchronize, reopened]
+      - test  # Trigger workflow when changes are pushed to the `test` branch
 
 jobs:
-  sonarcloud:
-    name: SonarCloud
+  deploy:
+    name: Deploy to Test Environment
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Check out the repository
+      # Step 1: Checkout code
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensures the full history for better analysis
@@ -28,69 +27,46 @@ jobs:
           echo "SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }}" >> $GITHUB_ENV
           echo "SF_ORG_ID_TWO=${{ secrets.SF_ORG_ID_TWO }}" >> $GITHUB_ENV
 
-      # Step 3: Create GCP credentials file
-      - name: Create GCP credentials file
-        run: |
-          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > "$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json" >> $GITHUB_ENV
-
-      # Step 4: Install libreoffice
+      # Step 3: Install LibreOffice (if required)
       - name: Install LibreOffice
         run: |
           sudo apt-get update
           sudo apt-get install -y libreoffice
           sudo apt-get install -y libreoffice-writer
 
-      # Step 5: Install dependencies
+      # Step 4: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 6: Run Jest Tests with Coverage
+      # Step 5: Run Jest Tests (optional but useful for testing the code)
       - name: Run Jest Tests
         run: npm test -- --coverage
 
-      # Step 7: Run SonarCloud Scan
+      # Step 6: Build and Push Docker image to Google Container Registry (GCR)
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t gcr.io/docgen-440809/docgen-testenv:latest .
+          docker push gcr.io/docgen-440809/docgen-testenv:latest
+
+      # Step 7: Deploy Docker Image to Cloud Run (Staging)
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy your-service-name  # Replace with your Cloud Run service name
+          --image=gcr.io/docgen-440809/docgen-testenv:latest
+          --region=us-central1  # Replace with your region
+          --platform=managed
+          --allow-unauthenticated  # Optional: Remove if authentication is required
+
+      # Step 8: (Optional) Run SonarCloud Scan again for the test branch
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Add cleanup step
+      # Step 9: Cleanup
       - name: Cleanup SonarCloud artifacts
         if: success()
         run: |
           sudo rm -rf .scannerwork/
           git clean -fd
-
-
-       # New approach: Direct merge to test branch with conflict resolution
-      - name: Merge to test branch
-        if: success() && github.ref == 'refs/heads/dev'
-        run: |
-          # Configure git
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          
-          # Fetch all branches
-          git fetch origin
-          
-          # Clean any leftover files
-          git clean -fd
-          
-          # Create backup of credentials file if it exists
-          if [ -f "src/service/gcp/gcp-credentials.json" ]; then
-            cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
-          fi
-          
-          # Force reset to dev branch state
-          git reset --hard origin/dev
-          
-          # Restore credentials file if it existed
-          if [ -f "/tmp/gcp-credentials.json" ]; then
-            mkdir -p src/service/gcp/
-            cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
-          fi
-          
-          # Push to test branch
-          git push origin HEAD:test --force
