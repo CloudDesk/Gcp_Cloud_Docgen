@@ -32,13 +32,7 @@ steps:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 5: Run the npm build (just to test)
-  - name: 'gcr.io/cloud-builders/npm'
-    args:
-      - 'run'
-      - 'build'
-
-  # Step 6: Deploy the image to Cloud Run
+  # Step 5: Deploy the image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
