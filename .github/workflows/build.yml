@@ -56,6 +56,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+        # Step 8: Wait for SonarCloud Quality Gate status
+      - name: Wait for SonarCloud Quality Gate
+        uses: actions/github-script@v6
+        id: check_quality_gate
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          script: |
+            const fetch = require('node-fetch');
+            const projectKey = 'CloudDesk_Gcp_Cloud_Docgen'; // Replace with your project key
+            const response = await fetch(`https://sonarcloud.io/api/qualitygates/project_status?projectKey=${projectKey}`, {
+              headers: { 'Authorization': `Basic ${Buffer.from('${{ secrets.SONAR_TOKEN }}:').toString('base64')}` },
+            });
+            const data = await response.json();
+            const status = data.projectStatus.status;
+            if (status !== 'OK') {
+              core.setFailed(`SonarCloud Quality Gate failed with status: ${status}`);
+            } else {
+              console.log('SonarCloud Quality Gate passed.');
+            }
+
       # Add cleanup step
       - name: Cleanup SonarCloud artifacts
         if: success()
