@@ -64,7 +64,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           script: |
-            const projectKey = 'your_sonarcloud_project_key'; // Replace with your project key
+            const projectKey = 'CloudDesk_Gcp_Cloud_Docgen'; // Replace with your project key
             const response = await fetch(`https://sonarcloud.io/api/qualitygates/project_status?projectKey=${projectKey}`, {
             headers: {
                 'Authorization': `Basic ${Buffer.from(process.env.SONAR_TOKEN + ':').toString('base64')}`,
