@@ -44,7 +44,7 @@ steps:
         echo "SF_ORG_ID_TWO=$SF_ORG_ID_TWO" >> /workspace/env-vars.txt
         echo "BASE_URL=$BASE_URL" >> /workspace/env-vars.txt
 
-  # Step 4: Build and push the Docker image to Google Container Registry (GCR)
+  # Step 4: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -58,30 +58,39 @@ steps:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 6: Deploy the Docker image to Cloud Run
+  # Step 6: Check if Cloud Run service exists, create or deploy accordingly
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
+    entrypoint: 'bash'
     args:
-      - 'run'
-      - 'deploy'
-      - 'your-service-name'  # Replace with your Cloud Run service name
-      - '--image'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'
-      - '--region'
-      - 'your-region'  # Replace with your region, e.g., us-central1
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'  # Optional: Remove if authentication is required
-      - '--set-env-vars'
-      - 'PORT=$(cat /workspace/env-vars.txt | grep PORT | cut -d "=" -f2)'
-      - 'API_KEY=$(cat /workspace/env-vars.txt | grep API_KEY | cut -d "=" -f2)'
-      - 'SF_ORG_ID=$(cat /workspace/env-vars.txt | grep SF_ORG_ID | cut -d "=" -f2)'
-      - 'SF_USERNAME=$(cat /workspace/env-vars.txt | grep SF_USERNAME | cut -d "=" -f2)'
-      - 'SF_CLIENT_ID=$(cat /workspace/env-vars.txt | grep SF_CLIENT_ID | cut -d "=" -f2)'
-      - 'SERVICE_ACCOUNT=$(cat /workspace/env-vars.txt | grep SERVICE_ACCOUNT | cut -d "=" -f2)'
-      - 'SF_ORG_ID_TWO=$(cat /workspace/env-vars.txt | grep SF_ORG_ID_TWO | cut -d "=" -f2)'
-      - 'BASE_URL=$(cat /workspace/env-vars.txt | grep BASE_URL | cut -d "=" -f2)'
+      - '-c'
+      - |
+        REGION="us-central1"  # Replace with your region, e.g., us-central1
+
+        # Dynamically generate a service name (e.g., use a timestamp or project ID)
+        SERVICE_NAME="docgen-service-$(date +'%Y%m%d%H%M%S')"  # Dynamic service name based on timestamp
+        
+        # Check if the Cloud Run service exists
+        gcloud run services describe $SERVICE_NAME --region $REGION &> /dev/null
+        
+        if [ $? -eq 0 ]; then
+          # Service exists, redeploy the existing service
+          echo "Service exists, redeploying..."
+          gcloud run deploy $SERVICE_NAME \
+            --image gcr.io/docgen-440809/docgen-testenv:latest \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars $(cat /workspace/env-vars.txt | xargs)
+        else
+          # Service doesn't exist, create a new one
+          echo "Service does not exist, creating a new one..."
+          gcloud run deploy $SERVICE_NAME \
+            --image gcr.io/docgen-440809/docgen-testenv:latest \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars $(cat /workspace/env-vars.txt | xargs)
+        fi
 
 options:
   logging: CLOUD_LOGGING_ONLY  # Specify logging option (to avoid logs_bucket error)
-
