@@ -1,0 +1,60 @@
+steps:
+  # Step 1: Authenticate with GCP using Service Account stored in Secret Manager
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Fetch the service account key from Secret Manager
+        gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
+        gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
+
+  # Step 2: Set GCP project
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'config'
+      - 'set'
+      - 'project'
+      - 'docgen-440809'  # Replace with your GCP project ID
+
+  # Step 3: Build and push the Docker image to Google Container Registry (GCR)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'  # Replace with your service name
+      - '.'
+
+  # Step 4: Push Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+
+  # Step 5: Deploy the Docker image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'your-service-name'  # Replace with your Cloud Run service name
+      - '--image'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+      - '--region'
+      - 'your-region'  # Replace with your region, e.g., us-central1
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'  # Optional: Remove if authentication is required
+      - '--set-env-vars'
+      - 'PORT=$(gcloud secrets versions access latest --secret="PORT")'  # Fetch environment variables securely
+      - 'API_KEY=$(gcloud secrets versions access latest --secret="docgen_apikey")'
+      - 'SF_ORG_ID=$(gcloud secrets versions access latest --secret="SF_ORG_ID")'
+      - 'SF_USERNAME=$(gcloud secrets versions access latest --secret="SF_USERNAME")'
+      - 'SF_CLIENT_ID=$(gcloud secrets versions access latest --secret="SF_CLIENT_ID")'
+      - 'SERVICE_ACCOUNT=$(gcloud secrets versions access latest --secret="SERVICE_ACCOUNT")'
+      - 'SF_ORG_ID_TWO=$(gcloud secrets versions access latest --secret="SF_ORG_ID_TWO")'
+      - 'BASE_URL=$(gcloud secrets versions access latest --secret="TEST_BASE_URL")'
+
+substitutions:
+  _PORT: 4350  # You can use default or fallback values here if you prefer
