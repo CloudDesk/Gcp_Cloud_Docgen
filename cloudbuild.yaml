@@ -74,7 +74,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--port'
-      - "$PORT"
+      - "4450"
       - '--set-env-vars'
       - |
         dockgen_apikey=$dockgen_apikey,
