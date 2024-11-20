@@ -83,13 +83,13 @@ jobs:
       - name: Create Pull Request from Dev to Test
         uses: peter-evans/create-pull-request@v5
         with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        branch: dev
-        base: test
-        title: "Sync Dev to Test"
-        body: |
-          Automatically created PR to sync changes from `dev` to `test` branch.
-          Please review and merge.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: dev
+          base: test
+          title: "Sync Dev to Test"
+          body: |
+            Automatically created PR to sync changes from `dev` to `test` branch.
+            Please review and merge.
 
       # Step 5: Notify Success
       - name: Notify Sync Success
