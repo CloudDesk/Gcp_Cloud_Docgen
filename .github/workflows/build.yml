@@ -81,6 +81,7 @@ jobs:
 
       # Step 4: Create a pull request from 'dev' to 'test'
       - name: Create Pull Request from Dev to Test
+        id: pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -91,6 +92,14 @@ jobs:
             Automatically created PR to sync changes from `dev` to `test` branch.
             Please review and merge.
 
-      # Step 5: Notify Success
+      # Step 5: Automatically merge the pull request
+      - name: Merge Pull Request
+        run: |
+          PR_NUMBER=$(echo "${{ steps.pr.outputs.pull-request-url }}" | grep -oE '[0-9]+$')
+          curl -X PUT -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"commit_title":"Sync Dev to Test","commit_message":"Merging dev into test","merge_method":"merge"}' \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/merge"
+          
+      # Step 6: Notify Success
       - name: Notify Sync Success
         run: echo "Successfully synced 'dev' branch to 'test' branch!"
