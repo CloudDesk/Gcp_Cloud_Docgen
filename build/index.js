@@ -7,11 +7,15 @@ import swaggerUi from "@fastify/swagger-ui";
 import { getSecretValue } from "./service/gcp/secretManager.service.js";
 const Fastify = fastify({ logger: { level: 'debug' } });
 let apiKeyFromSecretManager = null;
+console.log(apiKeyFromSecretManager, "API key from secret manager");
 async function initializeApiKey() {
     try {
         if (!apiKeyFromSecretManager) {
             apiKeyFromSecretManager = await getSecretValue("docgen_apikey");
             console.log("API Key initialized:", apiKeyFromSecretManager);
+        }
+        if (apiKeyFromSecretManager.error) {
+            throw new Error("API key initialization failed");
         }
         return apiKeyFromSecretManager;
     }

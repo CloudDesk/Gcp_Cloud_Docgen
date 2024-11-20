@@ -8,8 +8,8 @@ import { validateAndParseCredentials } from "../../utils/validateBase.js";
 import { SERVICE_ACCOUNT } from "../../config/config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-console.log(SERVICE_ACCOUNT, "process.env.SERVICE_ACCOUNT 22 latest");
 let credentialsData;
+console.log(SERVICE_ACCOUNT, "Service Account");
 try {
     credentialsData = await validateAndParseCredentials(SERVICE_ACCOUNT);
     console.log(credentialsData, "Credentials Data");
