@@ -16,7 +16,6 @@ steps:
       - '-c'
       - |
         echo "Fetching secrets and exporting as environment variables..."
-        gcloud secrets versions access latest --secret="PORT" > /workspace/PORT
         gcloud secrets versions access latest --secret="dockgen_apikey" > /workspace/dockgen_apikey
         gcloud secrets versions access latest --secret="SF_ORG_ID" > /workspace/SF_ORG_ID
         gcloud secrets versions access latest --secret="SF_ORG_ID_TWO" > /workspace/SF_ORG_ID_TWO
@@ -26,7 +25,6 @@ steps:
         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/docgen-service-account-key
         gcloud secrets versions access latest --secret="TEST_BASE_URL" > /workspace/TEST_BASE_URL
 
-        export PORT=$$(cat /workspace/PORT)
         export dockgen_apikey=$$(cat /workspace/dockgen_apikey)
         export SF_ORG_ID=$$(cat /workspace/SF_ORG_ID)
         export SF_ORG_ID_TWO=$$(cat /workspace/SF_ORG_ID_TWO)
@@ -79,7 +77,6 @@ steps:
       - "$PORT"
       - '--set-env-vars'
       - |
-        PORT=$PORT,
         dockgen_apikey=$dockgen_apikey,
         SF_ORG_ID=$$SF_ORG_ID,
         SF_ORG_ID_TWO=$$SF_ORG_ID_TWO,
