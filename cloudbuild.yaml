@@ -58,7 +58,7 @@ steps:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 6: Check if Cloud Run service exists, create or deploy accordingly
+    # Step 6: Check if Cloud Run service exists, create or deploy accordingly
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
     args:
@@ -91,6 +91,5 @@ steps:
             --allow-unauthenticated \
             --set-env-vars $(cat /workspace/env-vars.txt | xargs)
         fi
-
 options:
   logging: CLOUD_LOGGING_ONLY  # Specify logging option (to avoid logs_bucket error)

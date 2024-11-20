@@ -16,7 +16,7 @@ COPY package*.json ./
 COPY . .
 
 # Expose the port that your application will run on
-EXPOSE 4350
+EXPOSE 4450
 
 # Explicitly install docxtemplater (in case it's not in package.json)
 RUN npm install docxtemplater
