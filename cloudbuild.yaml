@@ -18,69 +18,43 @@ steps:
       - 'project'
       - 'docgen-440809'  # Replace with your GCP project ID
 
-  # Step 3: Fetch environment variables from Secret Manager and store them in files for later use
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        # Fetch secrets from Secret Manager and export as environment variables
-        export PORT=$(gcloud secrets versions access latest --secret="PORT")
-        export API_KEY=$(gcloud secrets versions access latest --secret="docgen_apikey")
-        export SF_ORG_ID=$(gcloud secrets versions access latest --secret="SF_ORG_ID")
-        export SF_USERNAME=$(gcloud secrets versions access latest --secret="SF_USERNAME")
-        export SF_CLIENT_ID=$(gcloud secrets versions access latest --secret="SF_CLIENT_ID")
-        export SERVICE_ACCOUNT=$(gcloud secrets versions access latest --secret="SERVICE_ACCOUNT")
-        export SF_ORG_ID_TWO=$(gcloud secrets versions access latest --secret="SF_ORG_ID_TWO")
-        export BASE_URL=$(gcloud secrets versions access latest --secret="TEST_BASE_URL")
-        
-        # Store the environment variables in a file to use later
-        echo "PORT=$PORT" >> /workspace/env-vars.txt
-        echo "API_KEY=$API_KEY" >> /workspace/env-vars.txt
-        echo "SF_ORG_ID=$SF_ORG_ID" >> /workspace/env-vars.txt
-        echo "SF_USERNAME=$SF_USERNAME" >> /workspace/env-vars.txt
-        echo "SF_CLIENT_ID=$SF_CLIENT_ID" >> /workspace/env-vars.txt
-        echo "SERVICE_ACCOUNT=$SERVICE_ACCOUNT" >> /workspace/env-vars.txt
-        echo "SF_ORG_ID_TWO=$SF_ORG_ID_TWO" >> /workspace/env-vars.txt
-        echo "BASE_URL=$BASE_URL" >> /workspace/env-vars.txt
-
-  # Step 4: Build and push the Docker image to Google Container Registry (GCR)
+  # Step 3: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'  # Replace with your service name
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'  # Replace with your image name
       - '.'
 
-  # Step 5: Push Docker image to Google Container Registry
+  # Step 4: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 6: Deploy the Docker image to Cloud Run
+  # Step 5: Deploy to Cloud Run with environment variables from Secret Manager
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
+    entrypoint: 'bash'
     args:
-      - 'run'
-      - 'deploy'
-      - 'docgen-service'  # Specify your service name here (this will create a new service)
-      - '--image'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'
-      - '--region'
-      - 'us-central1'  # Replace with your desired region, e.g., us-central1
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'  # Optional: Remove if authentication is required
-      - '--set-env-vars'
-      - 'PORT=$$(cat /workspace/env-vars.txt | grep PORT | cut -d "=" -f2)'  # Referencing ENV VARS with $$ to expand
-      - 'API_KEY=$$(cat /workspace/env-vars.txt | grep API_KEY | cut -d "=" -f2)'
-      - 'SF_ORG_ID=$$(cat /workspace/env-vars.txt | grep SF_ORG_ID | cut -d "=" -f2)'
-      - 'SF_USERNAME=$$(cat /workspace/env-vars.txt | grep SF_USERNAME | cut -d "=" -f2)'
-      - 'SF_CLIENT_ID=$$(cat /workspace/env-vars.txt | grep SF_CLIENT_ID | cut -d "=" -f2)'
-      - 'SERVICE_ACCOUNT=$$(cat /workspace/env-vars.txt | grep SERVICE_ACCOUNT | cut -d "=" -f2)'
-      - 'SF_ORG_ID_TWO=$$(cat /workspace/env-vars.txt | grep SF_ORG_ID_TWO | cut -d "=" -f2)'
-      - 'BASE_URL=$$(cat /workspace/env-vars.txt | grep BASE_URL | cut -d "=" -f2)'
+      - '-c'
+      - |
+        # Fetch all the environment variables from Secret Manager
+        PORT=$(gcloud secrets versions access latest --secret="PORT")
+        API_KEY=$(gcloud secrets versions access latest --secret="docgen_apikey")
+        SF_ORG_ID=$(gcloud secrets versions access latest --secret="SF_ORG_ID")
+        SF_USERNAME=$(gcloud secrets versions access latest --secret="SF_USERNAME")
+        SF_CLIENT_ID=$(gcloud secrets versions access latest --secret="SF_CLIENT_ID")
+        SERVICE_ACCOUNT=$(gcloud secrets versions access latest --secret="SERVICE_ACCOUNT")
+        SF_ORG_ID_TWO=$(gcloud secrets versions access latest --secret="SF_ORG_ID_TWO")
+        BASE_URL=$(gcloud secrets versions access latest --secret="TEST_BASE_URL")
+        
+        # Deploy to Cloud Run, passing the environment variables
+        gcloud run deploy docgen-service  # Use your service name here
+          --image gcr.io/docgen-440809/docgen-testenv:latest
+          --region us-central1  # Replace with your desired region
+          --platform managed
+          --allow-unauthenticated
+          --set-env-vars PORT=${PORT},API_KEY=${API_KEY},SF_ORG_ID=${SF_ORG_ID},SF_USERNAME=${SF_USERNAME},SF_CLIENT_ID=${SF_CLIENT_ID},SERVICE_ACCOUNT=${SERVICE_ACCOUNT},SF_ORG_ID_TWO=${SF_ORG_ID_TWO},BASE_URL=${BASE_URL}
 
 options:
-  logging: CLOUD_LOGGING_ONLY  # Specify logging option to avoid logs_bucket error
+  logging: CLOUD_LOGGING_ONLY  # Ensure proper logging configuration
