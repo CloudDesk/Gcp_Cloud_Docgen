@@ -92,12 +92,13 @@ jobs:
             Automatically created PR to sync changes from `dev` to `test` branch.
             Please review and merge.
 
-      # Step 5: Wait for the PR to be created and get the PR number
-      - name: Get PR Number
-        id: pr_number
+      # Step 5: Get PR URL and PR Number
+      - name: Get PR URL and PR Number
+        id: pr_url
         run: |
           PR_URL="${{ steps.pr.outputs.pull-request-url }}"
           PR_NUMBER=$(echo $PR_URL | grep -oE '[0-9]+$')
+          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
 
       # Step 6: Automatically merge the pull request
