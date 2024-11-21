@@ -63,18 +63,17 @@ steps:
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
-      - 'run'
-      - 'deploy'
-      - 'docgen-service'
-      - '--image'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'
-      - '--region'
-      - 'us-central1'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--port'
-      - "4450"
+      - '-c'
+      - |
+        echo "Deploying to Cloud Run with environment variables from env.list..."
+        gcloud run deploy docgen-service \
+          --image gcr.io/docgen-440809/docgen-testenv:latest \
+          --region us-central1 \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 4450 \
+          --set-env-vars $(cat /workspace/env.list | tr '\n' ',' | sed 's/,$//')
+
 options:
   logging: CLOUD_LOGGING_ONLY
     
