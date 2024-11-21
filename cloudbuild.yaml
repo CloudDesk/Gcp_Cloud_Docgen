@@ -62,6 +62,8 @@ steps:
        - '--allow-unauthenticated'
        - '--port'
        - "4450"
+       - '--timeout'
+       - '600'
        # Add environment variables to Cloud Run deployment
        - '--set-env-vars'
        - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO},BASE_URL=${_TEST_BASE_URL}'
