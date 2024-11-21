@@ -9,28 +9,27 @@ steps:
         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
         gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
 
- 
- # Step 2: Set secrets as environment variables
-    - name: Export Secrets
-      env:
-        API_KEY: ${{ secrets.API_KEY }}
-        SF_ORG_ID: ${{ secrets.SF_ORG_ID }}
-        SF_ORG_ID_TWO: ${{ secrets.SF_ORG_ID_TWO }}
-        SF_USERNAME: ${{ secrets.SF_USERNAME }}
-        SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
-        SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-        BASE_URL: ${{ secrets.BASE_URL }}
-        TEST_DATA: ${{ secrets.TEST_DATA }}
-      run: |
-        echo "Secrets are available as environment variables."
-        echo "API_KEY=${API_KEY}"
-        echo "SF_ORG_ID=${SF_ORG_ID}"
-        echo "SF_ORG_ID_TWO=${SF_ORG_ID_TWO}"
-        echo "SF_USERNAME=${SF_USERNAME}"
-        echo "SF_CLIENT_ID=${SF_CLIENT_ID}"
-        echo "SERVICE_ACCOUNT=${SERVICE_ACCOUNT}"
-        echo "BASE_URL=${BASE_URL}"
-        echo "TEST_DATA=${TEST_DATA}"
+  # Step 2: Set secrets as environment variables
+  - name: Export Secrets
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+      SF_ORG_ID: ${{ secrets.SF_ORG_ID }}
+      SF_ORG_ID_TWO: ${{ secrets.SF_ORG_ID_TWO }}
+      SF_USERNAME: ${{ secrets.SF_USERNAME }}
+      SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+      BASE_URL: ${{ secrets.BASE_URL }}
+      TEST_DATA: ${{ secrets.TEST_DATA }}
+    run: |
+      echo "Secrets are available as environment variables."
+      echo "API_KEY=${API_KEY}"
+      echo "SF_ORG_ID=${SF_ORG_ID}"
+      echo "SF_ORG_ID_TWO=${SF_ORG_ID_TWO}"
+      echo "SF_USERNAME=${SF_USERNAME}"
+      echo "SF_CLIENT_ID=${SF_CLIENT_ID}"
+      echo "SERVICE_ACCOUNT=${SERVICE_ACCOUNT}"
+      echo "BASE_URL=${BASE_URL}"
+      echo "TEST_DATA=${TEST_DATA}"
 
   # Step 3: Set GCP project
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -72,8 +71,7 @@ steps:
       - '--port'
       - "4450"
       - '--set-env-vars'
-      
+      - "API_KEY=${API_KEY},SF_ORG_ID=${SF_ORG_ID},SF_USERNAME=${SF_USERNAME},TEST_DATA=${TEST_DATA},SF_CLIENT_ID=${SF_CLIENT_ID},SERVICE_ACCOUNT=${SERVICE_ACCOUNT},SF_ORG_ID_TWO=${SF_ORG_ID_TWO},BASE_URL=${BASE_URL}"
 
 options:
   logging: CLOUD_LOGGING_ONLY
-    
