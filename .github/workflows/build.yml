@@ -137,6 +137,7 @@ jobs:
       - name: Submit Cloud Build
         run: |
           gcloud builds submit \
+            --project=docgen-440809 \
             --substitutions=_API_KEY=${{ secrets.API_KEY }},_SF_ORG_ID=${{ secrets.SF_ORG_ID }},_SF_USERNAME=${{ secrets.SF_USERNAME }},_SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }},_SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }},_SF_ORG_ID_TWO=${{ secrets.SF_ORG_ID_TWO }},_TEST_BASE_URL=${{ secrets.TEST_BASE_URL }} \
             --config cloudbuild.yaml .
            
