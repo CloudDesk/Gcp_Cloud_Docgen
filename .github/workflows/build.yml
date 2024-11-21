@@ -17,23 +17,6 @@ jobs:
         with:
           fetch-depth: 0  # Ensures the full history for better analysis
 
-
-
-      - name: Generate environment variable file for Cloud Run
-        run: |
-          echo "PORT=${{ secrets.PORT }}" >> $GITHUB_WORKSPACE/env.list
-          echo "dockgen_apikey=${{ secrets.API_KEY }}" >> $GITHUB_WORKSPACE/env.list
-          echo "SF_ORG_ID=${{ secrets.SF_ORG_ID }}" >> $GITHUB_WORKSPACE/env.list
-          echo "SF_ORG_ID_TWO=${{ secrets.SF_ORG_ID_TWO }}" >> $GITHUB_WORKSPACE/env.list
-          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_WORKSPACE/env.list
-          echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_WORKSPACE/env.list
-          echo "SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }}" >> $GITHUB_WORKSPACE/env.list
-          echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_WORKSPACE/env.list
-          echo "TEST_BASE_URL=${{ secrets.TEST_BASE_URL }}" >> $GITHUB_WORKSPACE/env.list
-       env:
-          GITHUB_ENV: ${{ github.env }}
-
-
       # Step 2: Set environment variables (using GitHub Secrets)
       - name: Set environment variables
         run: |
