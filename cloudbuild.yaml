@@ -1,81 +1,87 @@
 steps:
-   # Step 1: Authenticate with GCP using Service Account stored in Secret Manager
-   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-     entrypoint: 'bash'
-     args:
-       - '-c'
-       - |
-         echo "Authenticating with GCP..."
-         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
-         gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
+  # Step 1: Authenticate with GCP using Service Account
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Authenticating with GCP..."
+        gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
+        gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
 
-   # Step 2: Detailed Environment Variable Debugging
-   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-     entrypoint: 'bash'
-     args:
-       - '-c'
-       - |
-         echo "Debugging environment variables:"
-         echo "API_KEY length: ${#_API_KEY}"
-         echo "SF_ORG_ID length: ${#_SF_ORG_ID}"
+  # Step 2: Debug and Load Environment Variables
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Loading Environment Variables..."
+        echo "API_KEY=${_API_KEY}"
+        echo "SF_ORG_ID=${_SF_ORG_ID}"
+        echo "SF_USERNAME=${_SF_USERNAME}"
+        echo "SF_CLIENT_ID=${_SF_CLIENT_ID}"
+        echo "SERVICE_ACCOUNT=${_SERVICE_ACCOUNT}"
+        echo "SF_ORG_ID_TWO=${_SF_ORG_ID_TWO}"
+        echo "TEST_BASE_URL=${_TEST_BASE_URL}"
 
-   # Step 3: Set GCP project
-   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-     entrypoint: 'gcloud'
-     args:
-       - 'config'
-       - 'set'
-       - 'project'
-       - 'docgen-440809'
+  # Step 3: Set GCP Project Configuration
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'config'
+      - 'set'
+      - 'project'
+      - 'docgen-440809'
 
-   # Step 4: Build the Docker image with debug entrypoint
-   - name: 'gcr.io/cloud-builders/docker'
-     args:
-       - 'build'
-       - '-t'
-       - 'gcr.io/docgen-440809/docgen-testenv:latest'
-       - '.'
+  # Step 4: Build the Docker Image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+      - '.'
 
-   # Step 5: Push the Docker image to Google Container Registry
-   - name: 'gcr.io/cloud-builders/docker'
-     args:
-       - 'push'
-       - 'gcr.io/docgen-440809/docgen-testenv:latest'
+  # Step 5: Push the Docker Image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-   # Step 6: Deploy the image to Cloud Run with extensive diagnostics
-   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-     entrypoint: 'gcloud'
-     args:
-       - 'run'
-       - 'deploy'
-       - 'docgen-service'
-       - '--image'
-       - 'gcr.io/docgen-440809/docgen-testenv:latest'
-       - '--region'
-       - 'us-central1'
-       - '--platform'
-       - 'managed'
-       - '--allow-unauthenticated'
-       - '--port'
-       - '4450'
-       - '--max-instances'
-       - '1'
-       - '--cpu'
-       - '1'
-       - '--memory'
-       - '512Mi'
-       - '--timeout'
-       - '900'  # 15 minutes timeout
-       - '--set-env-vars'
-       - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO}'
+  # Step 6: Deploy the Docker Image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'docgen-service'
+      - '--image'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '4450'
+      - '--max-instances'
+      - '1'
+      - '--cpu'
+      - '1'
+      - '--memory'
+      - '512Mi'
+      - '--timeout'
+      - '900' # 15 minutes timeout
+      - '--set-env-vars'
+      - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO},TEST_BASE_URL=${_TEST_BASE_URL}'
 
 options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
-  _API_KEY: '${API_KEY}'
+  _API_KEY: '${API_KEY}'              # Passed via CI/CD or set in substitutions
   _SF_ORG_ID: '${SF_ORG_ID}'
   _SF_USERNAME: '${SF_USERNAME}'
   _SF_CLIENT_ID: '${SF_CLIENT_ID}'
   _SERVICE_ACCOUNT: '${SERVICE_ACCOUNT}'
   _SF_ORG_ID_TWO: '${SF_ORG_ID_TWO}'
+  _TEST_BASE_URL: '${TEST_BASE_URL}'  # New substitution

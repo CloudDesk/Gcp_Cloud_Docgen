@@ -70,6 +70,7 @@ jobs:
             const response = await fetch(`https://sonarcloud.io/api/qualitygates/project_status?projectKey=${projectKey}`, {
             headers: {
                 'Authorization': `Basic ${Buffer.from(process.env.SONAR_TOKEN + ':').toString('base64')}`,
+
             },
             });
 
@@ -93,7 +94,6 @@ jobs:
               console.log(`Unexpected SonarCloud Quality Gate status: ${status}`);
               core.setFailed(`Unexpected status: ${status}`);
             }
-    
 
       # Add cleanup step
       - name: Cleanup SonarCloud artifacts
@@ -101,7 +101,6 @@ jobs:
         run: |
           sudo rm -rf .scannerwork/
           git clean -fd
-
 
        # New approach: Direct merge to test branch with conflict resolution
       - name: Merge to test branch
@@ -133,3 +132,11 @@ jobs:
           
           # Push to test branch
           git push origin HEAD:test --force
+
+      # Step 9: Submit Cloud Build
+      - name: Submit Cloud Build
+        run: |
+          gcloud builds submit \
+            --substitutions=_API_KEY=${{ secrets.API_KEY }},_SF_ORG_ID=${{ secrets.SF_ORG_ID }},_SF_USERNAME=${{ secrets.SF_USERNAME }},_SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }},_SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }},_SF_ORG_ID_TWO=${{ secrets.SF_ORG_ID_TWO }},_TEST_BASE_URL=${{ secrets.TEST_BASE_URL }} \
+            --config cloudbuild.yaml .
+           
