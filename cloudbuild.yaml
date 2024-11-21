@@ -1,77 +1,79 @@
 steps:
-  # Step 1: Authenticate with GCP using Service Account stored in Secret Manager
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "Authenticating with GCP..."
-        gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
-        gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
+   # Step 1: Authenticate with GCP using Service Account stored in Secret Manager
+   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+     entrypoint: 'bash'
+     args:
+       - '-c'
+       - |
+         echo "Authenticating with GCP..."
+         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
+         gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
 
-  # Step 2: Fetch environment variables from Secret Manager and export them
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
+   # Step 2: Fetch environment variables from Substitution Variables
+   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+     entrypoint: 'bash'
+     args:
+       - '-c'
+       - |
          echo "API_KEY: ${_API_KEY}"
          echo "SF_ORG_ID: ${_SF_ORG_ID}"
          echo "SF_USERNAME: ${_SF_USERNAME}"
          echo "SF_CLIENT_ID: ${_SF_CLIENT_ID}"
          echo "SERVICE_ACCOUNT: ${_SERVICE_ACCOUNT}"
          echo "SF_ORG_ID_TWO: ${_SF_ORG_ID_TWO}"
+         echo "PORT: ${_PORT}"
 
-  # Step 3: Set GCP project
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - 'config'
-      - 'set'
-      - 'project'
-      - 'docgen-440809'
+   # Step 3: Set GCP project
+   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+     entrypoint: 'gcloud'
+     args:
+       - 'config'
+       - 'set'
+       - 'project'
+       - 'docgen-440809'
 
-  # Step 4: Build the Docker image
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '-t'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'
-      - '.'
+   # Step 4: Build the Docker image
+   - name: 'gcr.io/cloud-builders/docker'
+     args:
+       - 'build'
+       - '-t'
+       - 'gcr.io/docgen-440809/docgen-testenv:latest'
+       - '.'
 
-  # Step 5: Push the Docker image to Google Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+   # Step 5: Push the Docker image to Google Container Registry
+   - name: 'gcr.io/cloud-builders/docker'
+     args:
+       - 'push'
+       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 6: Deploy the image to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - 'run'
-      - 'deploy'
-      - 'docgen-service'
-      - '--image'
-      - 'gcr.io/docgen-440809/docgen-testenv:latest'
-      - '--region'
-      - 'us-central1'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--port'
-      - "4450"
-      # Add environment variables to Cloud Run deployment
+   # Step 6: Deploy the image to Cloud Run
+   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+     entrypoint: 'gcloud'
+     args:
+       - 'run'
+       - 'deploy'
+       - 'docgen-service'
+       - '--image'
+       - 'gcr.io/docgen-440809/docgen-testenv:latest'
+       - '--region'
+       - 'us-central1'
+       - '--platform'
+       - 'managed'
+       - '--allow-unauthenticated'
+       - '--port'
+       - "4450"
+       # Add environment variables to Cloud Run deployment
        - '--set-env-vars'
-       - API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO}'
+       - 'PORT=${_PORT},API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO}'
+
 options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
+  _PORT: '${PORT}'
   _API_KEY: '${API_KEY}'
   _SF_ORG_ID: '${SF_ORG_ID}'
   _SF_USERNAME: '${SF_USERNAME}'
   _SF_CLIENT_ID: '${SF_CLIENT_ID}'
   _SERVICE_ACCOUNT: '${SERVICE_ACCOUNT}'
   _SF_ORG_ID_TWO: '${SF_ORG_ID_TWO}'
-    
