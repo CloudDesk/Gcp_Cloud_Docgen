@@ -1,52 +1,66 @@
 steps:
-  # Step 1: Export Environment Variables and Authenticate
+  # Step 1: Authenticate with GCP using Service Account stored in Secret Manager
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
-    env:
-      - 'API_KEY=${API_KEY}'
-      - 'SF_ORG_ID=${SF_ORG_ID}'
-      - 'SF_USERNAME=${SF_USERNAME}'
-      - 'SF_CLIENT_ID=${SF_CLIENT_ID}'
-      - 'SERVICE_ACCOUNT=${SERVICE_ACCOUNT}'
-      - 'SF_ORG_ID_TWO=${SF_ORG_ID_TWO}'
-      - 'BASE_URL=${BASE_URL}'
-      - 'TEST_BASE_URL=${TEST_BASE_URL}'
-      - 'TEST_DATA=${TEST_DATA}'
     args:
       - '-c'
       - |
         echo "Authenticating with GCP..."
         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
         gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
-        
-        # Verify environment variables are set (optional, for debugging)
-        echo "Deploying with:"
-        echo "PORT: $PORT"
-        echo "API_KEY: ${API_KEY:0:4}********"  # Partially mask sensitive info
 
-  # Step 2: Deploy to Cloud Run using environment variables
+  # Step 2: Set GCP project
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'bash'
-    env:
-      - 'API_KEY=${API_KEY}'
-      - 'SF_ORG_ID=${SF_ORG_ID}'
-      - 'SF_USERNAME=${SF_USERNAME}'
-      - 'SF_CLIENT_ID=${SF_CLIENT_ID}'
-      - 'SERVICE_ACCOUNT=${SERVICE_ACCOUNT}'
-      - 'SF_ORG_ID_TWO=${SF_ORG_ID_TWO}'
-      - 'BASE_URL=${BASE_URL}'
-      - 'TEST_BASE_URL=${TEST_BASE_URL}'
-      - 'TEST_DATA=${TEST_DATA}'
+    entrypoint: 'gcloud'
     args:
-      - '-c'
-      - |
-        gcloud run deploy docgen-service \
-          --image gcr.io/docgen-440809/docgen-testenv:latest \
-          --region us-central1 \
-          --platform managed \
-          --allow-unauthenticated \
-          --port 4450 \
-          --set-env-vars API_KEY=$API_KEY,SF_ORG_ID=$SF_ORG_ID,SF_USERNAME=$SF_USERNAME,SF_CLIENT_ID=$SF_CLIENT_ID,SERVICE_ACCOUNT=$SERVICE_ACCOUNT,SF_ORG_ID_TWO=$SF_ORG_ID_TWO,BASE_URL=$BASE_URL,TEST_BASE_URL=$TEST_BASE_URL,TEST_DATA=$TEST_DATA
+      - 'config'
+      - 'set'
+      - 'project'
+      - 'docgen-440809'
+
+  # Step 3: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+      - '.'
+
+  # Step 4: Push the Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+
+  # Step 5: Deploy the image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'docgen-service'
+      - '--image'
+      - 'gcr.io/docgen-440809/docgen-testenv:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '4450'
+      - '--set-env-vars'
+      - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO},BASE_URL=${_BASE_URL},TEST_BASE_URL=${_TEST_BASE_URL}'
+
+# Substitution variables matched exactly to GitHub Secrets
+substitutions:
+  _API_KEY: '$API_KEY'
+  _SF_ORG_ID: '$SF_ORG_ID'
+  _SF_USERNAME: '$SF_USERNAME'
+  _SF_CLIENT_ID: '$SF_CLIENT_ID'
+  _SERVICE_ACCOUNT: '$SERVICE_ACCOUNT'
+  _SF_ORG_ID_TWO: '$SF_ORG_ID_TWO'
+  _BASE_URL: '$BASE_URL'
+  _TEST_BASE_URL: '$TEST_BASE_URL'
 
 options:
   logging: CLOUD_LOGGING_ONLY
