@@ -8,7 +8,7 @@ import { getSecretValue } from "./service/gcp/secretManager.service.js";
 const Fastify = fastify({ logger: { level: 'debug' } });
 let apiKeyFromSecretManager = null;
 console.log(apiKeyFromSecretManager, "API key from secret manager");
-console.log('done')
+console.log('done sucessfully');
 async function initializeApiKey() {
     try {
         if (!apiKeyFromSecretManager) {
