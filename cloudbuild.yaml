@@ -9,19 +9,15 @@ steps:
          gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
          gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
 
-   # Step 2: Fetch environment variables from Substitution Variables
+   # Step 2: Detailed Environment Variable Debugging
    - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
      entrypoint: 'bash'
      args:
        - '-c'
        - |
-         echo "API_KEY: ${_API_KEY}"
-         echo "SF_ORG_ID: ${_SF_ORG_ID}"
-         echo "SF_USERNAME: ${_SF_USERNAME}"
-         echo "SF_CLIENT_ID: ${_SF_CLIENT_ID}"
-         echo "SERVICE_ACCOUNT: ${_SERVICE_ACCOUNT}"
-         echo "SF_ORG_ID_TWO: ${_SF_ORG_ID_TWO}"
-         echo "TEST_BASE_URL: ${_TEST_BASE_URL}"
+         echo "Debugging environment variables:"
+         echo "API_KEY length: ${#_API_KEY}"
+         echo "SF_ORG_ID length: ${#_SF_ORG_ID}"
 
    # Step 3: Set GCP project
    - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -32,7 +28,7 @@ steps:
        - 'project'
        - 'docgen-440809'
 
-   # Step 4: Build the Docker image
+   # Step 4: Build the Docker image with debug entrypoint
    - name: 'gcr.io/cloud-builders/docker'
      args:
        - 'build'
@@ -46,7 +42,7 @@ steps:
        - 'push'
        - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-   # Step 6: Deploy the image to Cloud Run
+   # Step 6: Deploy the image to Cloud Run with extensive diagnostics
    - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
      entrypoint: 'gcloud'
      args:
@@ -61,12 +57,17 @@ steps:
        - 'managed'
        - '--allow-unauthenticated'
        - '--port'
-       - "4450"
+       - '4450'
+       - '--max-instances'
+       - '1'
+       - '--cpu'
+       - '1'
+       - '--memory'
+       - '512Mi'
        - '--timeout'
-       - '600'
-       # Add environment variables to Cloud Run deployment
+       - '900'  # 15 minutes timeout
        - '--set-env-vars'
-       - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO},TEST_BASE_URL=${_TEST_BASE_URL}'
+       - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO}'
 
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -78,4 +79,3 @@ substitutions:
   _SF_CLIENT_ID: '${SF_CLIENT_ID}'
   _SERVICE_ACCOUNT: '${SERVICE_ACCOUNT}'
   _SF_ORG_ID_TWO: '${SF_ORG_ID_TWO}'
-  _TEST_BASE_URL: '${TEST_BASE_URL}'
