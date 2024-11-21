@@ -20,15 +20,15 @@ jobs:
       # Step 2: Set environment variables (using GitHub Secrets)
       - name: Set environment variables
         run: |
-      #     echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
-      #     echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
-      #     echo "SF_ORG_ID=${{ secrets.SF_ORG_ID }}" >> $GITHUB_ENV
-      #     echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
-      #     echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
-      #     echo "SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }}" >> $GITHUB_ENV
-      #     echo "SF_ORG_ID_TWO=${{ secrets.SF_ORG_ID_TWO }}" >> $GITHUB_ENV
-      #     echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
-      #     echo "TEST_BASE_URL=${{ secrets.TEST_BASE_URL }}" >> $GITHUB_ENV
+          echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
+          echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
+          echo "SF_ORG_ID=${{ secrets.SF_ORG_ID }}" >> $GITHUB_ENV
+          echo "SF_USERNAME=${{ secrets.SF_USERNAME }}" >> $GITHUB_ENV
+          echo "SF_CLIENT_ID=${{ secrets.SF_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }}" >> $GITHUB_ENV
+          echo "SF_ORG_ID_TWO=${{ secrets.SF_ORG_ID_TWO }}" >> $GITHUB_ENV
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
+          echo "TEST_BASE_URL=${{ secrets.TEST_BASE_URL }}" >> $GITHUB_ENV
 
       # # Step 3: Create GCP credentials file
       # - name: Create GCP credentials file

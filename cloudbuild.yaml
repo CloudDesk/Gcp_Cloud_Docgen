@@ -9,29 +9,7 @@ steps:
         gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
         gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
 
-  # Step 2: Set secrets as environment variables
-  - name: Export Secrets
-    env:
-      API_KEY: ${API_KEY}
-      # SF_ORG_ID: ${{ secrets.SF_ORG_ID }}
-      # SF_ORG_ID_TWO: ${{ secrets.SF_ORG_ID_TWO }}
-      # SF_USERNAME: ${{ secrets.SF_USERNAME }}
-      # SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
-      # SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-      # BASE_URL: ${{ secrets.BASE_URL }}
-      # TEST_DATA: ${{ secrets.TEST_DATA }}
-    run: |
-      echo "Secrets are available as environment variables."
-      echo "API_KEY=${API_KEY}"
-      # echo "SF_ORG_ID=${SF_ORG_ID}"
-      # echo "SF_ORG_ID_TWO=${SF_ORG_ID_TWO}"
-      # echo "SF_USERNAME=${SF_USERNAME}"
-      # echo "SF_CLIENT_ID=${SF_CLIENT_ID}"
-      # echo "SERVICE_ACCOUNT=${SERVICE_ACCOUNT}"
-      # echo "BASE_URL=${BASE_URL}"
-      # echo "TEST_DATA=${TEST_DATA}"
-
-  # Step 3: Set GCP project
+  # Step 2: Set GCP project
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -40,7 +18,7 @@ steps:
       - 'project'
       - 'docgen-440809'
 
-  # Step 4: Build the Docker image
+  # Step 3: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -48,13 +26,13 @@ steps:
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
       - '.'
 
-  # Step 5: Push the Docker image to Google Container Registry
+  # Step 4: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-testenv:latest'
 
-  # Step 6: Deploy the image to Cloud Run
+  # Step 5: Deploy the image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -71,7 +49,18 @@ steps:
       - '--port'
       - "4450"
       - '--set-env-vars'
-      - "API_KEY=${API_KEY},SF_ORG_ID=${SF_ORG_ID},SF_ORG_ID_TWO=${SF_ORG_ID_TWO},SF_USERNAME=${SF_USERNAME},SF_CLIENT_ID=${SF_CLIENT_ID},SERVICE_ACCOUNT=${SERVICE_ACCOUNT},BASE_URL=${BASE_URL},TEST_DATA=${TEST_DATA}"
+      - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO},BASE_URL=${_BASE_URL},TEST_BASE_URL=${_TEST_BASE_URL}'
+
+# Substitution variables matched exactly to GitHub Secrets
+substitutions:
+  _API_KEY: '$API_KEY'
+  _SF_ORG_ID: '$SF_ORG_ID'
+  _SF_USERNAME: '$SF_USERNAME'
+  _SF_CLIENT_ID: '$SF_CLIENT_ID'
+  _SERVICE_ACCOUNT: '$SERVICE_ACCOUNT'
+  _SF_ORG_ID_TWO: '$SF_ORG_ID_TWO'
+  _BASE_URL: '$BASE_URL'
+  _TEST_BASE_URL: '$TEST_BASE_URL'
 
 options:
   logging: CLOUD_LOGGING_ONLY
