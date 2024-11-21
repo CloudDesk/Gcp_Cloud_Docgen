@@ -19,7 +19,7 @@ jobs:
     
       - name: Print out the secret length for debugging
         run: |
-          echo "The length of the GCP_CREDENTIALS_JSON secret is: ${#GCP_CREDENTIALS_JSON}"
+          echo "The length of the GCP_CREDENTIALSJSON secret is: ${#GCP_CREDENTIALSJSON}"
           echo "The first 50 characters of the secret are: ${GCP_CREDENTIALS_JSON:0:50}"
 
        #Auhenticate with Google Cloud
