@@ -53,14 +53,14 @@ steps:
 
 # Substitution variables matched exactly to GitHub Secrets
 substitutions:
-  _API_KEY: '$API_KEY'
-  _SF_ORG_ID: '$SF_ORG_ID'
-  _SF_USERNAME: '$SF_USERNAME'
-  _SF_CLIENT_ID: '$SF_CLIENT_ID'
-  _SERVICE_ACCOUNT: '$SERVICE_ACCOUNT'
-  _SF_ORG_ID_TWO: '$SF_ORG_ID_TWO'
-  _BASE_URL: '$BASE_URL'
-  _TEST_BASE_URL: '$TEST_BASE_URL'
+  _API_KEY: '${API_KEY}'
+  _SF_ORG_ID: '${SF_ORG_ID}'
+  _SF_USERNAME: '${SF_USERNAME}'
+  _SF_CLIENT_ID: '${SF_CLIENT_ID}'
+  _SERVICE_ACCOUNT: '${SERVICE_ACCOUNT}'
+  _SF_ORG_ID_TWO: '${SF_ORG_ID_TWO}'
+  _BASE_URL: '${BASE_URL}'
+  _TEST_BASE_URL: '${TEST_BASE_URL}'
 
 options:
   logging: CLOUD_LOGGING_ONLY
