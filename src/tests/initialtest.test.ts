@@ -40,8 +40,7 @@ describe('Initial test', () => {
             },
         });
         console.log(response, 'Response for salesfroce credentila');
-        // expect(response.statusCode).toBe(200);
-        expect(response.statusCode).toBe(400);
+        expect(response.statusCode).toBe(200);
 
     });
 
@@ -54,8 +53,7 @@ describe('Initial test', () => {
             },
         });
         console.log(response, 'Response for salesfroce credentila');
-        // expect(response.statusCode).toBe(403);
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(403);
     });
 
 
