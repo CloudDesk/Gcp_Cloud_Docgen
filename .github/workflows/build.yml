@@ -77,7 +77,8 @@ jobs:
 
             const data = await response.json();
             console.log('SonarCloud API Response:', data); // Debugging the response
-
+            console.log('SonarCloud API Response:', data.projectStatus.periods); // Debugging the response
+            console.log('SonarCloud Quality Gate status:', JSON.stringify(data, null, 2));
             const status = data.projectStatus.status;
 
             if (status === 'ERROR') {
