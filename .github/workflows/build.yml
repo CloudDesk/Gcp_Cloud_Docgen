@@ -18,11 +18,29 @@ jobs:
           fetch-depth: 0  # Ensures the full history for better analysis
 
        #Auhenticate with Google Cloud
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: 'docgen-440809'
+          credentials_json: ${{ secrets.GCP_CREDENTIALSJSON }}
+
       - name: Authenticate with Google Cloud
         run: |
+          # Ensure the GCP credentials secret is being set correctly
           echo "${{ secrets.GCP_CREDENTIALSJSON }}" > "${HOME}/gcp-key.json"
+
+          # Verify the credentials file exists and has correct contents
+          echo "Contents of the first 100 characters of the credentials file:"
+          head -c 100 "${HOME}/gcp-key.json"
+
+          # Authenticate using the GCP credentials
           gcloud auth activate-service-account --key-file="${HOME}/gcp-key.json"
-          gcloud config set project docgen-440809  # Replace with your project ID
+
+          # Set the project
+          gcloud config set project docgen-440809
+          
+          # Verify the authentication
+          gcloud auth list
 
       # Step 2: Set environment variables (using GitHub Secrets)
       - name: Set environment variables
