@@ -43,7 +43,8 @@ jobs:
           
       # Step 3: Debugging: Print Environment Variables
       - name: Debug: Print Environment Variables
-        run: printenv
+        run: |
+          printenv
     
       # # Step 3: Install libreofficeSERVICE_ACCOUNT_TYPE
       # - name: Install LibreOffice
