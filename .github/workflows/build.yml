@@ -101,8 +101,7 @@ jobs:
           git clean -fd
 
 
-       # New approach: Direct merge to test branch with conflict resolution
-      - name: Merge to test branch
+             - name: Merge to test branch
         if: success() && github.ref == 'refs/heads/dev'
         run: |
           # Configure git
@@ -122,15 +121,21 @@ jobs:
           
           # Force reset to dev branch state
           git reset --hard origin/dev
-
+          
           # Remove the build.yaml file
           git rm .github/workflows/build.yaml || true
-
-           # Remove the test folder inside src
+          
+          # Remove the test folder inside src
           git rm -r src/test || true
-
+          
+          # Debug: Show staged changes
+          git status
+          
           # Commit the removals if needed
           git commit -m "Exclude build.yaml and src/test for test branch" || true
+          
+          # Debug: Show commit history
+          git log -1
           
           # Restore credentials file if it existed
           if [ -f "/tmp/gcp-credentials.json" ]; then

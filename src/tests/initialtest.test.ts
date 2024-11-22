@@ -4,7 +4,7 @@ import { cleanupCredentials } from '../utils/clearCrendtials.js';
 
 describe('Initial test', () => {
     let fastify: any;
-
+console.log('test')
     beforeAll(async () => {
         fastify = await initializeApp(); // Initialize the app instance
 
