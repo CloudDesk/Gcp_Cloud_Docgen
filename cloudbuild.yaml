@@ -48,6 +48,7 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - '4450'
+      - --update-secrets=dockgen_apikey=dockgen_apikey:latest
       - '--set-env-vars'
       - 'API_KEY=${_API_KEY},SF_ORG_ID=${_SF_ORG_ID},SF_USERNAME=${_SF_USERNAME},SF_CLIENT_ID=${_SF_CLIENT_ID},SERVICE_ACCOUNT=${_SERVICE_ACCOUNT},SF_ORG_ID_TWO=${_SF_ORG_ID_TWO},BASE_URL=${_BASE_URL},TEST_BASE_URL=${_TEST_BASE_URL}'
 
