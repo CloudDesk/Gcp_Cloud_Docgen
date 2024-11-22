@@ -1,3 +1,4 @@
+
 name: Build
 
 on:
@@ -40,10 +41,14 @@ jobs:
           echo "SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL=${{ secrets.SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL }}" >> $GITHUB_ENV
           echo "SERVICE_ACCOUNT_CLIENT_X509_CERT_URL=${{ secrets.SERVICE_ACCOUNT_CLIENT_X509_CERT_URL }}" >> $GITHUB_ENV
           echo "SERVICE_ACCOUNT_UNIVERSE_DOMAIN=${{ secrets.SERVICE_ACCOUNT_UNIVERSE_DOMAIN }}" >> $GITHUB_ENV
-
-      # Step 3: Debugging: Print Environment Variables
-      - name: Debug: Print Environment Variables
-        run: printenv
+          
+    
+      # # Step 3: Install libreofficeSERVICE_ACCOUNT_TYPE
+      # - name: Install LibreOffice
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y libreoffice
+      #     sudo apt-get install -y libreoffice-writer
 
       # Step 4: Install dependencies
       - name: Install Dependencies
@@ -52,6 +57,8 @@ jobs:
       # Step 5: Run Jest Tests with Coverage
       - name: Run Jest Tests
         run: npm test -- --coverage
+
+        
 
       # Step 6: Run SonarCloud Scan
       - name: SonarCloud Scan
@@ -81,11 +88,13 @@ jobs:
 
             const data = await response.json();
             console.log('SonarCloud API Response:', data); // Debugging the response
+            console.log('SonarCloud API Response:', data.projectStatus.periods); // Debugging the response
             console.log('SonarCloud Quality Gate status:', JSON.stringify(data, null, 2));
             const status = data.projectStatus.status;
 
             if (status === 'ERROR') {
               console.log(`SonarCloud Quality Gate failed with status: ${status}`);
+              console.log('Conditions:', data.projectStatus.conditions);
               core.setFailed('SonarCloud Quality Gate did not meet the required conditions.');
             } else if (status === 'OK') {
               console.log('SonarCloud Quality Gate passed.');
@@ -93,10 +102,43 @@ jobs:
               console.log(`Unexpected SonarCloud Quality Gate status: ${status}`);
               core.setFailed(`Unexpected status: ${status}`);
             }
+    
 
-      # Step 8: Cleanup SonarCloud artifacts
+      # Add cleanup step
       - name: Cleanup SonarCloud artifacts
         if: success()
         run: |
           sudo rm -rf .scannerwork/
           git clean -fd
+
+
+      #  # New approach: Direct merge to test branch with conflict resolution
+      # - name: Merge to test branch
+      #   if: success() && github.ref == 'refs/heads/dev'
+      #   run: |
+      #     # Configure git
+      #     git config --global user.name "GitHub Actions"
+      #     git config --global user.email "actions@github.com"
+          
+      #     # Fetch all branches
+      #     git fetch origin
+          
+      #     # Clean any leftover files
+      #     git clean -fd
+          
+      #     # Create backup of credentials file if it exists
+      #     if [ -f "src/service/gcp/gcp-credentials.json" ]; then
+      #       cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
+      #     fi
+          
+      #     # Force reset to dev branch state
+      #     git reset --hard origin/dev
+          
+      #     # Restore credentials file if it existed
+      #     if [ -f "/tmp/gcp-credentials.json" ]; then
+      #       mkdir -p src/service/gcp/
+      #       cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
+      #     fi
+          
+      #     # Push to test branch
+      #     git push origin HEAD:test --force
