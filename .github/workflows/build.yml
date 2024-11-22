@@ -122,6 +122,15 @@ jobs:
           
           # Force reset to dev branch state
           git reset --hard origin/dev
+
+          # Remove the build.yaml file
+          git rm .github/workflows/build.yaml || true
+
+           # Remove the test folder inside src
+          git rm -r src/test || true
+
+          # Commit the removals if needed
+          git commit -m "Exclude build.yaml and src/test for test branch" || true
           
           # Restore credentials file if it existed
           if [ -f "/tmp/gcp-credentials.json" ]; then
