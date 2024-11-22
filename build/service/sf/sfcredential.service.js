@@ -8,14 +8,13 @@ export const sfCredentialService = {
      */
     async validateAndStoreCredentials(payload) {
         console.log("Payload received:", payload);
-        // Validate the payload
-        if (!payload.clientId || !payload.orgId) {
-            return { error: "Client ID and Org ID are required" };
-        }
         try {
             // Store the client ID and org ID using the secret manager service
             const storeResult = await storeSecret(payload.clientId, payload.orgId);
             console.log("Store client id result:", storeResult);
+            if (storeResult.error) {
+                return { error: storeResult.error };
+            }
             return { success: storeResult };
         }
         catch (error) {

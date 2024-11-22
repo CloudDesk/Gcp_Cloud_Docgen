@@ -31,37 +31,32 @@ jobs:
           echo "TEST_BASE_URL=${{ secrets.TEST_BASE_URL }}" >> $GITHUB_ENV
           echo "DOCGEN_API_KEY=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
           
-      # Step 3: Create GCP credentials file
-      - name: Create GCP credentials file
-        run: |
-          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > "$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$GITHUB_WORKSPACE/docgen-440809-afae407a4dd7.json" >> $GITHUB_ENV
-
-      # Step 4: Install libreoffice
+    
+      # Step 3: Install libreoffice
       - name: Install LibreOffice
         run: |
           sudo apt-get update
           sudo apt-get install -y libreoffice
           sudo apt-get install -y libreoffice-writer
 
-      # Step 5: Install dependencies
+      # Step 4: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 6: Run Jest Tests with Coverage
+      # Step 5: Run Jest Tests with Coverage
       - name: Run Jest Tests
         run: npm test -- --coverage
 
         
 
-      # Step 7: Run SonarCloud Scan
+      # Step 6: Run SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Step 8: Wait for SonarCloud Quality Gate status
+      # Step 7: Wait for SonarCloud Quality Gate status
       - name: Wait for SonarCloud Quality Gate
         uses: actions/github-script@v6
         id: check_quality_gate
@@ -106,33 +101,33 @@ jobs:
           git clean -fd
 
 
-       # New approach: Direct merge to test branch with conflict resolution
-      - name: Merge to test branch
-        if: success() && github.ref == 'refs/heads/dev'
-        run: |
-          # Configure git
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+      #  # New approach: Direct merge to test branch with conflict resolution
+      # - name: Merge to test branch
+      #   if: success() && github.ref == 'refs/heads/dev'
+      #   run: |
+      #     # Configure git
+      #     git config --global user.name "GitHub Actions"
+      #     git config --global user.email "actions@github.com"
           
-          # Fetch all branches
-          git fetch origin
+      #     # Fetch all branches
+      #     git fetch origin
           
-          # Clean any leftover files
-          git clean -fd
+      #     # Clean any leftover files
+      #     git clean -fd
           
-          # Create backup of credentials file if it exists
-          if [ -f "src/service/gcp/gcp-credentials.json" ]; then
-            cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
-          fi
+      #     # Create backup of credentials file if it exists
+      #     if [ -f "src/service/gcp/gcp-credentials.json" ]; then
+      #       cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
+      #     fi
           
-          # Force reset to dev branch state
-          git reset --hard origin/dev
+      #     # Force reset to dev branch state
+      #     git reset --hard origin/dev
           
-          # Restore credentials file if it existed
-          if [ -f "/tmp/gcp-credentials.json" ]; then
-            mkdir -p src/service/gcp/
-            cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
-          fi
+      #     # Restore credentials file if it existed
+      #     if [ -f "/tmp/gcp-credentials.json" ]; then
+      #       mkdir -p src/service/gcp/
+      #       cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
+      #     fi
           
-          # Push to test branch
-          git push origin HEAD:test --force
+      #     # Push to test branch
+      #     git push origin HEAD:test --force

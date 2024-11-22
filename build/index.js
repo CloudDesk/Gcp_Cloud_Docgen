@@ -1,13 +1,13 @@
 import { fastify } from "fastify";
 import { docGenRouter } from "./router/router.js";
-import { BASE_URL, DOCGEN_API_KEY, PORT } from "./config/config.js";
+import { DOCGEN_API_KEY, PORT } from "./config/config.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 const Fastify = fastify({ logger: { level: 'debug' } });
 console.log(DOCGEN_API_KEY, "API key from secret manager DOCGEN_API_KEY");
 function setupSwagger(fastifyInstance) {
-    const SWAGGER_URL = BASE_URL || "http://localhost:4350";
+    const SWAGGER_URL = "http://localhost:4350";
     fastifyInstance.register(swagger, {
         openapi: {
             info: {

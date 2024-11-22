@@ -8,9 +8,6 @@ describe('POST /api/v1/salesforce/process-document', () => {
         fastify = await initializeApp(); // Initialize the app instance
     });;
     afterAll(async () => {
-        console.log('After all called')
-        let data = await cleanupCredentials('/src/service/gcp/gcp-credentials.json')
-        console.log(data, 'Data from cleanup');
         await fastify.close(); // Close the Fastify instance
     });
 

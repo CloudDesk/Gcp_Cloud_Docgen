@@ -21,7 +21,9 @@ export const sfCredentialService = {
       // Store the client ID and org ID using the secret manager service
       const storeResult = await storeSecret(payload.clientId, payload.orgId);
       console.log("Store client id result:", storeResult);
-
+      if (storeResult.error) {
+        return { error: storeResult.error }
+      }
       return { success: storeResult };
     } catch (error) {
       console.error("Error storing client ID:", error);

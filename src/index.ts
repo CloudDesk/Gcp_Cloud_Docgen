@@ -9,7 +9,7 @@ console.log(DOCGEN_API_KEY, "API key from secret manager DOCGEN_API_KEY");
 
 
 function setupSwagger(fastifyInstance) {
-    const SWAGGER_URL =BASE_URL || "http://localhost:4350";
+    const SWAGGER_URL ="http://localhost:4350";
 
     fastifyInstance.register(swagger, {
         openapi: {
