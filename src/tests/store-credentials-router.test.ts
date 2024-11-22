@@ -1,11 +1,10 @@
-import { initializeApp,initializeApiKey } from '../index.js';
+import { initializeApp } from '../index.js';
 import { API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
 import { cleanupCredentials } from '..//utils/clearCrendtials.js';
 
 describe('POST /api/v1/salesforce/store-credentials', () => {
   let fastify: any;
   beforeAll(async () => {
-    await initializeApiKey();
     fastify = await initializeApp(); // Initialize the app instance
   });;
 

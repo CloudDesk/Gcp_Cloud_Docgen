@@ -1,28 +1,12 @@
 import { fastify, FastifyRequest, FastifyReply } from "fastify";
 import { docGenRouter } from "./router/router.js";
-import { BASE_URL, PORT } from "./config/config.js";
+import { BASE_URL, DOCGEN_API_KEY, PORT } from "./config/config.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
-import { getSecretValue } from "./service/gcp/secretManager.service.js";
 const Fastify = fastify({ logger: { level: 'debug' } });
-let apiKeyFromSecretManager = null;
-console.log(apiKeyFromSecretManager, "API key from secret manager");
-async function initializeApiKey() {
-    try {
-        if (!apiKeyFromSecretManager) {
-          apiKeyFromSecretManager = await getSecretValue("docgen_apikey");
-            console.log("API Key initialized:", apiKeyFromSecretManager);
-        }
-        if(apiKeyFromSecretManager.error) {
-            throw new Error("API key initialization failed"); 
-        }
-        return apiKeyFromSecretManager;
-    } catch (error) {
-        console.error("Error getting API key:", error.message);
-        throw new Error("API key initialization failed"); 
-    }
-}
+console.log(DOCGEN_API_KEY, "API key from secret manager DOCGEN_API_KEY");
+
 
 function setupSwagger(fastifyInstance) {
     const SWAGGER_URL =BASE_URL || "http://localhost:4350";
@@ -85,15 +69,15 @@ async function apiKeyValidationHook(
         return; // Allow requests to Swagger documentation without API key
     }
 
-    const apiKey = request.headers["x-api-key"];
-    if (!apiKey) {
+    const headerApiKey = request.headers["x-api-key"];
+    if (!headerApiKey) {
         return reply.status(401).send({
             error:
                 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint.',
         });
     }
 
-    if (apiKey !== apiKeyFromSecretManager) {
+    if (headerApiKey !== DOCGEN_API_KEY) {
         return reply.status(403).send({
             error:
                 "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
@@ -110,7 +94,6 @@ Fastify.register(docGenRouter);
 
 const start = async () => {
     try {
-        await initializeApiKey();
         await Fastify.listen({ port: PORT, host: "0.0.0.0" });
         console.log(`Server is running on port ${PORT}`);
     } catch (err) {
@@ -125,10 +108,9 @@ start().catch((err) => {
 });
 
 async function initializeApp() {
-  await initializeApiKey(); // Ensure the API key is set
   await Fastify.ready();   // Ensure Fastify is initialized
   return Fastify;
 }
 
 export const app = Fastify;
-export { initializeApp, initializeApiKey, apiKeyFromSecretManager };
+export { initializeApp,  DOCGEN_API_KEY };

@@ -1,10 +1,9 @@
-import { initializeApp, initializeApiKey } from '../index.js';
+import { initializeApp } from '../index.js';
 import { API_KEY } from '../config/config.js';
 import { cleanupCredentials } from '../utils/clearCrendtials.js';
 describe('POST /api/v1/salesforce/process-document', () => {
     let fastify;
     beforeAll(async () => {
-        await initializeApiKey();
         fastify = await initializeApp(); // Initialize the app instance
     });
     ;
