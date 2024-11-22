@@ -3,6 +3,9 @@ import { API_KEY } from '../config/config.js';
 import { cleanupCredentials } from '../utils/clearCrendtials.js';
 describe('Initial test', () => {
     let fastify;
+    console.log('test');
+    console.log('test');
+    console.log('test');
     beforeAll(async () => {
         fastify = await initializeApp(); // Initialize the app instance
     });

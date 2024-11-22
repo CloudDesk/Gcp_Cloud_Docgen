@@ -85,44 +85,49 @@ jobs:
           sudo rm -rf .scannerwork/
           git clean -fd
 
-      - name: Merge to test branch
+       - name: Merge to test branch
         if: success() && github.ref == 'refs/heads/dev'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Configure git
+          # Configure git with token-based authentication
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           
           # Fetch all branches
           git fetch origin
           
-          # Create a temporary directory for the merge
-          mkdir temp_merge
-          cd temp_merge
+          # Backup current state
+          git stash
           
-          # Clone the repository fresh
-          git clone --single-branch --branch dev https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git .
+          # Switch to dev branch and get latest
+          git checkout dev
+          git pull origin dev
+          
+          # Create or reset test branch to match dev
+          git checkout -B test
           
           # Remove unwanted files and directories
           rm -rf .github/workflows/build.yaml || true
           rm -rf src/test || true
           
-          # Create .gitignore if it doesn't exist
-          touch .gitignore
+          # Stage deletions
+          git add -u
           
-          # Add entries to .gitignore
-          echo ".github/workflows/build.yaml" >> .gitignore
-          echo "src/test/" >> .gitignore
+          # Create/update .gitignore if needed
+          if ! grep -q ".github/workflows/build.yaml" .gitignore; then
+            echo ".github/workflows/build.yaml" >> .gitignore
+          fi
+          if ! grep -q "src/test/" .gitignore; then
+            echo "src/test/" >> .gitignore
+          fi
           
-          # Stage all changes
-          git add .
+          # Stage .gitignore changes
           git add .gitignore
           
-          # Commit changes
-          git commit -m "Prepare for test branch (excluding build.yaml and test directory)"
+          # Commit changes if there are any
+          git diff --staged --quiet || git commit -m "Prepare test branch (excluding build.yaml and test directory)"
           
-          # Push to test branch
-          git push origin HEAD:test --force
-          
-          # Cleanup
-          cd ..
-          rm -rf temp_merge
+          # Push to test branch using token authentication
+          git remote set-url origin "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push -f origin test
