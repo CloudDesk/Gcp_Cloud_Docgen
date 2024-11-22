@@ -12,12 +12,10 @@ jobs:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out the repository
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ensures the full history for better analysis
-
-      # Step 2: Set environment variables (using GitHub Secrets)
+          fetch-depth: 0
+          
       - name: Set environment variables
         run: |
           echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
@@ -30,33 +28,25 @@ jobs:
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
           echo "TEST_BASE_URL=${{ secrets.TEST_BASE_URL }}" >> $GITHUB_ENV
           echo "DOCGEN_API_KEY=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
-          
-    
-      # Step 3: Install libreoffice
+
       - name: Install LibreOffice
         run: |
           sudo apt-get update
           sudo apt-get install -y libreoffice
           sudo apt-get install -y libreoffice-writer
 
-      # Step 4: Install dependencies
       - name: Install Dependencies
         run: npm install
 
-      # Step 5: Run Jest Tests with Coverage
       - name: Run Jest Tests
         run: npm test -- --coverage
 
-        
-
-      # Step 6: Run SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # Step 7: Wait for SonarCloud Quality Gate status
       - name: Wait for SonarCloud Quality Gate
         uses: actions/github-script@v6
         id: check_quality_gate
@@ -64,11 +54,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           script: |
-            const projectKey = 'CloudDesk_Gcp_Cloud_Docgen'; // Replace with your project key
+            const projectKey = 'CloudDesk_Gcp_Cloud_Docgen';
             const response = await fetch(`https://sonarcloud.io/api/qualitygates/project_status?projectKey=${projectKey}`, {
-            headers: {
+              headers: {
                 'Authorization': `Basic ${Buffer.from(process.env.SONAR_TOKEN + ':').toString('base64')}`,
-            },
+              },
             });
 
             if (!response.ok) {
@@ -76,9 +66,6 @@ jobs:
             }
 
             const data = await response.json();
-            console.log('SonarCloud API Response:', data); // Debugging the response
-            console.log('SonarCloud API Response:', data.projectStatus.periods); // Debugging the response
-            console.log('SonarCloud Quality Gate status:', JSON.stringify(data, null, 2));
             const status = data.projectStatus.status;
 
             if (status === 'ERROR') {
@@ -91,15 +78,12 @@ jobs:
               console.log(`Unexpected SonarCloud Quality Gate status: ${status}`);
               core.setFailed(`Unexpected status: ${status}`);
             }
-    
 
-      # Add cleanup step
       - name: Cleanup SonarCloud artifacts
         if: success()
         run: |
           sudo rm -rf .scannerwork/
           git clean -fd
-
 
       - name: Merge to test branch
         if: success() && github.ref == 'refs/heads/dev'
@@ -111,37 +95,34 @@ jobs:
           # Fetch all branches
           git fetch origin
           
-          # Clean any leftover files
-          git clean -fd
+          # Create a temporary directory for the merge
+          mkdir temp_merge
+          cd temp_merge
           
-          # Create backup of credentials file if it exists
-          if [ -f "src/service/gcp/gcp-credentials.json" ]; then
-            cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
-          fi
+          # Clone the repository fresh
+          git clone --single-branch --branch dev https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git .
           
-          # Force reset to dev branch state
-          git reset --hard origin/dev
+          # Remove unwanted files and directories
+          rm -rf .github/workflows/build.yaml || true
+          rm -rf src/test || true
           
-          # Remove the build.yaml file
-          git rm .github/workflows/build.yaml || true
+          # Create .gitignore if it doesn't exist
+          touch .gitignore
           
-          # Remove the test folder inside src
-          git rm -r src/test || true
+          # Add entries to .gitignore
+          echo ".github/workflows/build.yaml" >> .gitignore
+          echo "src/test/" >> .gitignore
           
-          # Debug: Show staged changes
-          git status
+          # Stage all changes
+          git add .
+          git add .gitignore
           
-          # Commit the removals if needed
-          git commit -m "Exclude build.yaml and src/test for test branch" || true
-          
-          # Debug: Show commit history
-          git log -1
-          
-          # Restore credentials file if it existed
-          if [ -f "/tmp/gcp-credentials.json" ]; then
-            mkdir -p src/service/gcp/
-            cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
-          fi
+          # Commit changes
+          git commit -m "Prepare for test branch (excluding build.yaml and test directory)"
           
           # Push to test branch
           git push origin HEAD:test --force
+          
+          # Cleanup
+          cd ..
+          rm -rf temp_merge
