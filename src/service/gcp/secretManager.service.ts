@@ -6,7 +6,7 @@ import { writeFile } from 'fs/promises';
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 import { validateAndParseCredentials } from "../../utils/validateBase.js";
-import { SERVICE_ACCOUNT, SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL, SERVICE_ACCOUNT_AUTH_URI, SERVICE_ACCOUNT_CLIENT_EMAIL, SERVICE_ACCOUNT_CLIENT_ID, SERVICE_ACCOUNT_CLIENT_X509_CERT_URL, SERVICE_ACCOUNT_PRIVATE_KEY, SERVICE_ACCOUNT_PRIVATE_KEY_ID, SERVICE_ACCOUNT_PROJECT_ID, SERVICE_ACCOUNT_TOKEN_URI, SERVICE_ACCOUNT_TYPE, SERVICE_ACCOUNT_UNIVERSE_DOMAIN } from "../../config/config.js";
+import { SERVICE_ACCOUNT} from "../../config/config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 let credentialsData;
