@@ -1,5 +1,6 @@
 import { initializeApp } from '../index.js';
 import { API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
+import { cleanupCredentials } from '..//utils/clearCrendtials.js';
 describe('POST /api/v1/salesforce/store-credentials', () => {
     let fastify;
     beforeAll(async () => {
@@ -7,6 +8,9 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
     });
     ;
     afterAll(async () => {
+        console.log('After all called');
+        let data = await cleanupCredentials('/src/service/gcp/gcp-credentials.json');
+        console.log(data, 'Data from cleanup');
         await fastify.close(); // Close the Fastify instance
     });
     it('should validate the Salesforce credentials and return 200 with correct API key', async () => {

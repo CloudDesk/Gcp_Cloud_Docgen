@@ -1,44 +1,27 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
+import { writeFile } from 'fs/promises';
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
-import { SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL, SERVICE_ACCOUNT_AUTH_URI, SERVICE_ACCOUNT_CLIENT_EMAIL, SERVICE_ACCOUNT_CLIENT_ID, SERVICE_ACCOUNT_CLIENT_X509_CERT_URL, SERVICE_ACCOUNT_PRIVATE_KEY, SERVICE_ACCOUNT_PRIVATE_KEY_ID, SERVICE_ACCOUNT_PROJECT_ID, SERVICE_ACCOUNT_TOKEN_URI, SERVICE_ACCOUNT_TYPE, SERVICE_ACCOUNT_UNIVERSE_DOMAIN } from "../../config/config.js";
+import { validateAndParseCredentials } from "../../utils/validateBase.js";
+import { SERVICE_ACCOUNT } from "../../config/config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// let credentialsData;
-// console.log(SERVICE_ACCOUNT, "Service Account");
-// try {
-//    credentialsData = await validateAndParseCredentials(SERVICE_ACCOUNT);
-//    console.log(credentialsData, "Credentials Data");
-// } catch (parseError) {
-//     throw new Error(`Invalid JSON in SERVICE_ACCOUNT: ${parseError.message}`);
-// }
-// const credentialsPath = join(__dirname, 'gcp-credentials.json');
-// await writeFile(credentialsPath, JSON.stringify(credentialsData, null, 2));
-// const secretClient = new SecretManagerServiceClient({
-//   keyFilename: credentialsPath,
-// });
-//Define the credentials JSON object
-const credentials = {
-    type: SERVICE_ACCOUNT_TYPE,
-    project_id: SERVICE_ACCOUNT_PROJECT_ID,
-    private_key_id: SERVICE_ACCOUNT_PRIVATE_KEY_ID,
-    private_key: SERVICE_ACCOUNT_PRIVATE_KEY,
-    client_email: SERVICE_ACCOUNT_CLIENT_EMAIL,
-    client_id: SERVICE_ACCOUNT_CLIENT_ID,
-    auth_uri: SERVICE_ACCOUNT_AUTH_URI,
-    token_uri: SERVICE_ACCOUNT_TOKEN_URI,
-    auth_provider_x509_cert_url: SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL,
-    client_x509_cert_url: SERVICE_ACCOUNT_CLIENT_X509_CERT_URL,
-    universe_domain: SERVICE_ACCOUNT_UNIVERSE_DOMAIN
-};
-console.log(credentials, 'credentials ');
-// Initialize Secret Manager client
+let credentialsData;
+console.log(SERVICE_ACCOUNT, "Service Account");
+try {
+    credentialsData = await validateAndParseCredentials(SERVICE_ACCOUNT);
+    console.log(credentialsData, "Credentials Data");
+}
+catch (parseError) {
+    throw new Error(`Invalid JSON in SERVICE_ACCOUNT: ${parseError.message}`);
+}
+const credentialsPath = join(__dirname, 'gcp-credentials.json');
+await writeFile(credentialsPath, JSON.stringify(credentialsData, null, 2));
 const secretClient = new SecretManagerServiceClient({
-    credentials: credentials,
+    keyFilename: credentialsPath,
 });
-console.log(secretClient, "Secret Client");
 //  const secretClient = new SecretManagerServiceClient();
 /**
  * Retrieves a secret from Google Secret Manager.

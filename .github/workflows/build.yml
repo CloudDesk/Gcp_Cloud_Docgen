@@ -1,4 +1,3 @@
-
 name: Build
 
 on:
@@ -29,36 +28,16 @@ jobs:
           echo "SERVICE_ACCOUNT=${{ secrets.SERVICE_ACCOUNT }}" >> $GITHUB_ENV
           echo "SF_ORG_ID_TWO=${{ secrets.SF_ORG_ID_TWO }}" >> $GITHUB_ENV
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
+          echo "TEST_BASE_URL=${{ secrets.TEST_BASE_URL }}" >> $GITHUB_ENV
           echo "DOCGEN_API_KEY=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_TYPE=${{ secrets.SERVICE_ACCOUNT_TYPE }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_PROJECT_ID=${{ secrets.SERVICE_ACCOUNT_PROJECT_ID }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_PRIVATE_KEY_ID=${{ secrets.SERVICE_ACCOUNT_PRIVATE_KEY_ID }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_PRIVATE_KEY=${{ secrets.SERVICE_ACCOUNT_PRIVATE_KEY }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_CLIENT_EMAIL=${{ secrets.SERVICE_ACCOUNT_CLIENT_EMAIL }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_CLIENT_ID=${{ secrets.SERVICE_ACCOUNT_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_AUTH_URI=${{ secrets.SERVICE_ACCOUNT_AUTH_URI }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_TOKEN_URI=${{ secrets.SERVICE_ACCOUNT_TOKEN_URI }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL=${{ secrets.SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_CLIENT_X509_CERT_URL=${{ secrets.SERVICE_ACCOUNT_CLIENT_X509_CERT_URL }}" >> $GITHUB_ENV
-          echo "SERVICE_ACCOUNT_UNIVERSE_DOMAIN=${{ secrets.SERVICE_ACCOUNT_UNIVERSE_DOMAIN }}" >> $GITHUB_ENV
           
-      # Step 3: Debug Specific Environment Variables
-      - name: Debug: Print Specific Environment Variables
+    
+      # Step 3: Install libreoffice
+      - name: Install LibreOffice
         run: |
-          echo "PORT=$PORT"
-          echo "BASE_URL=$BASE_URL"
-          echo "SF_USERNAME=$SF_USERNAME"
-          echo "SERVICE_ACCOUNT_PROJECT_ID=$SERVICE_ACCOUNT_PROJECT_ID"
-          echo "SERVICE_ACCOUNT_CLIENT_EMAIL=$SERVICE_ACCOUNT_CLIENT_EMAIL"
-          echo "SERVICE_ACCOUNT_PRIVATE_KEY=$SERVICE_ACCOUNT_PRIVATE_KEY"
-
-
-      # # Step 3: Install libreofficeSERVICE_ACCOUNT_TYPE
-      # - name: Install LibreOffice
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y libreoffice
-      #     sudo apt-get install -y libreoffice-writer
+          sudo apt-get update
+          sudo apt-get install -y libreoffice
+          sudo apt-get install -y libreoffice-writer
 
       # Step 4: Install dependencies
       - name: Install Dependencies
