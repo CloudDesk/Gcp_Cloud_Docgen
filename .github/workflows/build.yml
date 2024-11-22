@@ -85,7 +85,7 @@ jobs:
           sudo rm -rf .scannerwork/
           git clean -fd
 
-       - name: Merge to test branch
+      - name: Merge to test branch
         if: success() && github.ref == 'refs/heads/dev'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
