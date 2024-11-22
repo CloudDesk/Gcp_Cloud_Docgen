@@ -42,7 +42,17 @@ jobs:
           echo "SERVICE_ACCOUNT_CLIENT_X509_CERT_URL=${{ secrets.SERVICE_ACCOUNT_CLIENT_X509_CERT_URL }}" >> $GITHUB_ENV
           echo "SERVICE_ACCOUNT_UNIVERSE_DOMAIN=${{ secrets.SERVICE_ACCOUNT_UNIVERSE_DOMAIN }}" >> $GITHUB_ENV
           
-    
+      # Step 3: Debug Specific Environment Variables
+      - name: Debug: Print Specific Environment Variables
+        run: |
+          echo "PORT=$PORT"
+          echo "BASE_URL=$BASE_URL"
+          echo "SF_USERNAME=$SF_USERNAME"
+          echo "SERVICE_ACCOUNT_PROJECT_ID=$SERVICE_ACCOUNT_PROJECT_ID"
+          echo "SERVICE_ACCOUNT_CLIENT_EMAIL=$SERVICE_ACCOUNT_CLIENT_EMAIL"
+          echo "SERVICE_ACCOUNT_PRIVATE_KEY=$SERVICE_ACCOUNT_PRIVATE_KEY"
+
+
       # # Step 3: Install libreofficeSERVICE_ACCOUNT_TYPE
       # - name: Install LibreOffice
       #   run: |
