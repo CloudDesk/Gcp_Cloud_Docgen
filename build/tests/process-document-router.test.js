@@ -1,19 +1,18 @@
 import { initializeApp } from '../index.js';
 import { API_KEY } from '../config/config.js';
 import { cleanupCredentials } from '../utils/clearCrendtials.js';
-
 describe('POST /api/v1/salesforce/process-document', () => {
-    let fastify: any;
+    let fastify;
     beforeAll(async () => {
         fastify = await initializeApp(); // Initialize the app instance
-    });;
+    });
+    ;
     afterAll(async () => {
-        console.log('After all called')
-        let data = await cleanupCredentials('/src/service/gcp/gcp-credentials.json')
+        console.log('After all called');
+        let data = await cleanupCredentials('/src/service/gcp/gcp-credentials.json');
         console.log(data, 'Data from cleanup');
         await fastify.close(); // Close the Fastify instance
     });
-
     it('should validate the Body and process the document Return 200 status code', async () => {
         const requestBody = {
             "orgId": "00DWU00000BoiXu",
@@ -44,7 +43,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
                     }
                 }
             ]
-        }
+        };
         console.log(requestBody, 'requestBody');
         const response = await fastify.inject({
             method: 'POST',
@@ -56,9 +55,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
         });
         console.log(response.statusCode, 'Response for process document');
         expect(response.statusCode).toBe(200);
-
     });
-
     it('Should Retrun 400 from wrong content version Id', async () => {
         const requestBody = {
             "orgId": "00DWU00000BoiXu",
@@ -89,7 +86,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
                     }
                 }
             ]
-        }
+        };
         console.log(requestBody, 'requestBody');
         const response = await fastify.inject({
             method: 'POST',
@@ -101,9 +98,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
         });
         console.log(response.statusCode, 'Response for process document');
         expect(response.statusCode).toBe(400);
-
     });
-
     it('should validate the Body and process the document Return 400 status code', async () => {
         const requestBody = {
             "orgId": "00DWU00000BoiXu",
@@ -134,7 +129,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
                     }
                 }
             ]
-        }
+        };
         console.log(requestBody, 'requestBody');
         const response = await fastify.inject({
             method: 'POST',
@@ -146,9 +141,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
         });
         console.log(response, 'Response for process document');
         expect(response.statusCode).toBe(400);
-
     });
-
     it('should validate the Body and process the document Return 400 status code', async () => {
         const requestBody = {
             "orgId": "00DWU00000BoiX",
@@ -179,7 +172,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
                     }
                 }
             ]
-        }
+        };
         console.log(requestBody, 'requestBody');
         const response = await fastify.inject({
             method: 'POST',
@@ -191,8 +184,6 @@ describe('POST /api/v1/salesforce/process-document', () => {
         });
         console.log(response, 'Response for process document');
         expect(response.statusCode).toBe(400);
-
     });
-
-
 });
+//# sourceMappingURL=process-document-router.test.js.map

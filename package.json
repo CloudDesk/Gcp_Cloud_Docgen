@@ -10,7 +10,11 @@
     "build": "tsc",
     "dev": "npx tsx src/index",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "docgen-build": "docker build -t docgen .",
+    "docgen-tag": "docker tag docgen gcr.io/docgen-440809/docgen",
+    "docgen-push": "docker push gcr.io/docgen-440809/docgen",
+    "gcp-deploy": "gcloud run deploy docgen-dev --image gcr.io/docgen-440809/docgen:latest --platform managed --region us-central1 --allow-unauthenticated --port 4350"
   },
   "author": "",
   "license": "ISC",

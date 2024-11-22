@@ -10,13 +10,9 @@ export const docGenRouter = (fastify, options, done) => {
   // Root route
   fastify.get("/", (request, reply) => {
     console.log("Root route accessed");
-    reply.send("Successfully Worked");
+    reply.send("Successfully Worked DocGen Testing");
   });
 
-  fastify.get("/test", (request, reply) => {
-    console.log("Root route accessed");
-    reply.send("Successfully Worked Test route");
-  });
 
   // Salesforce ID validation route
   fastify.post(

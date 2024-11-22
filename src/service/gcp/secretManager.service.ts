@@ -6,20 +6,28 @@ import { writeFile } from 'fs/promises';
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 import { validateAndParseCredentials } from "../../utils/validateBase.js";
-import { SERVICE_ACCOUNT } from "../../config/config.js";
+import { SERVICE_ACCOUNT, SERVICE_ACCOUNT_AUTH_PROVIDER_X509_CERT_URL, SERVICE_ACCOUNT_AUTH_URI, SERVICE_ACCOUNT_CLIENT_EMAIL, SERVICE_ACCOUNT_CLIENT_ID, SERVICE_ACCOUNT_CLIENT_X509_CERT_URL, SERVICE_ACCOUNT_PRIVATE_KEY, SERVICE_ACCOUNT_PRIVATE_KEY_ID, SERVICE_ACCOUNT_PROJECT_ID, SERVICE_ACCOUNT_TOKEN_URI, SERVICE_ACCOUNT_TYPE, SERVICE_ACCOUNT_UNIVERSE_DOMAIN } from "../../config/config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 let credentialsData;
+console.log(SERVICE_ACCOUNT, "Service Account");
 try {
    credentialsData = await validateAndParseCredentials(SERVICE_ACCOUNT);
+   console.log(credentialsData, "Credentials Data");
+
 } catch (parseError) {
     throw new Error(`Invalid JSON in SERVICE_ACCOUNT: ${parseError.message}`);
 }
 const credentialsPath = join(__dirname, 'gcp-credentials.json');
 await writeFile(credentialsPath, JSON.stringify(credentialsData, null, 2));
+
+
+
+
 const secretClient = new SecretManagerServiceClient({
   keyFilename: credentialsPath,
 });
+
 
 
 
@@ -84,9 +92,11 @@ async function addSecretVersion(fullSecretPath: string, secretValue: string) {
         data: Buffer.from(secretValue),
       },
     });
+    console.log(version, "Version");
     return version.name;
   } catch (versionError) {
-    return versionError;
+    console.log(versionError, "Version Error data");
+    return { error: versionError.message };
   }
 }
 
@@ -126,8 +136,12 @@ export async function storeSecret(secretValue: string, orgId: string) {
   }
 
   try {
-    const versionName = await addSecretVersion(fullSecretPath, secretValue);
+    const versionName: any = await addSecretVersion(fullSecretPath, secretValue);
     console.log(`Stored secret version for organization ${orgId}`);
+    console.log(versionName, "Version Name")
+    if (versionName.error) {
+      return { error: versionName.error }
+    }
     return { success: true, versionName };
   } catch (versionError) {
     console.error("Error storing secret version:", versionError);
@@ -157,8 +171,8 @@ export async function getSecretValue(orgId: string) {
     // Extract the secret payload (raw data) and convert it to a string
     const secretPayload = accessResponse.payload?.data?.toString(); // No 'utf8' argument
     console.log('Raw secret value:', secretPayload); // Log the raw secret value to inspect
-      console.log('Returning plain text secret:', secretPayload);
-      return secretPayload;
+    console.log('Returning plain text secret:', secretPayload);
+    return secretPayload;
 
   } catch (err) {
     console.error("Error accessing secret value:", err);
