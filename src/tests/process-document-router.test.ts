@@ -20,7 +20,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
             "userName": "cddev@org.com",
             "recordId": "001WU00000Tv8bLYAR",
             "fileName": "Account",
-            "contentVersionId": "068WU000005PAisYAG",
+            "contentVersionId": "068WU000005Ukk5YAC",
             "fieldData": [
                 {
                     "Account": {

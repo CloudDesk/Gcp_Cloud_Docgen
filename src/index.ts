@@ -9,7 +9,8 @@ console.log(DOCGEN_API_KEY, "API key from secret manager DOCGEN_API_KEY");
 
 
 function setupSwagger(fastifyInstance) {
-    const SWAGGER_URL ="http://localhost:4350";
+    console.log('inside setupSwagger')
+    const SWAGGER_URL = BASE_URL || "http://localhost:4350";
 
     fastifyInstance.register(swagger, {
         openapi: {
@@ -68,8 +69,10 @@ async function apiKeyValidationHook(
     ) {
         return; // Allow requests to Swagger documentation without API key
     }
-
+    console.log('inside hhook')
+    console.log(request.headers, 'request.headers');
     const headerApiKey = request.headers["x-api-key"];
+    console.log(headerApiKey, "headerApiKey");
     if (!headerApiKey) {
         return reply.status(401).send({
             error:
@@ -108,9 +111,9 @@ start().catch((err) => {
 });
 
 async function initializeApp() {
-  await Fastify.ready();   // Ensure Fastify is initialized
-  return Fastify;
+    await Fastify.ready();   // Ensure Fastify is initialized
+    return Fastify;
 }
 
 export const app = Fastify;
-export { initializeApp,  DOCGEN_API_KEY };
+export { initializeApp, DOCGEN_API_KEY };

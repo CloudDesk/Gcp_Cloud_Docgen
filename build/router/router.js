@@ -11,10 +11,6 @@ export const docGenRouter = (fastify, options, done) => {
         console.log("Root route accessed");
         reply.send("Successfully Worked DocGen Testing");
     });
-    fastify.get("/test", (request, reply) => {
-        console.log("Root route accessed");
-        reply.send("Successfully Worked Test route");
-    });
     // Salesforce ID validation route
     fastify.post("/api/v1/salesforce/store-credentials", {
         schema: sfOrgClientIdSwagger,

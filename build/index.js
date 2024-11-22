@@ -1,13 +1,14 @@
 import { fastify } from "fastify";
 import { docGenRouter } from "./router/router.js";
-import { DOCGEN_API_KEY, PORT } from "./config/config.js";
+import { BASE_URL, DOCGEN_API_KEY, PORT } from "./config/config.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 const Fastify = fastify({ logger: { level: 'debug' } });
 console.log(DOCGEN_API_KEY, "API key from secret manager DOCGEN_API_KEY");
 function setupSwagger(fastifyInstance) {
-    const SWAGGER_URL = "http://localhost:4350";
+    console.log('inside setupSwagger');
+    const SWAGGER_URL = BASE_URL || "http://localhost:4350";
     fastifyInstance.register(swagger, {
         openapi: {
             info: {
@@ -57,7 +58,10 @@ async function apiKeyValidationHook(request, reply) {
         request.url === "/") {
         return; // Allow requests to Swagger documentation without API key
     }
+    console.log('inside hhook');
+    console.log(request.headers, 'request.headers');
     const headerApiKey = request.headers["x-api-key"];
+    console.log(headerApiKey, "headerApiKey");
     if (!headerApiKey) {
         return reply.status(401).send({
             error: 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint.',

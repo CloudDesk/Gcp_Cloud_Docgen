@@ -101,33 +101,33 @@ jobs:
           git clean -fd
 
 
-      #  # New approach: Direct merge to test branch with conflict resolution
-      # - name: Merge to test branch
-      #   if: success() && github.ref == 'refs/heads/dev'
-      #   run: |
-      #     # Configure git
-      #     git config --global user.name "GitHub Actions"
-      #     git config --global user.email "actions@github.com"
+       # New approach: Direct merge to test branch with conflict resolution
+      - name: Merge to test branch
+        if: success() && github.ref == 'refs/heads/dev'
+        run: |
+          # Configure git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
           
-      #     # Fetch all branches
-      #     git fetch origin
+          # Fetch all branches
+          git fetch origin
           
-      #     # Clean any leftover files
-      #     git clean -fd
+          # Clean any leftover files
+          git clean -fd
           
-      #     # Create backup of credentials file if it exists
-      #     if [ -f "src/service/gcp/gcp-credentials.json" ]; then
-      #       cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
-      #     fi
+          # Create backup of credentials file if it exists
+          if [ -f "src/service/gcp/gcp-credentials.json" ]; then
+            cp src/service/gcp/gcp-credentials.json /tmp/gcp-credentials.json
+          fi
           
-      #     # Force reset to dev branch state
-      #     git reset --hard origin/dev
+          # Force reset to dev branch state
+          git reset --hard origin/dev
           
-      #     # Restore credentials file if it existed
-      #     if [ -f "/tmp/gcp-credentials.json" ]; then
-      #       mkdir -p src/service/gcp/
-      #       cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
-      #     fi
+          # Restore credentials file if it existed
+          if [ -f "/tmp/gcp-credentials.json" ]; then
+            mkdir -p src/service/gcp/
+            cp /tmp/gcp-credentials.json src/service/gcp/gcp-credentials.json
+          fi
           
-      #     # Push to test branch
-      #     git push origin HEAD:test --force
+          # Push to test branch
+          git push origin HEAD:test --force
