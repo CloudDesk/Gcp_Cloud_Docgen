@@ -42,16 +42,16 @@ jobs:
           echo "SERVICE_ACCOUNT_UNIVERSE_DOMAIN=${{ secrets.SERVICE_ACCOUNT_UNIVERSE_DOMAIN }}" >> $GITHUB_ENV
           
     
-      # Step 3: Install libreofficeSERVICE_ACCOUNT_TYPE
-      - name: Install LibreOffice
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libreoffice
-          sudo apt-get install -y libreoffice-writer
+      # # Step 3: Install libreofficeSERVICE_ACCOUNT_TYPE
+      # - name: Install LibreOffice
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y libreoffice
+      #     sudo apt-get install -y libreoffice-writer
 
-      # Step 4: Install dependencies
-      - name: Install Dependencies
-        run: npm install
+      # # Step 4: Install dependencies
+      # - name: Install Dependencies
+      #   run: npm install
 
       # Step 5: Run Jest Tests with Coverage
       - name: Run Jest Tests
