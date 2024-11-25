@@ -90,6 +90,7 @@ const requestNewAccessToken = async (orgId, userName) => {
             instanceUrlCache = response.data.instance_url;
         }
         catch (error) {
+            console.log('Error Below is ', error);
             console.log(error, "Error  in ");
             return error.message;
         }

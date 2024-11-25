@@ -1,49 +1,100 @@
-import { initializeApp } from '../index.js';
-import { API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
-import { cleanupCredentials } from '..//utils/clearCrendtials.js';
+import { jest } from '@jest/globals';
+import { API_KEY, DOCGEN_API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
+// Mock service account data
+const mockServiceAccount = {
+    type: "service_account",
+    project_id: "gcp-project-id",
+    private_key_id: "474a5abdc6da8a2cdcfSc3141f21d74db91d4792",
+    private_key: "-----BEGIN PRIVATE KEY-----\nfeahsdkhkahjsdgihohjwerofdsknbvcbmzbjhjashedfncknhgfbkblkdsahk\n-----END PRIVATE KEY-----\n",
+    client_email: "mock-service@your-project.iam.gserviceaccount.com",
+    client_id: "119178689018994015340",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/mock-service%40your-project.iam.gserviceaccount.com",
+    universe_domain: "googleapis.com"
+};
+// Create mock implementations
+const mockAccessSecretVersion = jest.fn().mockResolvedValue([
+    {
+        payload: {
+            data: Buffer.from(JSON.stringify(mockServiceAccount)),
+        },
+    },
+    undefined,
+    undefined
+]);
+const mockAddSecretVersion = jest.fn().mockResolvedValue([
+    {
+        name: 'projects/123/secrets/test-secret/versions/1',
+        state: 'ENABLED',
+        createTime: new Date(),
+    },
+    undefined,
+    undefined
+]);
+const mockCreateSecret = jest.fn().mockResolvedValue([
+    {
+        name: 'projects/doctez-2023/secrets/00D5g00000Dh2ZSEAZ',
+    },
+]);
+// Mock the Secret Manager module with all necessary methods
+jest.mock('@google-cloud/secret-manager', () => ({
+    SecretManagerServiceClient: jest.fn().mockImplementation(() => ({
+        accessSecretVersion: mockAccessSecretVersion,
+        addSecretVersion: mockAddSecretVersion,
+        createSecret: mockCreateSecret,
+        projectPath: jest.fn().mockReturnValue('projects/123'),
+        secretPath: jest.fn().mockReturnValue('projects/123/secrets/test-secret'),
+        secretVersionPath: jest.fn().mockReturnValue('projects/123/secrets/test-secret/versions/1')
+    }))
+}));
+// Import the app after setting up all mocks
+let initializeApp;
 describe('POST /api/v1/salesforce/store-credentials', () => {
     let fastify;
     beforeAll(async () => {
-        fastify = await initializeApp(); // Initialize the app instance
+        // Import the app only after setting up all mocks
+        const appModule = await import('../index.js');
+        initializeApp = appModule.initializeApp;
+        // Initialize Fastify app
+        fastify = await initializeApp();
     });
-    ;
     afterAll(async () => {
-        console.log('After all called');
-        let data = await cleanupCredentials('/src/service/gcp/gcp-credentials.json');
-        console.log(data, 'Data from cleanup');
-        await fastify.close(); // Close the Fastify instance
+        await fastify.close();
+        jest.clearAllMocks();
+    });
+    beforeEach(() => {
+        mockAccessSecretVersion.mockClear();
+        mockAddSecretVersion.mockClear();
+        mockCreateSecret.mockClear();
     });
     it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
+        // Setup
         const requestBody = {
             clientId: SF_CLIENT_ID,
             orgId: SF_ORG_ID,
         };
+        // Execute
         const response = await fastify.inject({
             method: 'POST',
             url: '/api/v1/salesforce/store-credentials',
             payload: requestBody,
             headers: {
-                'X-API-KEY': API_KEY,
+                'X-API-KEY': DOCGEN_API_KEY,
             },
         });
-        console.log(response, 'Response for salesfroce credentila');
+        // Debug logging
+        console.log('Mock calls - accessSecretVersion:', mockAccessSecretVersion.mock.calls);
+        console.log('Mock calls - addSecretVersion:', mockAddSecretVersion.mock.calls);
+        console.log('Mock calls - createSecret:', mockCreateSecret.mock.calls);
+        console.log('Response status:', response.statusCode);
+        console.log('Response body:', response.body);
+        // Assert
+        expect(mockAddSecretVersion).toHaveBeenCalled();
         expect(response.statusCode).toBe(200);
-    });
-    it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
-        const requestBody = {
-            clientId: SF_CLIENT_ID,
-            orgId: SF_ORG_ID_TWO
-        };
-        const response = await fastify.inject({
-            method: 'POST',
-            url: '/api/v1/salesforce/store-credentials',
-            payload: requestBody,
-            headers: {
-                'X-API-KEY': API_KEY,
-            },
-        });
-        console.log(response, 'Response for salesfroce credentila');
-        expect(response.statusCode).toBe(200);
+        // Since the response is not JSON, directly check the string
+        expect(response.body).toBe("Successfully stored Client ID in Secret Manager");
     });
     it('should validate the Salesforce credentials and return 403 For wrong API KEY', async () => {
         const requestBody = {
@@ -58,7 +109,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
                 'X-API-KEY': 'wrong api key',
             },
         });
-        console.log(response, 'Response for salesfroce credentila');
+        console.log(response, 'Response for salesfroce credentila for function 1 is ');
         expect(response.statusCode).toBe(403);
     });
     it('should return 400 for invalid request body', async () => {
@@ -88,7 +139,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         });
         expect(response.statusCode).toBe(401);
     });
-    it('should return 500 for invalid request body', async () => {
+    it('should return 415 for invalid request body', async () => {
         const invalidPayload = '{ clientId: INVALID_CLIENT_ID, orgId: INVALID_ORG_ID ';
         const response = await fastify.inject({
             method: 'POST',
@@ -99,6 +150,26 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
             },
         });
         expect(response.statusCode).toBe(415);
+    });
+    it('should create a new secret and validate Salesforce credentials with SF_ORG_ID_TWO, returning 200', async () => {
+        const requestBody = {
+            clientId: SF_CLIENT_ID,
+            orgId: SF_ORG_ID_TWO,
+        };
+        const response = await fastify.inject({
+            method: 'POST',
+            url: '/api/v1/salesforce/store-credentials',
+            payload: requestBody,
+            headers: {
+                'X-API-KEY': API_KEY,
+            },
+        });
+        console.log('Mock calls - createSecret:', mockCreateSecret.mock.calls);
+        console.log('Response status:', response.statusCode);
+        console.log('Response body:', response.body);
+        expect(mockAddSecretVersion).toHaveBeenCalled(); // Validate secret version addition
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toBe('Successfully stored Client ID in Secret Manager');
     });
 });
 //# sourceMappingURL=store-credentials-router.test.js.map

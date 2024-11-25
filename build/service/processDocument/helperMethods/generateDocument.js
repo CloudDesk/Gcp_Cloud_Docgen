@@ -7,7 +7,6 @@ import Docxtemplater from "docxtemplater";
 import { promisify } from "util";
 const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
 const __dirname = path.join(dirname(__filename), '../../../../templates');
 /**
  * Generates a DOCX file from a template with provided data.
