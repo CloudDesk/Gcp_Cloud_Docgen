@@ -115,6 +115,9 @@ const requestNewAccessToken = async (
       accessTokenCache = response.data.access_token;
       instanceUrlCache = response.data.instance_url;
     } catch (error) {
+      console.log(
+        'Error Below is ',error
+      )
       console.log(error, "Error  in ");
       return error.message;
     }

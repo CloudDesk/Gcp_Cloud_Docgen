@@ -54,10 +54,10 @@ const convertDocxBufferToPdf = async (
 ): Promise<string> => {
   const tempDocxPath = path.join(outputDir, `${fileName}.docx`);
   const tempPdfPath = path.join(outputDir, `${fileName}.pdf`);
-
+console.log('inside convertDocxBufferToPdf');
   try {
-    await fs.writeFile(tempDocxPath, docxBuffer);
-
+  let writefile =   await fs.writeFile(tempDocxPath, docxBuffer);
+console.log(writefile, "write file data");
     await execAsync(
       `soffice --headless --convert-to pdf "${tempDocxPath}" --outdir "${outputDir}"`
     );
