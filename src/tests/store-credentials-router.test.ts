@@ -67,7 +67,7 @@ type CreateSecretResponse = [
 
 const mockCreateSecret = jest.fn<() => Promise<CreateSecretResponse>>().mockResolvedValue([
   {
-    name: 'projects/123/secrets/test-secret',
+    name: 'projects/doctez-2023/secrets/00D5g00000Dh2ZSEAZ',
   },
 ]);
 
@@ -206,12 +206,12 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
     expect(response.statusCode).toBe(415);
   });
 
-  it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
+  it('should create a new secret and validate Salesforce credentials with SF_ORG_ID_TWO, returning 200', async () => {
     const requestBody = {
       clientId: SF_CLIENT_ID,
-      orgId: SF_ORG_ID_TWO
+      orgId: SF_ORG_ID_TWO,
     };
-
+  
     const response = await fastify.inject({
       method: 'POST',
       url: '/api/v1/salesforce/store-credentials',
@@ -220,9 +220,15 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         'X-API-KEY': API_KEY,
       },
     });
-    console.log(response, 'Response for salesfroce credentila for function  3 is~');
+  
+    console.log('Mock calls - createSecret:', mockCreateSecret.mock.calls);
+    console.log('Response status:', response.statusCode);
+    console.log('Response body:', response.body);
+  
+    expect(mockAddSecretVersion).toHaveBeenCalled(); // Validate secret version addition
     expect(response.statusCode).toBe(200);
-
+    expect(response.body).toBe('Successfully stored Client ID in Secret Manager');
   });
+  
 
 });
