@@ -105,10 +105,7 @@ const start = async () => {
     }
 };
 
-start().catch((err) => {
-    console.error("Unhandled error starting server:", err);
-    process.exit(1);
-});
+start()
 
 async function initializeApp() {
     await Fastify.ready();   // Ensure Fastify is initialized
