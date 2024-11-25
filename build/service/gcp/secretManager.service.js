@@ -13,7 +13,8 @@ async function getSecret(fullSecretPath) {
     console.log(fullSecretPath, "Full secret path");
     try {
         const [secret] = await secretClient.getSecret({ name: fullSecretPath });
-        console.log(secret, "Secret");
+        console.log('Attempting to access secret');
+        console.log(secret, "Secret value in the get getSecret function");
         return secret;
     }
     catch (err) {
