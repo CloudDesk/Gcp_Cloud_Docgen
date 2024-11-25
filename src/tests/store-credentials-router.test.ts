@@ -28,7 +28,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         'X-API-KEY': API_KEY,
       },
     });
-    console.log(response, 'Response for salesfroce credentila');
+    console.log(response, 'Response for salesfroce credentila for function 2 is');
     expect(response.statusCode).toBe(200);
 
   });
@@ -47,7 +47,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         'X-API-KEY': API_KEY,
       },
     });
-    console.log(response, 'Response for salesfroce credentila');
+    console.log(response, 'Response for salesfroce credentila for function  3 is');
     expect(response.statusCode).toBe(200);
 
   });
@@ -66,7 +66,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         'X-API-KEY': 'wrong api key',
       },
     });
-    console.log(response, 'Response for salesfroce credentila');
+    console.log(response, 'Response for salesfroce credentila for function 1 is ');
     expect(response.statusCode).toBe(403);
 
   });
