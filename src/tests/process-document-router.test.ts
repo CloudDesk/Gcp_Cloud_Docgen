@@ -1,9 +1,7 @@
 import { API_KEY } from '../config/config.js';
 import { jest } from '@jest/globals';
 import fs from 'fs/promises';
-import path from 'path';
-// import { cleanupCredentials } from '../utils/clearCrendtials.js';
-import { SecretManagerServiceClient, protos } from '@google-cloud/secret-manager';
+import { protos } from '@google-cloud/secret-manager';
 
 // Define types for Secret Manager responses
 import axios from 'axios';
@@ -39,8 +37,8 @@ jest.spyOn(axios, 'post').mockImplementation((url, data) => {
         console.log('inside next function');
         // Simulate binary file content (Buffer or ArrayBuffer)
         return Promise.resolve({
-            data:{
-                id:"069WU000006Yx0bYAC"
+            data: {
+                id: "069WU000006Yx0bYAC"
             }
         });
     }
@@ -50,43 +48,43 @@ jest.spyOn(axios, 'post').mockImplementation((url, data) => {
 });
 const readDocxFile = async (filePath: string) => {
     try {
-      // Read file as a buffer
-      const docxBuffer = await fs.readFile(filePath);
-  
-      // Log the buffer content (this will be binary data)
-  
-      // Example: Convert buffer to string if needed (for debugging or processing)
-      const fileContent = docxBuffer.toString();
-      
-      return docxBuffer; // You can return the buffer for further use
+        // Read file as a buffer
+        const docxBuffer = await fs.readFile(filePath);
+
+        // Log the buffer content (this will be binary data)
+
+        // Example: Convert buffer to string if needed (for debugging or processing)
+        const fileContent = docxBuffer.toString();
+
+        return docxBuffer; // You can return the buffer for further use
     } catch (err) {
-      console.error('Error reading file:', err);
+        console.error('Error reading file:', err);
     }
-  };
-  
+};
+
 
 jest.spyOn(axios, 'get').mockImplementation(async (url, config) => {
-    console.log(url , 'URL for get request');
+    console.log(url, 'URL for get request');
     const filePath = 'src/tests/template/Account.docx'
     let docxbuffer = await readDocxFile(filePath);
     // Simulate the case where you're fetching file content, not Account data.
     if (url.includes('/services/data/v57.0/sobjects/ContentVersion/068WU000005Ukk5YAC/VersionData')) {
-      // Simulating binary file content (a buffer or arraybuffer)
-      const fileBuffer = Buffer.from(docxbuffer);
-      return Promise.resolve({
-        data: fileBuffer, // Return the simulated file content as a Buffer
-      });
+        // Simulating binary file content (a buffer or arraybuffer)
+        const fileBuffer = Buffer.from(docxbuffer);
+        return Promise.resolve({
+            data: fileBuffer, // Return the simulated file content as a Buffer
+        });
     }
-    
+
     // For other URLs, return a mock response with JSON data (this could be for other Salesforce endpoints)
     if (url.includes('/services/data/v57.0/sobjects/Account/068WU000005Ukk5YAC')) {
         console.log('inside the mock get  request is ')
-      return Promise.resolve({
-        data: {
-          Id: '068WU000005Ukk5YAC',
-          Name: 'Financial Insights LLC',
-        },
-      });
+        return Promise.resolve({
+            data: {
+                Id: '068WU000005Ukk5YAC',
+                Name: 'Financial Insights LLC',
+            },
+        });
     }
 
     // Handle the correct ContentVersion URL format without /VersionData
@@ -95,17 +93,17 @@ jest.spyOn(axios, 'get').mockImplementation(async (url, config) => {
         // Simulate binary file content (Buffer or ArrayBuffer)
         const fileBuffer = Buffer.from(docxbuffer);
         return Promise.resolve({
-            data:{
-                ContentDocumentId:"069WU000006Yx0bYAC"
+            data: {
+                ContentDocumentId: "069WU000006Yx0bYAC"
             }
         });
     }
 
 
-      console.error('Unknown URL: ', url);  // Log the unknown URL that was triggered
+    console.error('Unknown URL: ', url);  // Log the unknown URL that was triggered
 
     return Promise.reject(new Error('Unknown URL'));
-  });
+});
 
 
 

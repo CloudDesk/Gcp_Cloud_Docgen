@@ -26,6 +26,7 @@ async function createContentVersion(auth, base64FileContent, fileName) {
             Authorization: `Bearer ${auth.accessToken}`,
         },
     });
+    console.log(response, 'response in createContentVersion');
     return response.data.id;
 }
 /**
@@ -35,11 +36,15 @@ async function createContentVersion(auth, base64FileContent, fileName) {
  * @returns The ContentDocumentId.
  */
 async function getContentDocumentId(auth, contentVersionId) {
+    console.log('inside getContentDocumentId');
+    console.log(auth.instanceUrl, 'auth.instanceUrl in getContentDocumentId');
+    console.log(`${auth.instanceUrl}/services/data/v57.0/sobjects/ContentVersion/${contentVersionId}`, 'Version Id');
     const response = await axios.get(`${auth.instanceUrl}/services/data/v57.0/sobjects/ContentVersion/${contentVersionId}`, {
         headers: {
             Authorization: `Bearer ${auth.accessToken}`,
         },
     });
+    console.log(response.data, 'response in getContentDocumentId');
     return response.data.ContentDocumentId;
 }
 /**
@@ -50,6 +55,7 @@ async function getContentDocumentId(auth, contentVersionId) {
  * @returns The ID of the created ContentDocumentLink.
  */
 async function createContentDocumentLink(auth, contentDocumentId, recordId) {
+    console.log(contentDocumentId, 'contentDocumentId in createContentDocumentLink');
     const response = await axios.post(`${auth.instanceUrl}/services/data/v57.0/sobjects/ContentDocumentLink/`, {
         ContentDocumentId: contentDocumentId,
         LinkedEntityId: recordId,
@@ -61,6 +67,7 @@ async function createContentDocumentLink(auth, contentDocumentId, recordId) {
             "Content-Type": "application/json",
         },
     });
+    console.log(response.data, 'response in createContentDocumentLink');
     return response.data.id;
 }
 /**
@@ -75,8 +82,11 @@ export async function uploadFile(auth, filePath, recordId) {
         console.log(auth.accessToken, "Access token in uploadFile");
         const base64FileContent = await readFileAsBase64(filePath);
         const fileName = filePath.split("/").pop() || "unknown";
+        console.log(fileName, 'file name in uploadFile');
         const contentVersionId = await createContentVersion(auth, base64FileContent, fileName);
+        console.log(contentVersionId, 'contentVersionId in uploadFile');
         const contentDocumentId = await getContentDocumentId(auth, contentVersionId);
+        console.log(contentDocumentId, 'contentDocumentId in uploadFile');
         const contentDocumentLinkId = await createContentDocumentLink(auth, contentDocumentId, recordId);
         console.log("File uploaded successfully and linked to record");
         console.log("ContentDocumentLink ID:", contentDocumentLinkId);
@@ -89,7 +99,8 @@ export async function uploadFile(auth, filePath, recordId) {
         };
     }
     catch (error) {
+        console.log(error.message, 'Error in uploadFile');
         console.error("Error uploading file:", error.response ? error.response.data : error.message);
     }
 }
-//# sourceMappingURL=fileupload2.service.js.map
+//# sourceMappingURL=fileupload.service.js.map

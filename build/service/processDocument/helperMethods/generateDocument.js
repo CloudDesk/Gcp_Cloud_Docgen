@@ -7,7 +7,6 @@ import Docxtemplater from "docxtemplater";
 import { promisify } from "util";
 const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
 const __dirname = path.join(dirname(__filename), '../../../../templates');
 /**
  * Generates a DOCX file from a template with provided data.
@@ -43,7 +42,7 @@ const convertDocxBufferToPdf = async (docxBuffer, outputDir, fileName) => {
     const tempDocxPath = path.join(outputDir, `${fileName}.docx`);
     const tempPdfPath = path.join(outputDir, `${fileName}.pdf`);
     try {
-        await fs.writeFile(tempDocxPath, docxBuffer);
+        let writefile = await fs.writeFile(tempDocxPath, docxBuffer);
         await execAsync(`soffice --headless --convert-to pdf "${tempDocxPath}" --outdir "${outputDir}"`);
         if (!(await fs.stat(tempPdfPath))) {
             throw new Error("PDF file was not created.");

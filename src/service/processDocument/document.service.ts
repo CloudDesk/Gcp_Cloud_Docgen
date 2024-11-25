@@ -1,9 +1,8 @@
 import fs from "fs";
 import { fileURLToPath } from "url";
-
 import path, { dirname } from "path";
 import { generatePdfsFromTemplate } from "./helperMethods/generateDocument.js";
-import { uploadFile } from "../sf/fileupload2.service.js";
+import { uploadFile } from "../sf/fileupload.service.js";
 import { sfAuthService } from "../sf/auth.service.js";
 import { fileFetchService } from "../sf/fileFetch.service.js";
 

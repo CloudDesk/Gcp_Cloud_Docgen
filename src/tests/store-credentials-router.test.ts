@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import { API_KEY, DOCGEN_API_KEY, SF_CLIENT_ID, SF_ORG_ID } from '../config/config.js';
-import { SecretManagerServiceClient, protos } from '@google-cloud/secret-manager';
+import { protos } from '@google-cloud/secret-manager';
 
 // Define types for Secret Manager responses
 type SecretVersionResponse = [
@@ -159,8 +159,6 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
     expect(response.statusCode).toBe(403);
 
   });
-
-
 
   it('should return 400 for invalid request body', async () => {
     const invalidRequestBody = {

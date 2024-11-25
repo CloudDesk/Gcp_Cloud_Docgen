@@ -21,6 +21,7 @@ export const fileFetchService = {
             console.log(filePath, 'file path data fetched');
             const relativeFilePath = path.join("templates", `${fileName}.docx`);
             console.log(relativeFilePath, 'relative file path data fetched');
+            console.log(filePath, 'file path data fetched');
             await this.ensureDirectoryExists(filePath);
             fs.writeFileSync(filePath, response.data);
             console.log(relativeFilePath, 'relative file path data fetched');
@@ -66,6 +67,7 @@ export const fileFetchService = {
                 responseType: "arraybuffer",
             });
             console.log(fetchfiledata, 'fetched file data');
+            console.log(fetchfiledata.data, 'fetched file data');
             return fetchfiledata;
         }
         catch (error) {

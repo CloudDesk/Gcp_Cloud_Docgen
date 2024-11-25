@@ -139,7 +139,6 @@ export async function uploadFile(
       contentDocumentId,
       recordId
     );
-    console.log(contentDocumentLinkId, 'contentDocumentLinkId in uploadFile');
     console.log("File uploaded successfully and linked to record");
     console.log("ContentDocumentLink ID:", contentDocumentLinkId);
 
