@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",           // Changed from NodeNext
+    "moduleResolution": "Node",   // Changed from NodeNext
+    "target": "ESNext",          // Changed from ES2020
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "outDir": "build",
+    "strict": false,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "build"]
+}
