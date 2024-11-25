@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { API_KEY, DOCGEN_API_KEY, SF_CLIENT_ID, SF_ORG_ID } from '../config/config.js';
+import { API_KEY, DOCGEN_API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
 import { protos } from '@google-cloud/secret-manager';
 
 // Define types for Secret Manager responses
@@ -192,7 +192,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
     expect(response.statusCode).toBe(401);
   });
 
-  it('should return 500 for invalid request body', async () => {
+  it('should return 415 for invalid request body', async () => {
     const invalidPayload = '{ clientId: INVALID_CLIENT_ID, orgId: INVALID_ORG_ID ';
     const response = await fastify.inject({
       method: 'POST',
@@ -204,6 +204,25 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
       },
     });
     expect(response.statusCode).toBe(415);
+  });
+
+  it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
+    const requestBody = {
+      clientId: SF_CLIENT_ID,
+      orgId: SF_ORG_ID_TWO
+    };
+
+    const response = await fastify.inject({
+      method: 'POST',
+      url: '/api/v1/salesforce/store-credentials',
+      payload: requestBody,
+      headers: {
+        'X-API-KEY': API_KEY,
+      },
+    });
+    console.log(response, 'Response for salesfroce credentila for function  3 is~');
+    expect(response.statusCode).toBe(200);
+
   });
 
 });
