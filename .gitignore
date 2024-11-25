@@ -6,5 +6,4 @@ uploads
 .vscode/settings.json
 pnpm-lock.yaml
 docgen-440809-afae407a4dd7.json
-build
 coverage
