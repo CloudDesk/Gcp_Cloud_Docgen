@@ -45,7 +45,7 @@ describe('POST /api/v1/salesforce/process-document', () => {
                 }
             ]
         }
-        console.log(requestBody, 'requestBody');
+        console.log(requestBody, 'requestBody for validation test case');
         const response = await fastify.inject({
             method: 'POST',
             url: '/api/v1/salesforce/process-document',
@@ -54,7 +54,9 @@ describe('POST /api/v1/salesforce/process-document', () => {
                 'X-API-KEY': API_KEY,
             },
         });
-        console.log(response.statusCode, 'Response for process document');
+        console.log(response, 'Response for process document 200 sucess code test case');
+
+        console.log(response.statusCode, 'Response for process document 200 sucess code test case');
         expect(response.statusCode).toBe(200);
 
     });
