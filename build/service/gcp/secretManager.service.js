@@ -1,28 +1,7 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { writeFile } from 'fs/promises';
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
-import { validateAndParseCredentials } from "../../utils/validateBase.js";
-import { SERVICE_ACCOUNT } from "../../config/config.js";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-let credentialsData;
-console.log(SERVICE_ACCOUNT, "Service Account");
-try {
-    credentialsData = await validateAndParseCredentials(SERVICE_ACCOUNT);
-    console.log(credentialsData, "Credentials Data");
-}
-catch (parseError) {
-    throw new Error(`Invalid JSON in SERVICE_ACCOUNT: ${parseError.message}`);
-}
-const credentialsPath = join(__dirname, 'gcp-credentials.json');
-await writeFile(credentialsPath, JSON.stringify(credentialsData, null, 2));
-const secretClient = new SecretManagerServiceClient({
-    keyFilename: credentialsPath,
-});
-//  const secretClient = new SecretManagerServiceClient();
+const secretClient = new SecretManagerServiceClient({});
 /**
  * Retrieves a secret from Google Secret Manager.
  *
