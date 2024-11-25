@@ -1,5 +1,6 @@
 import { initializeApp } from '../index.js';
 import { API_KEY, SF_CLIENT_ID, SF_ORG_ID, SF_ORG_ID_TWO } from '../config/config.js';
+// import { cleanupCredentials } from '..//utils/clearCrendtials.js';
 describe('POST /api/v1/salesforce/store-credentials', () => {
     let fastify;
     beforeAll(async () => {
@@ -41,7 +42,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
                 'X-API-KEY': API_KEY,
             },
         });
-        console.log(response, 'Response for salesfroce credentila for function  3 is');
+        console.log(response, 'Response for salesfroce credentila for function  3 is~');
         expect(response.statusCode).toBe(200);
     });
     it('should validate the Salesforce credentials and return 403 For wrong API KEY', async () => {

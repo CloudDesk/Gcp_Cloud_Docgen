@@ -11,4 +11,4 @@ async function validateAndParseCredentials(encodedCredentials) {
     }
 }
 export { validateAndParseCredentials };
-//# sourceMappingURL=validateBase.js.map
+//# sourceMappingURL=validatebase.js.map
