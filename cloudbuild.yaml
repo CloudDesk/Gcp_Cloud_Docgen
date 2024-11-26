@@ -32,6 +32,8 @@ steps:
       - 'push'
       - 'gcr.io/docgen-440809/docgen-prodenv:latest'
 
+
+
   # Step 5: Deploy the image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
