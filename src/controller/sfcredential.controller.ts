@@ -5,6 +5,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 interface ValidationPayload {
   clientId: string;
   orgId: string;
+  test: boolean;
 }
 
 // Controller for Salesforce credential operations

@@ -93,7 +93,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
     // Import the app only after setting up all mocks
     const appModule = await import('../index.js');
     initializeApp = appModule.initializeApp;
-    
+
     // Initialize Fastify app
     fastify = await initializeApp();
   });
@@ -104,18 +104,21 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
   });
 
   beforeEach(() => {
+    jest.clearAllMocks();
     mockAccessSecretVersion.mockClear();
     mockAddSecretVersion.mockClear();
     mockCreateSecret.mockClear();
   });
 
   it('should validate the Salesforce credentials and return 200 with correct API key', async () => {
+
+  
     // Setup
     const requestBody = {
       clientId: SF_CLIENT_ID,
       orgId: SF_ORG_ID,
     };
-  
+
     // Execute
     const response = await fastify.inject({
       method: 'POST',
@@ -125,18 +128,18 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         'X-API-KEY': DOCGEN_API_KEY,
       },
     });
-  
+
     // Debug logging
     console.log('Mock calls - accessSecretVersion:', mockAccessSecretVersion.mock.calls);
     console.log('Mock calls - addSecretVersion:', mockAddSecretVersion.mock.calls);
     console.log('Mock calls - createSecret:', mockCreateSecret.mock.calls);
     console.log('Response status:', response.statusCode);
     console.log('Response body:', response.body);
-  
+
     // Assert
     expect(mockAddSecretVersion).toHaveBeenCalled();
     expect(response.statusCode).toBe(200);
-    
+
     // Since the response is not JSON, directly check the string
     expect(response.body).toBe("Successfully stored Client ID in Secret Manager");
   });
@@ -200,7 +203,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
       payload: invalidPayload,
       headers: {
 
-        'X-API-KEY':API_KEY,
+        'X-API-KEY': API_KEY,
       },
     });
     expect(response.statusCode).toBe(415);
@@ -212,6 +215,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
       orgId: SF_ORG_ID_TWO,
     };
   
+  console.log(requestBody, 'Request body for function 2');
     const response = await fastify.inject({
       method: 'POST',
       url: '/api/v1/salesforce/store-credentials',
@@ -221,14 +225,17 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
       },
     });
   
+    // Logs
+    console.log('Response Status:', response.statusCode);
+    console.log('Response Body:', response.body);
     console.log('Mock calls - createSecret:', mockCreateSecret.mock.calls);
-    console.log('Response status:', response.statusCode);
-    console.log('Response body:', response.body);
   
-    expect(mockAddSecretVersion).toHaveBeenCalled(); // Validate secret version addition
+    // Assertions
+    expect(mockAddSecretVersion).toHaveBeenCalledTimes(1);
+    expect(mockCreateSecret).toHaveBeenCalledTimes(1);
     expect(response.statusCode).toBe(200);
     expect(response.body).toBe('Successfully stored Client ID in Secret Manager');
   });
-  
+
 
 });
