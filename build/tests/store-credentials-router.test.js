@@ -65,6 +65,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         jest.clearAllMocks();
     });
     beforeEach(() => {
+        jest.clearAllMocks();
         mockAccessSecretVersion.mockClear();
         mockAddSecretVersion.mockClear();
         mockCreateSecret.mockClear();
@@ -156,6 +157,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
             clientId: SF_CLIENT_ID,
             orgId: SF_ORG_ID_TWO,
         };
+        console.log(requestBody, 'Request body for function 2');
         const response = await fastify.inject({
             method: 'POST',
             url: '/api/v1/salesforce/store-credentials',
@@ -164,10 +166,13 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
                 'X-API-KEY': API_KEY,
             },
         });
+        // Logs
+        console.log('Response Status:', response.statusCode);
+        console.log('Response Body:', response.body);
         console.log('Mock calls - createSecret:', mockCreateSecret.mock.calls);
-        console.log('Response status:', response.statusCode);
-        console.log('Response body:', response.body);
-        expect(mockAddSecretVersion).toHaveBeenCalled(); // Validate secret version addition
+        // Assertions
+        expect(mockAddSecretVersion).toHaveBeenCalledTimes(1);
+        expect(mockCreateSecret).toHaveBeenCalledTimes(1);
         expect(response.statusCode).toBe(200);
         expect(response.body).toBe('Successfully stored Client ID in Secret Manager');
     });

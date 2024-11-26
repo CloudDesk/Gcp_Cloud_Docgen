@@ -18,7 +18,11 @@ async function getSecret(fullSecretPath) {
         return secret;
     }
     catch (err) {
-        console.log(err.code, "Error whne getting secret");
+        console.log(err, "Error whne getting secret for test");
+        console.log(err.code, "Error whne getting secret for test");
+        if (err.code === undefined) {
+            return 5;
+        }
         return err.code;
     }
 }
