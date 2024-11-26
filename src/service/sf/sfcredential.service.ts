@@ -4,6 +4,7 @@ import { storeSecret } from "../gcp/secretManager.service.js";
 interface Payload {
   clientId: string;
   orgId: string;
+  test: boolean
 }
 
 // Service for handling Salesforce credentials
@@ -17,6 +18,7 @@ export const sfCredentialService = {
     payload: Payload
   ): Promise<{ success?: any; error?: string }> {
     console.log("Payload received:", payload);
+
     try {
       // Store the client ID and org ID using the secret manager service
       const storeResult = await storeSecret(payload.clientId, payload.orgId);

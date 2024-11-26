@@ -3,7 +3,7 @@ import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 const PROJECT_ID = "projects/docgen-440809";
 const ERROR_CODE_SECRET_NOT_FOUND = 5;
 
-   const secretClient = new SecretManagerServiceClient({});
+const secretClient = new SecretManagerServiceClient({});
 
 /**
  * Retrieves a secret from Google Secret Manager.
@@ -12,7 +12,7 @@ const ERROR_CODE_SECRET_NOT_FOUND = 5;
  * @returns The secret object.
  * @throws Will throw an error if the secret is not found or any other error occurs.
  */
-async function getSecret(fullSecretPath: string) {
+async function getSecret(fullSecretPath: string ) {
   console.log(fullSecretPath, "Full secret path");
   try {
     const [secret] = await secretClient.getSecret({ name: fullSecretPath });
@@ -21,7 +21,11 @@ async function getSecret(fullSecretPath: string) {
     console.log(secret, "Secret value in the get getSecret function");
     return secret;
   } catch (err) {
-    console.log(err.code, "Error whne getting secret");
+    console.log(err, "Error whne getting secret for test");
+    console.log(err.code, "Error whne getting secret for test");
+    if (err.code === undefined) {
+      return 5
+    }
     return err.code;
   }
 }
