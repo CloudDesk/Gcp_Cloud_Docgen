@@ -4,7 +4,6 @@ import { sfCredentialController } from "../controller/sfcredential.controller.js
 import { sfOrgIdClientIdValidation } from "../schema/validateSalesforceData.js";
 import { sfValidateTemplateData } from "../schema/sfuserdatavalidation.js";
 import { sfOrgClientIdSwagger } from "../swager/sforgidclientid.swagger.js";
-import { processDocumentSwagger } from "../swager/processdocument.swager.js";
 export const docGenRouter = (fastify, options, done) => {
     // Root route
     fastify.get("/", (request, reply) => {
@@ -16,10 +15,7 @@ export const docGenRouter = (fastify, options, done) => {
         schema: sfOrgClientIdSwagger,
         preHandler: [validateRequestBody(sfOrgIdClientIdValidation)],
     }, sfCredentialController.validateAndStoreSalesforceCredentials);
-    // Salesforce process document route
-    // console.log(processDocumentSwagger);
     fastify.post("/api/v1/salesforce/process-document", {
-        schema: processDocumentSwagger,
         preHandler: [validateRequestBody(sfValidateTemplateData)],
     }, documentController.processDocument);
     done();

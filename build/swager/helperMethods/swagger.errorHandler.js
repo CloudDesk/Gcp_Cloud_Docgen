@@ -4,7 +4,7 @@ export const errorResponse = (description, example) => ({
     properties: {
         error: {
             type: "string",
-            example,
+            example: example,
         },
     },
 });

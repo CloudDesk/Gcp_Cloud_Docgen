@@ -24,12 +24,9 @@ export const docGenRouter = (fastify, options, done) => {
     sfCredentialController.validateAndStoreSalesforceCredentials
   );
 
-  // Salesforce process document route
-  // console.log(processDocumentSwagger);
   fastify.post(
     "/api/v1/salesforce/process-document",
     {
-      schema: processDocumentSwagger,
       preHandler: [validateRequestBody(sfValidateTemplateData)],
     },
     documentController.processDocument

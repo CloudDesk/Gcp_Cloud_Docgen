@@ -4,7 +4,7 @@ import { BASE_URL, DOCGEN_API_KEY, PORT } from "./config/config.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
-const Fastify = fastify({ logger: { level: 'debug' } });
+const Fastify = fastify({ logger: false });
 console.log(DOCGEN_API_KEY, "API key from secret manager DOCGEN_API_KEY");
 function setupSwagger(fastifyInstance) {
     console.log('inside setupSwagger');
@@ -53,24 +53,30 @@ function setupCors(fastifyInstance) {
     });
 }
 async function apiKeyValidationHook(request, reply) {
-    const swaggerRoutes = ["/docs", "/docs/*"];
-    if (swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
-        request.url === "/") {
-        return; // Allow requests to Swagger documentation without API key
+    try {
+        const swaggerRoutes = ["/docs", "/docs/*"];
+        if (swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
+            request.url === "/") {
+            return; // Allow requests to Swagger documentation without API key
+        }
+        console.log('inside hhook');
+        console.log(request.headers, 'request.headers');
+        const headerApiKey = request.headers["x-api-key"];
+        console.log(headerApiKey, "headerApiKey");
+        console.log(request.body, 'global hook check');
+        if (!headerApiKey) {
+            return reply.status(401).send({
+                error: 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint.',
+            });
+        }
+        if (headerApiKey !== DOCGEN_API_KEY) {
+            return reply.status(403).send({
+                error: "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
+            });
+        }
     }
-    console.log('inside hhook');
-    console.log(request.headers, 'request.headers');
-    const headerApiKey = request.headers["x-api-key"];
-    console.log(headerApiKey, "headerApiKey");
-    if (!headerApiKey) {
-        return reply.status(401).send({
-            error: 'API key is missing or invalid. Please include a valid API key in the "x-api-key" header to access this endpoint.',
-        });
-    }
-    if (headerApiKey !== DOCGEN_API_KEY) {
-        return reply.status(403).send({
-            error: "Access denied. The provided API key is incorrect. Ensure you are using the correct API key to access this route.",
-        });
+    catch (error) {
+        console.log(error, `error in global hook`);
     }
 }
 Fastify.addHook("onRequest", apiKeyValidationHook);
