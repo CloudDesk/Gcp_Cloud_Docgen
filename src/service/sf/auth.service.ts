@@ -3,6 +3,7 @@ import axios, { AxiosError } from "axios";
 import fs from "fs/promises";
 import path from "path";
 import { getSecretValue } from "../gcp/secretManager.service.js";
+import { error } from "console";
 
 // Types
 type AuthResult = {
@@ -34,15 +35,22 @@ let instanceUrlCache: string | null = null;
  * @param {string} orgId - The organization ID.
  * @returns {Promise<string>} - The clientId retrieved from Google Secret Manager.
  */
-const getClientIdFromSecretManager = async (orgId: string): Promise<string> => {
+const getClientIdFromSecretManager = async (orgId: string): Promise<any> => {
   console.log(orgId, "orgId from getClientIdFromSecretManager");
   try {
     let clientId = await getSecretValue(orgId);
+    console.log(clientId, 'clientId from getClientIdFromSecretManager')
     if (typeof clientId === "string") {
       console.log(clientId, "Client ID");
       return clientId;
     } else {
-      throw new Error(`Failed to fetch client ID: ${clientId.error}`);
+      console.log('inside else condition client id')
+      if (clientId.error.code === 5) {
+        let errormessage = { success: false, error: 'Given OrgId is Not Exist.Create New orgId with Client Secret For Authentication With Salesforce' }
+        console.log(errormessage, 'errormessage')
+        return errormessage;
+      }
+      return clientId.error;
     }
   } catch (error) {
     throw new Error(`Error fetching client ID: ${error.message}`);
@@ -92,12 +100,16 @@ const generateJWT = (
 const requestNewAccessToken = async (
   orgId: string,
   userName: string
-): Promise<AuthResult> => {
+): Promise<any> => {
   // console.log(orgId, "orgId from requestNewAccessToken");
   try {
     console.log("inside requestNewAccessToken");
-    const clientId = await getClientIdFromSecretManager(orgId);
+    const clientId: any = await getClientIdFromSecretManager(orgId);
     console.log(clientId, "Client ID from requestNewAccessToken");
+    if (clientId.success === false) {
+      console.log('inside if condition client id')
+      return clientId
+    }
     const privateKey = await loadPrivateKey();
     console.log(privateKey, "Private key from requestNewAccessToken");
     const jwtToken = generateJWT(privateKey, clientId, userName);
@@ -111,15 +123,16 @@ const requestNewAccessToken = async (
     try {
       const response = await axios.post(baseConfig.authUrl, params);
       console.log(response.data, "response data");
-
       accessTokenCache = response.data.access_token;
       instanceUrlCache = response.data.instance_url;
     } catch (error) {
-      console.log(
-        'Error Below is ',error
-      )
-      console.log(error, "Error  in ");
-      return error.message;
+      console.log(error.message, "error in requestNewAccessToken");
+      if (error.response.data.error_description = 'client identifier invalid') {
+        return { success: false, error: `This OrgId's ClientId or User Name is Invalid. Please Update the Correct ClientId for this OrgId And check the userName` };
+      }
+      else {
+        return { success: false, error: error.message };
+      }
     }
 
     return {
@@ -153,26 +166,13 @@ const getAccessToken = async (
   orgId?: string,
   userName?: string
 ): Promise<AuthResult> => {
-  if (!accessTokenCache) {
-    console.log("inside !accessTokenCache");
-    return requestNewAccessToken(orgId, userName);
-  }
 
-  return {
-    accessToken: accessTokenCache,
-    instanceUrl: instanceUrlCache,
-  };
+  return requestNewAccessToken(orgId, userName);
+
 };
 
-/**
- * Clears the current access token and instance URL.
- */
-const clearAccessToken = (): void => {
-  accessTokenCache = null;
-  instanceUrlCache = null;
-};
+
 
 export const sfAuthService = {
   getAccessToken,
-  clearAccessToken,
 };

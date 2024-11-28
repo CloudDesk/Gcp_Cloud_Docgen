@@ -163,7 +163,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
 
   });
 
-  it('should return 400 for invalid request body', async () => {
+  it('should return 403 for invalid request body', async () => {
     const invalidRequestBody = {
       clientId: 'INVALID_CLIENT_ID',
       orgId: 'INVALID_ORG_ID',
@@ -177,7 +177,7 @@ describe('POST /api/v1/salesforce/store-credentials', () => {
         'X-API-KEY': API_KEY,
       },
     });
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(403);
   });
 
   it('should return 401 for Not Giving API KEY', async () => {

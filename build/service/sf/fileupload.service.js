@@ -101,6 +101,10 @@ export async function uploadFile(auth, filePath, recordId) {
     catch (error) {
         console.log(error.message, 'Error in uploadFile');
         console.error("Error uploading file:", error.response ? error.response.data : error.message);
+        return {
+            success: false,
+            message: error.response.data[0].message,
+        };
     }
 }
 //# sourceMappingURL=fileupload.service.js.map

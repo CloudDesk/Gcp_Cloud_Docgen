@@ -21,12 +21,19 @@ const getClientIdFromSecretManager = async (orgId) => {
     console.log(orgId, "orgId from getClientIdFromSecretManager");
     try {
         let clientId = await getSecretValue(orgId);
+        console.log(clientId, 'clientId from getClientIdFromSecretManager');
         if (typeof clientId === "string") {
             console.log(clientId, "Client ID");
             return clientId;
         }
         else {
-            throw new Error(`Failed to fetch client ID: ${clientId.error}`);
+            console.log('inside else condition client id');
+            if (clientId.error.code === 5) {
+                let errormessage = { success: false, error: 'Given OrgId is Not Exist.Create New orgId with Client Secret For Authentication With Salesforce' };
+                console.log(errormessage, 'errormessage');
+                return errormessage;
+            }
+            return clientId.error;
         }
     }
     catch (error) {
@@ -73,6 +80,10 @@ const requestNewAccessToken = async (orgId, userName) => {
         console.log("inside requestNewAccessToken");
         const clientId = await getClientIdFromSecretManager(orgId);
         console.log(clientId, "Client ID from requestNewAccessToken");
+        if (clientId.success === false) {
+            console.log('inside if condition client id');
+            return clientId;
+        }
         const privateKey = await loadPrivateKey();
         console.log(privateKey, "Private key from requestNewAccessToken");
         const jwtToken = generateJWT(privateKey, clientId, userName);
@@ -90,9 +101,13 @@ const requestNewAccessToken = async (orgId, userName) => {
             instanceUrlCache = response.data.instance_url;
         }
         catch (error) {
-            console.log('Error Below is ', error);
-            console.log(error, "Error  in ");
-            return error.message;
+            console.log(error.message, "error in requestNewAccessToken");
+            if (error.response.data.error_description = 'client identifier invalid') {
+                return { success: false, error: `This OrgId's ClientId or User Name is Invalid. Please Update the Correct ClientId for this OrgId And check the userName` };
+            }
+            else {
+                return { success: false, error: error.message };
+            }
         }
         return {
             accessToken: accessTokenCache,
@@ -119,24 +134,9 @@ const requestNewAccessToken = async (orgId, userName) => {
  * @returns {Promise<AuthResult>} The authentication result containing the access token and instance URL.
  */
 const getAccessToken = async (orgId, userName) => {
-    if (!accessTokenCache) {
-        console.log("inside !accessTokenCache");
-        return requestNewAccessToken(orgId, userName);
-    }
-    return {
-        accessToken: accessTokenCache,
-        instanceUrl: instanceUrlCache,
-    };
-};
-/**
- * Clears the current access token and instance URL.
- */
-const clearAccessToken = () => {
-    accessTokenCache = null;
-    instanceUrlCache = null;
+    return requestNewAccessToken(orgId, userName);
 };
 export const sfAuthService = {
     getAccessToken,
-    clearAccessToken,
 };
 //# sourceMappingURL=auth.service.js.map

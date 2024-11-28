@@ -18,7 +18,7 @@ export const docGenRouter = (fastify, options, done) => {
   fastify.post(
     "/api/v1/salesforce/store-credentials",
     {
-      schema: sfOrgClientIdSwagger,
+     // schema: [sfOrgClientIdSwagger],
       preHandler: [validateRequestBody(sfOrgIdClientIdValidation)],
     },
     sfCredentialController.validateAndStoreSalesforceCredentials
@@ -27,6 +27,7 @@ export const docGenRouter = (fastify, options, done) => {
   fastify.post(
     "/api/v1/salesforce/process-document",
     {
+     // schema: [processDocumentSwagger],
       preHandler: [validateRequestBody(sfValidateTemplateData)],
     },
     documentController.processDocument

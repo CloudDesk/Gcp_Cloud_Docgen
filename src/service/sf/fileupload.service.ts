@@ -116,7 +116,7 @@ export async function uploadFile(
     contentDocumentId: string;
     contentDocumentLinkId: string;
   }
-  | undefined
+  | any
 > {
   try {
     console.log(auth.accessToken, "Access token in uploadFile");
@@ -155,5 +155,9 @@ export async function uploadFile(
       "Error uploading file:",
       error.response ? error.response.data : error.message
     );
+    return {
+      success: false,
+      message: error.response.data[0].message,
+    };
   }
 }

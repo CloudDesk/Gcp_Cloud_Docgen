@@ -10,7 +10,7 @@
 
     function setupSwagger(fastifyInstance) {
         console.log('inside setupSwagger')
-        const SWAGGER_URL =BASE_URL ||  "http://localhost:4350";
+        const SWAGGER_URL =BASE_URL;
 
         fastifyInstance.register(swagger, {
             openapi: {
@@ -37,7 +37,6 @@
         fastifyInstance.register(swaggerUi, {
             routePrefix: "/docs",
             staticCSP: true,
-            transformStaticCSP: (header) => header,
             uiConfig: {
                 docExpansion: "full",
                 deepLinking: false,
@@ -95,6 +94,8 @@
     }
 
     Fastify.addHook("onRequest", apiKeyValidationHook);
+
+  
 
     setupSwagger(Fastify);
     setupCors(Fastify);

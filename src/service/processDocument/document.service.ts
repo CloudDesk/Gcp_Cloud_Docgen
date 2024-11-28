@@ -16,18 +16,18 @@ export const processDocumentService = {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.join(dirname(__filename), "../../../templates");
     console.log(__dirname, "Current directory path");
-    console.log("Starting document generation...");
-
     const { orgId, userName, recordId, fileName, contentVersionId, fieldData } =
       documentData;
     console.log(documentData, "Document data received");
-
     // Authenticate with Salesforce
     let sfConn;
     try {
       // sfConn = await sfAuthController.authenticate(orgId, userName);
       sfConn = await sfAuthService.getAccessToken(orgId, userName);
-      console.log(sfConn, "Salesforce connection established");
+      console.log(sfConn, "Salesforce connection result is");
+      if (sfConn.success === false) {
+        return { error: sfConn.error };
+      }
     } catch (error) {
       console.error("Salesforce authentication failed", error);
       return { error: "Salesforce authentication failed" };
@@ -88,6 +88,10 @@ export const processDocumentService = {
         uploadResults,
         "Document uploaded to Salesforce successfully"
       );
+      if(uploadResults.some((result) => result.success === false)){
+        let errormessage = uploadResults.map((result) => result.message).join(',');
+        return { error: errormessage };
+      }
       if (uploadResults.every((result) => result.success)) {
         generatedDocument.pdfFilePaths.forEach((filePath) =>
           fs.unlinkSync(filePath)
