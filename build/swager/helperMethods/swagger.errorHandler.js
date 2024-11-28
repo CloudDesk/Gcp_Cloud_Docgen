@@ -1,11 +1,11 @@
-export const errorResponse = (description, example) => ({
-    description,
-    type: "object",
-    properties: {
-        error: {
-            type: "string",
-            example,
-        },
-    },
-});
+// export const errorResponse = (description: string, example: string) => ({
+//   description,
+//   type: "object",
+//   properties: {
+//     error: {
+//       type: "string",
+//       example: example,
+//     },
+//   },
+// });
 //# sourceMappingURL=swagger.errorHandler.js.map

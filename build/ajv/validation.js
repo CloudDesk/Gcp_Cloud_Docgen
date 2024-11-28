@@ -6,12 +6,21 @@ ajvErrors(ajv); // Initialize ajv-errors with the ajv instance
 export const validateRequestBody = (schema) => {
     return async (request, reply) => {
         try {
-            console.log(typeof request.body, "Request body type");
+            console.log(JSON.stringify(request.body), 'validation request body');
+            if (typeof request?.body?.fieldData === 'string') {
+                request.body.fieldData = request.body.fieldData.replace(/^"(.+)"$/, '$1'); // Remove the surrounding double quotes
+                request.body.fieldData = JSON.parse(request.body.fieldData);
+            }
+            console.log(request.body, 'validation request body after parsing');
             const valid = ajv.validate(schema, request.body);
-            console.log(valid);
             if (!valid) {
                 console.log(ajv.errors, "AJV Errors");
-                reply.status(400).send({ error: ajv.errors[0].message });
+                let errormessages = [];
+                ajv.errors.forEach((error) => {
+                    errormessages.push(error.message);
+                });
+                console.log(errormessages, 'errormessages');
+                reply.status(403).send({ error: errormessages });
             }
         }
         catch (error) {
