@@ -116,7 +116,7 @@ export async function uploadFile(
     contentDocumentId: string;
     contentDocumentLinkId: string;
   }
-  | any
+  | object
 > {
   try {
     console.log(auth.accessToken, "Access token in uploadFile");

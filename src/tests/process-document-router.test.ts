@@ -262,6 +262,32 @@ describe('POST /api/v1/salesforce/process-document', () => {
         expect(response.statusCode).toBe(200);
 
     });
+
+    it('should validate the Body and process the document Return 200 status code', async () => {
+        const requestBody = {
+            "contentVersionId": "068WU000005Ukk5YAC",
+            "fieldData": "\"[{\"Account\": {\"Name\": \"Financial Insights LLC\",\"BillingStreet\": \"New Street\",\"BillingCity\": \"Boston\",\"BillingCountry\": \"USA\",\"Phone\": \"+1 555-7890\"},\"OpportunityLineItems\":{\"records\": {\"Name\": \"Financial Analysis Tool Investment Strategy Simulator\",\"Product2\": {\"Name\": \"Investment Strategy Simulator\"},\"Quantity\": 6,\"UnitPrice\": 299,\"TotalPrice\": 1794,\"Discount__c\": 10,\"DiscountAmtQI__c\": 179.4,\"DiscountedFinalQIPrice__c\": 1614.6}}}]\"",
+            "userName": "cddev@org.com",
+            "orgId": "00DJK00000BoiXu",
+            "fileName": "Account",
+            "recordId": "001WU00000Tv8bLYAR"
+        }
+        console.log(requestBody, 'requestBody for validation test case');
+        const response = await fastify.inject({
+            method: 'POST',
+            url: '/api/v1/salesforce/process-document',
+            payload: requestBody,
+            headers: {
+                'X-API-KEY': API_KEY,
+            },
+        });
+        console.log(response, 'Response for process document 200 sucess code test case');
+
+        console.log(response.statusCode, 'Response for process document 200 sucess code test case');
+
+        expect(response.statusCode).toBe(200);
+
+    });
    
 
     it('Should Retrun 400 from wrong content version Id', async () => {

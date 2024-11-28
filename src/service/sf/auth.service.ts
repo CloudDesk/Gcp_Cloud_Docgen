@@ -3,7 +3,6 @@ import axios, { AxiosError } from "axios";
 import fs from "fs/promises";
 import path from "path";
 import { getSecretValue } from "../gcp/secretManager.service.js";
-import { error } from "console";
 
 // Types
 type AuthResult = {
@@ -127,7 +126,7 @@ const requestNewAccessToken = async (
       instanceUrlCache = response.data.instance_url;
     } catch (error) {
       console.log(error.message, "error in requestNewAccessToken");
-      if (error.response.data.error_description = 'client identifier invalid') {
+      if (error.response.data.error_description === 'client identifier invalid') {
         return { success: false, error: `This OrgId's ClientId or User Name is Invalid. Please Update the Correct ClientId for this OrgId And check the userName` };
       }
       else {

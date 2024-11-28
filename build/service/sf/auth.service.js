@@ -102,7 +102,7 @@ const requestNewAccessToken = async (orgId, userName) => {
         }
         catch (error) {
             console.log(error.message, "error in requestNewAccessToken");
-            if (error.response.data.error_description = 'client identifier invalid') {
+            if (error.response.data.error_description === 'client identifier invalid') {
                 return { success: false, error: `This OrgId's ClientId or User Name is Invalid. Please Update the Correct ClientId for this OrgId And check the userName` };
             }
             else {

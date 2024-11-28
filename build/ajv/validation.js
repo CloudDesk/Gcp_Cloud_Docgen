@@ -16,7 +16,7 @@ export const validateRequestBody = (schema) => {
             if (!valid) {
                 console.log(ajv.errors, "AJV Errors");
                 let errormessages = [];
-                ajv.errors.map((error) => {
+                ajv.errors.forEach((error) => {
                     errormessages.push(error.message);
                 });
                 console.log(errormessages, 'errormessages');
