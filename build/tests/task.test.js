@@ -3,6 +3,35 @@ import { CloudTasksClient } from '@google-cloud/tasks';
 import { createHttpTask } from '../service/gcp/googletask.service';
 // Mock the entire @google-cloud/tasks module
 jest.mock('@google-cloud/tasks');
+jest.mock('google-auth-library', () => {
+    return {
+        GoogleAuth: jest.fn().mockImplementation(() => ({
+            getClient: jest.fn().mockImplementation(async () => {
+                // Explicitly type the mock client
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue({})
+                };
+                return mockClient;
+            }),
+            getCredentials: jest.fn().mockImplementation(async () => {
+                const credentials = {
+                    type: "service_account",
+                    project_id: "gcp-project-id",
+                    private_key_id: "474a5abdc6da8a2cdcfSc3141f21d74db91d4792",
+                    private_key: "-----BEGIN PRIVATE KEY-----\nfeahsdkhkahjsdgihohjwerofdsknbvcbmzbjhjashedfncknhgfbkblkdsahk\n-----END PRIVATE KEY-----\n",
+                    client_email: "mock-service@your-project.iam.gserviceaccount.com",
+                    client_id: "119178689018994015340",
+                    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+                    token_uri: "https://oauth2.googleapis.com/token",
+                    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+                    client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/mock-service%40your-project.iam.gserviceaccount.com",
+                    universe_domain: "googleapis.com"
+                };
+                return credentials;
+            })
+        })),
+    };
+});
 // Mock the entire module
 jest.mock('@google-cloud/tasks', () => {
     const originalModule = jest.requireActual('@google-cloud/tasks');
@@ -10,24 +39,6 @@ jest.mock('@google-cloud/tasks', () => {
         __esModule: true,
         ...originalModule,
         CloudTasksClient: jest.fn().mockImplementation(() => ({
-            auth: {
-                getCredentials: jest.fn().mockImplementation(async () => {
-                    const credentials = {
-                        type: "service_account",
-                        project_id: "gcp-project-id",
-                        private_key_id: "474a5abdc6da8a2cdcfSc3141f21d74db91d4792",
-                        private_key: "-----BEGIN PRIVATE KEY-----\nfeahsdkhkahjsdgihohjwerofdsknbvcbmzbjhjashedfncknhgfbkblkdsahk\n-----END PRIVATE KEY-----\n",
-                        client_email: "mock-service@your-project.iam.gserviceaccount.com",
-                        client_id: "119178689018994015340",
-                        auth_uri: "https://accounts.google.com/o/oauth2/auth",
-                        token_uri: "https://oauth2.googleapis.com/token",
-                        auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-                        client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/mock-service%40your-project.iam.gserviceaccount.com",
-                        universe_domain: "googleapis.com"
-                    };
-                    return credentials;
-                })
-            },
             queuePath: jest.fn().mockReturnValue('projects/test-project/locations/us-central1/queues/test-queue'),
             createTask: jest.fn().mockImplementation(() => Promise.resolve([{ name: 'test-task-name' }])),
         })),
