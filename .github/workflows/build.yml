@@ -30,10 +30,10 @@ jobs:
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> $GITHUB_ENV
           echo "TEST_BASE_URL=${{ secrets.TEST_BASE_URL }}" >> $GITHUB_ENV
           echo "DOCGEN_API_KEY=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
-          echo "GCP_PROJECT_ID=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
-          echo "GCP_TASK_QUEUE=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
-          echo "GCP_LOCATION=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
-          echo "GCP_TRIGGER_URL=${{ secrets.DOCGEN_API_KEY }}" >> $GITHUB_ENV
+          echo "GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "GCP_TASK_QUEUE=${{ secrets.GCP_TASK_QUEUE }}" >> $GITHUB_ENV
+          echo "GCP_LOCATION=${{ secrets.GCP_LOCATION }}" >> $GITHUB_ENV
+          echo "GCP_TRIGGER_URL=${{ secrets.GCP_TRIGGER_URL }}" >> $GITHUB_ENV
           
     
       # Step 3: Install libreoffice
