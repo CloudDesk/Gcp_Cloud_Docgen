@@ -1,7 +1,7 @@
 
 
 
-import { GCP_LOCATION, GCP_PROJECT_ID, GCP_TASK_QUEUE, GCP_TRIGGER_URL } from '../../config/config.js';
+import { API_KEY, GCP_LOCATION, GCP_PROJECT_ID, GCP_TASK_QUEUE, GCP_TRIGGER_URL } from '../../config/config.js';
 import { CloudTasksClient } from '@google-cloud/tasks';
 let client;
 try {
@@ -30,7 +30,7 @@ export async function createHttpTask(processDocumentPayload: any) {
                 headers: {
                     'Content-Type': 'application/json',
                     'Content-Length': Buffer.byteLength(payloadString),
-                    'x-api-key': 'AIzaSyArxb3xZ5lTVpGrF6YbMsCrS9e8iPGLldY'
+                    'x-api-key': API_KEY
                 },
                 httpMethod: 'POST',
                 url,

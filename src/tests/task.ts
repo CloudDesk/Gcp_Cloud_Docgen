@@ -121,7 +121,7 @@ describe('createHttpTask', () => {
 
 
         // Explicitly type the mocked client
-        const mockClient = new CloudTasksClient() as unknown as jest.Mocked<{
+         new CloudTasksClient() as unknown as jest.Mocked<{
             queuePath: jest.Mock;
             createTask: jest.Mock;
             auth: { getCredentials: jest.Mock };

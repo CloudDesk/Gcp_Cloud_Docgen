@@ -88,7 +88,7 @@ describe('createHttpTask', () => {
     });
     it("should send the correct payload to Google Cloud Tasks", async () => {
         // Explicitly type the mocked client
-        const mockClient = new CloudTasksClient();
+        new CloudTasksClient();
         const response = await createHttpTask(samplePayload);
         console.log(response.httpRequest.url, 'response.url');
         // Assert the response
