@@ -5,8 +5,10 @@ ajvErrors(ajv); // Initialize ajv-errors with the ajv instance
 // Function to validate the uploaded fil
 export const validateRequestBody = (schema) => {
     return async (request, reply) => {
+        console.log('inside validation hook');
         try {
-            console.log(JSON.stringify(request.body), 'validation request body');
+            console.log('inside validation hook try block');
+            console.log(request.body, 'validation request body before parsing');
             if (typeof request?.body?.fieldData === 'string') {
                 request.body.fieldData = request.body.fieldData.replace(/^"(.+)"$/, '$1'); // Remove the surrounding double quotes
                 request.body.fieldData = JSON.parse(request.body.fieldData);
@@ -24,6 +26,7 @@ export const validateRequestBody = (schema) => {
             }
         }
         catch (error) {
+            console.log('inside validation hook catch block');
             reply.status(500).send(error);
         }
     };

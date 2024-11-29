@@ -13,6 +13,18 @@ const mockSalesforceTokenResponse = {
 jest.spyOn(axios, 'post').mockImplementation((url, data) => {
     console.log("POST Request URL:", url); // Debugging line
     if (url === 'https://login.salesforce.com/services/oauth2/token') {
+        console.log('inside the mock post request is ');
+        console.log(data, 'data for post request');
+        console.log(data.URLSearchParams, 'URLSearchParams for post request');
+        console.log(data.get('userName'), 'userName for post request');
+        if (data.get('userName') === 'mstestorgACZ@org.com') {
+            return Promise.reject({
+                response: {
+                    status: 400,
+                    data: { error: 'Invalid username' },
+                },
+            });
+        }
         return Promise.resolve({
             data: mockSalesforceTokenResponse,
         });
@@ -429,6 +441,50 @@ describe('POST /api/v1/salesforce/process-document', () => {
         });
         console.log(response, 'Response for process document');
         expect(response.statusCode).toBe(403);
+    });
+    it('should validate the Body and process the document Return 400 status code for wrong credentials', async () => {
+        const requestBody = {
+            "orgId": "00DWU00000BoiXu",
+            "userName": "mstestorgACZ@org.com",
+            "recordId": "001WU00000Tv8bLYAR",
+            "fileName": "Account",
+            "contentVersionId": "068WU000005Ukk5YAC",
+            "fieldData": [
+                {
+                    "Account": {
+                        "Name": "Financial Insights LLC",
+                        "BillingStreet": "",
+                        "BillingCity": "Boston",
+                        "BillingCountry": "USA",
+                        "Phone": "+1 555-7890"
+                    },
+                    "ProductDetails": {
+                        "Name": "Financial Analysis Tool Investment Strategy Simulator",
+                        "Product2": {
+                            "Name": "Investment Strategy Simulator"
+                        },
+                        "Quantity": 6,
+                        "UnitPrice": 299,
+                        "TotalPrice": 1794,
+                        "Discount__c": 10,
+                        "DiscountAmtQI__c": 179.4,
+                        "DiscountedFinalQIPrice__c": 1614.6
+                    }
+                }
+            ]
+        };
+        console.log(requestBody, 'requestBody for validation test case');
+        const response = await fastify.inject({
+            method: 'POST',
+            url: '/api/v1/salesforce/process-document',
+            payload: requestBody,
+            headers: {
+                'X-API-KEY': API_KEY,
+            },
+        });
+        console.log(response, 'Response for process document 200 sucess code test case');
+        console.log(response.statusCode, 'Response for process document 200 sucess code test case');
+        expect(response.statusCode).toBe(400);
     });
 });
 //# sourceMappingURL=process-document-router.test.js.map

@@ -91,6 +91,7 @@ const requestNewAccessToken = async (orgId, userName) => {
         const params = new URLSearchParams({
             grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
             assertion: jwtToken,
+            userName: userName,
         });
         console.log(params, "params");
         console.log(baseConfig.authUrl, "baseConfig.authUrl");
