@@ -34,6 +34,7 @@
     "fastify": "^5.1.0",
     "gcp_cloud_docgen": "file:",
     "glob": "^11.0.0",
+    "googleapis": "^144.0.0",
     "jsonwebtoken": "^9.0.2",
     "pizzip": "^3.1.7",
     "supertest": "^7.0.0"

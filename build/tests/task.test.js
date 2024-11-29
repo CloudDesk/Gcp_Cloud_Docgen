@@ -7,8 +7,27 @@ jest.mock('@google-cloud/tasks');
 jest.mock('@google-cloud/tasks', () => {
     const originalModule = jest.requireActual('@google-cloud/tasks');
     return {
+        __esModule: true,
         ...originalModule,
         CloudTasksClient: jest.fn().mockImplementation(() => ({
+            auth: {
+                getCredentials: jest.fn().mockImplementation(async () => {
+                    const credentials = {
+                        type: "service_account",
+                        project_id: "gcp-project-id",
+                        private_key_id: "474a5abdc6da8a2cdcfSc3141f21d74db91d4792",
+                        private_key: "-----BEGIN PRIVATE KEY-----\nfeahsdkhkahjsdgihohjwerofdsknbvcbmzbjhjashedfncknhgfbkblkdsahk\n-----END PRIVATE KEY-----\n",
+                        client_email: "mock-service@your-project.iam.gserviceaccount.com",
+                        client_id: "119178689018994015340",
+                        auth_uri: "https://accounts.google.com/o/oauth2/auth",
+                        token_uri: "https://oauth2.googleapis.com/token",
+                        auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+                        client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/mock-service%40your-project.iam.gserviceaccount.com",
+                        universe_domain: "googleapis.com"
+                    };
+                    return credentials;
+                })
+            },
             queuePath: jest.fn().mockReturnValue('projects/test-project/locations/us-central1/queues/test-queue'),
             createTask: jest.fn().mockImplementation(() => Promise.resolve([{ name: 'test-task-name' }])),
         })),
@@ -64,25 +83,5 @@ describe('createHttpTask', () => {
         // Assert the response
         expect(response.httpRequest.url).toEqual("https://docgen-dev-1027746116534.us-central1.run.app/api/v1/salesforce/process-document");
     });
-    //     // Mock the CloudTasksClient constructor
-    //     // @ts-ignore
-    //     CloudTasksClient.mockImplementation(() => mockCloudTasksClient);
-    //     // Call the function
-    //     const result = await createHttpTask(samplePayload);
-    //     // Assertions
-    //     expect(result).toEqual(mockTaskResponse);
-    //     // Verify method calls
-    //     expect(mockCloudTasksClient.queuePath).toHaveBeenCalled();
-    //     expect(mockCloudTasksClient.createTask).toHaveBeenCalledWith({
-    //         parent: 'projects/test-project/locations/us-central1/queues/test-queue',
-    //         task: expect.objectContaining({
-    //             httpRequest: expect.objectContaining({
-    //                 body: expect.any(String),
-    //                 httpMethod: 'POST',
-    //                 url: 'https://your-endpoint.com/process-task'
-    //             })
-    //         })
-    //     });
-    // });
 });
 //# sourceMappingURL=task.test.js.map
