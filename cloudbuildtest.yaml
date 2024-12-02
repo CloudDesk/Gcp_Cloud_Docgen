@@ -59,6 +59,10 @@ substitutions:
   _GCP_PROJECT_ID: '${GCP_PROJECT_ID}'
   _GCP_TASK_QUEUE: '${GCP_TASK_QUEUE}'
   _GCP_TRIGGER_URL: '${GCP_TRIGGER_URL}'
+  __TEST: 'TEST'
+
+
+ 
 
 options:
   logging: CLOUD_LOGGING_ONLY
