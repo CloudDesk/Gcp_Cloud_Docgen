@@ -10,6 +10,8 @@ export const documentController = {
     async processDocument(request, reply) {
         try {
             // Call the service to generate the document
+            const payloadSize = Buffer.byteLength(JSON.stringify(request.body), 'utf-8');
+            console.log(payloadSize, 'payload size is ');
             const result = await processDocumentService.generateDocument(request.body);
             // Check the result and send appropriate response
             console.log(result, 'Result from process document');
