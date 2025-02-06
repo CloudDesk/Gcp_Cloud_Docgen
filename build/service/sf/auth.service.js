@@ -3,6 +3,8 @@ import axios, { AxiosError } from "axios";
 import fs from "fs/promises";
 import path from "path";
 import { getSecretValue } from "../gcp/secretManager.service.js";
+import qs from 'querystring';
+import { SF_CLIENT_SECRET } from "../../config/config.js";
 // Configuration Template
 const baseConfig = {
     authUrl: "https://login.salesforce.com/services/oauth2/token",
@@ -61,13 +63,17 @@ const loadPrivateKey = async () => {
  * @returns {string} The generated JWT token.
  */
 const generateJWT = (privateKey, clientId, userName) => {
+    const expiresAt = Date.now() + (180 * 1000);
     const claims = {
         iss: clientId,
         sub: userName,
         aud: "https://login.salesforce.com",
-        exp: Math.floor(Date.now() / 1000) + 180, // 3 minutes expiry
+        exp: Math.floor(expiresAt / 1000)
     };
-    return jwt.sign(claims, privateKey, { algorithm: "RS256" });
+    return {
+        token: jwt.sign(claims, privateKey, { algorithm: "RS256" }),
+        jwtExpiresAt: expiresAt
+    };
 };
 /**
  * Requests a new access token from Salesforce.
@@ -77,29 +83,34 @@ const generateJWT = (privateKey, clientId, userName) => {
 const requestNewAccessToken = async (orgId, userName) => {
     // console.log(orgId, "orgId from requestNewAccessToken");
     try {
-        console.log("inside requestNewAccessToken");
-        const clientId = await getClientIdFromSecretManager(orgId);
+        let clientId = await getClientIdFromSecretManager(orgId);
+        // clientId = '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6'
         console.log(clientId, "Client ID from requestNewAccessToken");
         if (clientId.success === false) {
-            console.log('inside if condition client id');
             return clientId;
         }
         const privateKey = await loadPrivateKey();
-        console.log(privateKey, "Private key from requestNewAccessToken");
-        const jwtToken = generateJWT(privateKey, clientId, userName);
+        const { token: jwtToken, jwtExpiresAt } = generateJWT(privateKey, clientId, userName);
         console.log(jwtToken, "generated token");
         const params = new URLSearchParams({
             grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
             assertion: jwtToken,
             userName: userName,
         });
-        console.log(params, "params");
-        console.log(baseConfig.authUrl, "baseConfig.authUrl");
+        let accessTokenExpiryTime;
+        let accessTokenIssuedTime;
         try {
             const response = await axios.post(baseConfig.authUrl, params);
             console.log(response.data, "response data");
             accessTokenCache = response.data.access_token;
             instanceUrlCache = response.data.instance_url;
+            console.log(accessTokenCache);
+            console.log(instanceUrlCache);
+            const data = await introspectAccessToken(response.data.access_token, clientId, response.data.instance_url);
+            console.log('Test');
+            console.log(data, 'Token Expiry ==> ');
+            accessTokenExpiryTime = data.tokenExpiredTime;
+            accessTokenIssuedTime = data.tokenIssuedTime;
         }
         catch (error) {
             console.log(error.message, "error in requestNewAccessToken");
@@ -113,6 +124,9 @@ const requestNewAccessToken = async (orgId, userName) => {
         return {
             accessToken: accessTokenCache,
             instanceUrl: instanceUrlCache,
+            jwtExpiresAt: jwtExpiresAt,
+            accessTokenExpiryTime: accessTokenExpiryTime,
+            accessTokenIssuedTime: accessTokenIssuedTime
         };
     }
     catch (error) {
@@ -136,6 +150,50 @@ const requestNewAccessToken = async (orgId, userName) => {
  */
 const getAccessToken = async (orgId, userName) => {
     return requestNewAccessToken(orgId, userName);
+};
+const introspectAccessToken = async (accessToken, client_id, instance_url) => {
+    const introspectUrl = `${instance_url}/services/oauth2/introspect`;
+    const clientSecret = SF_CLIENT_SECRET;
+    console.log(clientSecret, ' Client Secret ');
+    const authHeader = `${Buffer.from(`${client_id}:${clientSecret}`).toString('base64')}`;
+    console.log(authHeader, 'Auth Header');
+    const data = qs.stringify({
+        token: accessToken,
+        token_type_hint: 'access_token',
+    });
+    try {
+        const response = await axios.post(introspectUrl, data, {
+            headers: {
+                'Authorization': `Basic ${authHeader}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        });
+        const expirationDate = new Date(response.data.exp * 1000);
+        const issuedDate = new Date(response.data.iat * 1000);
+        console.log(expirationDate, 'Expiration Date');
+        const options = {
+            timeZone: 'Asia/Kolkata',
+            hour12: true,
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        const expiredDateTime = new Intl.DateTimeFormat('en-IN', options).format(expirationDate);
+        const issuedDateTime = new Intl.DateTimeFormat('en-IN', options).format(issuedDate);
+        const result = {
+            tokenIssuedTime: issuedDateTime,
+            tokenExpiredTime: expiredDateTime
+        };
+        console.log(result, 'Returning Data');
+        return result;
+    }
+    catch (error) {
+        console.error('Error during introspection:', error.response ? error.response.data : error.message);
+        return { error: error.message };
+    }
 };
 export const sfAuthService = {
     getAccessToken,

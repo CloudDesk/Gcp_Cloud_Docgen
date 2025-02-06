@@ -15,6 +15,7 @@ export const GCP_PROJECT_ID =process.env.GCP_PROJECT_ID
 export const GCP_TASK_QUEUE =process.env.GCP_TASK_QUEUE
 export const GCP_LOCATION =process.env.GCP_LOCATION
 export const GCP_TRIGGER_URL =process.env.GCP_TRIGGER_URL
+export const SF_CLIENT_SECRET=process.env.CLIENT_SECRET
 
 
 export const PORT = Number(port);

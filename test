@@ -1,0 +1,8 @@
+
+{
+access_token: '00DWU00000BoiXu!AQEAQMGrJMYngbWIO84PpjR4yR2c5GipeWamD1V39BY18HS4p3ucm10JZfpzbL4pBKAkSZy.6iv4TF76JMRtAdbKZBZ55miH',
+scope: 'api full',
+instance_url: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com',
+id: 'https://login.salesforce.com/id/00DWU00000BoiXu2AJ/005WU000007NCu5YAG',
+token_type: 'Bearer'
+} 
