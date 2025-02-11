@@ -72,10 +72,13 @@ async function addSecretVersion(fullSecretPath: string, secretValue: string) {
     });
     console.log(version, "Version");
     return version.name;
-  } catch (versionError) {
+  } 
+  
+  catch (versionError) {
     console.log(versionError, "Version Error data");
     return { error: versionError.message };
   }
+  
 }
 
 /**
@@ -114,8 +117,9 @@ export async function storeSecret(secretValue: string, orgId: string) {
   }
 
   try {
+    console.log('Inside Test class ');
     const versionName: any = await addSecretVersion(fullSecretPath, secretValue);
-    console.log(`Stored secret version for organization ${orgId}`);
+    console.log(`Stored secret version for organization ${versionName}`);
     console.log(versionName, "Version Name")
     if (versionName.error) {
       return { error: versionName.error }

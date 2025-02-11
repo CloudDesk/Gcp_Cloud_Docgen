@@ -28,13 +28,14 @@ export const sfCredentialController = {
       const validationResult =
         await sfCredentialService.validateAndStoreCredentials(payload);
 
+        console.log(validationResult ,' Validation Result => ');
       // Handle validation errors
       if (validationResult.error) {
         return reply.status(400).send(validationResult);
       }
 
       // Send success response
-      reply.send("Successfully stored Client ID in Secret Manager");
+      reply.send(validationResult.urlData);
     } catch (error) {
       // Handle unexpected errors
       reply.status(500).send(error.message);

@@ -18,6 +18,10 @@ type SalesforceConfig = {
   privateKeyPath: string;
 };
 
+
+// obj={orgid:'clientid'}
+// obj.orgid
+
 // Configuration Template
 const baseConfig: SalesforceConfig = {
   authUrl: "https://login.salesforce.com/services/oauth2/token",
