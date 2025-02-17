@@ -5,6 +5,8 @@ import path from "path";
 import { getSecretValue } from "../gcp/secretManager.service.js";
 import qs from 'querystring';
 import { SF_CLIENT_SECRET } from "../../config/config.js";
+// obj={orgid:'clientid'}
+// obj.orgid
 // Configuration Template
 const baseConfig = {
     authUrl: "https://login.salesforce.com/services/oauth2/token",
@@ -106,11 +108,11 @@ const requestNewAccessToken = async (orgId, userName) => {
             instanceUrlCache = response.data.instance_url;
             console.log(accessTokenCache);
             console.log(instanceUrlCache);
-            const data = await introspectAccessToken(response.data.access_token, clientId, response.data.instance_url);
-            console.log('Test');
-            console.log(data, 'Token Expiry ==> ');
-            accessTokenExpiryTime = data.tokenExpiredTime;
-            accessTokenIssuedTime = data.tokenIssuedTime;
+            // const  data:any = await introspectAccessToken(response.data.access_token, clientId, response.data.instance_url);
+            // console.log('Test');
+            // console.log(data, 'Token Expiry ==> ');
+            // accessTokenExpiryTime = data.tokenExpiredTime
+            // accessTokenIssuedTime=data.tokenIssuedTime
         }
         catch (error) {
             console.log(error.message, "error in requestNewAccessToken");

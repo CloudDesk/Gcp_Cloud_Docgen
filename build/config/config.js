@@ -14,5 +14,7 @@ export const GCP_TASK_QUEUE = process.env.GCP_TASK_QUEUE;
 export const GCP_LOCATION = process.env.GCP_LOCATION;
 export const GCP_TRIGGER_URL = process.env.GCP_TRIGGER_URL;
 export const SF_CLIENT_SECRET = process.env.CLIENT_SECRET;
+export const DEPLOYMENT_PROJECT = process.env.DEPLOYMENT_PROJECT;
+export const DEPLOYMENT_PROJECTID = process.env.DEPLOYMENT_PROJECTID;
 export const PORT = Number(port);
 //# sourceMappingURL=config.js.map
