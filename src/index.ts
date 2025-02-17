@@ -92,7 +92,7 @@
         }
         
     }
-
+console.log('test');
     Fastify.addHook("onRequest", apiKeyValidationHook);
 
   
