@@ -1,0 +1,66 @@
+steps:
+  # Step 1: Authenticate with GCP using Service Account stored in Secret Manager
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Authenticating with GCP..."
+        gcloud secrets versions access latest --secret="docgen-service-account-key" > /workspace/gcp-key.json
+        gcloud auth activate-service-account --key-file=/workspace/gcp-key.json
+
+  # Step 2: Set GCP project
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'config'
+      - 'set'
+      - 'project'
+      - 'docgen-440809'
+
+  # Step 3: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/docgen-440809/docgen-prodenv:latest'
+      - '.'
+
+  # Step 4: Push the Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/docgen-440809/docgen-prodenv:latest'
+
+
+
+  # Step 5: Deploy the image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'docgen-prod'
+      - '--image'
+      - 'gcr.io/docgen-440809/docgen-prodenv:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '4550'
+      - --update-secrets=DOCGEN_API_KEY=DOCGEN_API_KEY_PROD:latest
+      - '--set-env-vars'
+      - 'BASE_URL=${_BASE_URL},GCP_LOCATION=${_GCP_LOCATION},GCP_PROJECT_ID=${_GCP_PROJECT_ID},GCP_TASK_QUEUE=${_GCP_TASK_QUEUE},GCP_TRIGGER_URL=${_GCP_TRIGGER_URL}'
+
+# Substitution variables matched exactly to GitHub Secrets
+substitutions:
+  _BASE_URL: '${BASE_URL}'
+  _GCP_LOCATION: '${GCP_LOCATION}'
+  _GCP_PROJECT_ID: '${GCP_PROJECT_ID}'
+  _GCP_TASK_QUEUE: '${GCP_TASK_QUEUE}'
+  _GCP_TRIGGER_URL: '${GCP_TRIGGER_URL}'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
