@@ -137,11 +137,11 @@ const requestNewAccessToken = async (
       instanceUrlCache = response.data.instance_url;
       console.log(accessTokenCache);
       console.log(instanceUrlCache);
-      const  data:any = await introspectAccessToken(response.data.access_token, clientId, response.data.instance_url);
-      console.log('Test');
-      console.log(data, 'Token Expiry ==> ');
-      accessTokenExpiryTime = data.tokenExpiredTime
-      accessTokenIssuedTime=data.tokenIssuedTime
+      // const  data:any = await introspectAccessToken(response.data.access_token, clientId, response.data.instance_url);
+      // console.log('Test');
+      // console.log(data, 'Token Expiry ==> ');
+      // accessTokenExpiryTime = data.tokenExpiredTime
+      // accessTokenIssuedTime=data.tokenIssuedTime
     } catch (error) {
       console.log(error.message, "error in requestNewAccessToken");
       if (error.response.data.error_description === 'client identifier invalid') {
