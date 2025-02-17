@@ -1,4 +1,4 @@
-import { DEPLOYMENT_PROJECT, DEPLOYMENT_PROJECTID } from "@/config/config.js";
+import { DEPLOYMENT_PROJECT, DEPLOYMENT_PROJECTID } from "../../config/config.js";
 import { storeSecret } from "../gcp/secretManager.service.js";
 import { exec } from 'child_process';
 import { spawn } from "child_process";
