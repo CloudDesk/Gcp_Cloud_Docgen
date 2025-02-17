@@ -1,6 +1,3 @@
-
-
-
 import {DOCGEN_API_KEY, GCP_LOCATION, GCP_PROJECT_ID, GCP_TASK_QUEUE, GCP_TRIGGER_URL } from '../../config/config.js';
 import { CloudTasksClient } from '@google-cloud/tasks';
 let client;
