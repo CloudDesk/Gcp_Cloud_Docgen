@@ -1,0 +1,55 @@
+{id: 'https://login.salesforce.com/id/00DWU00000BoiXu2AJ/005WU000007NCu5YAG',
+asserted_user: true,
+user_id: '005WU000007NCu5YAG',
+organization_id: '00DWU00000BoiXu2AJ',
+username: 'cddev@org.com',
+nick_name: 'cddev',
+display_name: 'Cloud Desk',
+email: 'manikandan@clouddesk.ae',
+email_verified: true,
+first_name: 'Cloud',
+last_name: 'Desk',
+timezone: 'Asia/Kolkata',
+photos: {
+picture: 'https://clouddesktechnology71-dev-ed.develop.file.force.com/profilephoto/005/F',
+thumbnail: 'https://clouddesktechnology71-dev-ed.develop.file.force.com/profilephoto/005/T'
+},
+addr_street: null,
+addr_city: null,
+addr_state: null,
+addr_country: 'IN',
+addr_zip: null,
+mobile_phone: null,
+mobile_phone_verified: false,
+is_lightning_login_user: false,
+status: { created_date: null, body: null },
+urls: {
+enterprise: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/Soap/c/{version}/00DWU00000BoiXu',
+metadata: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/Soap/m/{version}/00DWU00000BoiXu',
+partner: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/Soap/u/{version}/00DWU00000BoiXu',
+rest: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/',
+sobjects: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/sobjects/',
+search: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/search/',
+query: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/query/',
+recent: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/recent/',
+tooling_soap: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/Soap/T/{version}/00DWU00000BoiXu',
+tooling_rest: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/tooling/',
+profile: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/005WU000007NCu5YAG',
+feeds: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/chatter/feeds',
+groups: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/chatter/groups',
+users: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/chatter/users',
+feed_items: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/chatter/feed-items',
+feed_elements: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com/services/data/v{version}/chatter/feed-elements',
+custom_domain: 'https://clouddesktechnology71-dev-ed.develop.my.salesforce.com'
+},
+active: true,
+user_type: 'STANDARD',
+language: 'en_US',
+locale: 'en_IN',
+utcOffset: 19800000,
+last_modified_date: '2025-01-30T11:01:18Z'
+} identityResponse
+
+
+NaN sessionExpiresAt
+

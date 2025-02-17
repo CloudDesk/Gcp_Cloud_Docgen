@@ -110,8 +110,9 @@ export async function storeSecret(secretValue, orgId) {
         return { error: err };
     }
     try {
+        console.log('Inside Test class ');
         const versionName = await addSecretVersion(fullSecretPath, secretValue);
-        console.log(`Stored secret version for organization ${orgId}`);
+        console.log(`Stored secret version for organization ${versionName}`);
         console.log(versionName, "Version Name");
         if (versionName.error) {
             return { error: versionName.error };

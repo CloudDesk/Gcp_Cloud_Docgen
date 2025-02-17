@@ -8,8 +8,11 @@ ajvErrors(ajv); // Initialize ajv-errors with the ajv instance
 
 export const validateRequestBody = (schema: any) => {
   return async (request, reply) => {
+    console.log('inside validation hook')
+
     try {
-      console.log(JSON.stringify(request.body), 'validation request body')
+      console.log('inside validation hook try block')
+      console.log(request.body ,'validation request body before parsing')
 
       if (typeof request?.body?.fieldData === 'string') {
         request.body.fieldData = request.body.fieldData.replace(/^"(.+)"$/, '$1'); // Remove the surrounding double quotes
@@ -28,6 +31,8 @@ export const validateRequestBody = (schema: any) => {
         reply.status(403).send({ error: errormessages});
       }
     } catch (error) {
+      console.log('inside validation hook catch block')
+
       reply.status(500).send(error);
     }
   };
