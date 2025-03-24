@@ -2,7 +2,7 @@ steps:
   # Step 1: Authenticate with GCP using Service Account stored in Secret Manager
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
-    args:
+    args: 
       - '-c'
       - |
         echo "Authenticating with GCP..."

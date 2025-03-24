@@ -101,41 +101,41 @@ export const sfCredentialService = {
           // console.log(dockerPush, 'DOCKER PUSH');
   
           // Deploy the application to Cloud Run
-          const SERVICE_NAME =`docgen-${payload.orgId}`.toLowerCase()
-          const REGION = 'us-central1'
-          const deployProcess = spawn("gcloud", [
-            "run",
-            "deploy",
-            SERVICE_NAME,
-            `--image=gcr.io/${DEPLOYMENT_PROJECT}/docgen:latest`,
-            `--region=${REGION}`,
-            "--allow-unauthenticated",
-            "--format=value(status.url)"
-          ]);
+          // const SERVICE_NAME =`docgen-${payload.orgId}`.toLowerCase()
+          // const REGION = 'us-central1'
+          // const deployProcess = spawn("gcloud", [
+          //   "run",
+          //   "deploy",
+          //   SERVICE_NAME,
+          //   `--image=gcr.io/${DEPLOYMENT_PROJECT}/docgen:latest`,
+          //   `--region=${REGION}`,
+          //   "--allow-unauthenticated",
+          //   "--format=value(status.url)"
+          // ]);
   
-          return new Promise((resolve, reject) => {
-            deployProcess.stdout.on("data", (data) => {
-              let receivedUrl = data.toString().trim();
-              console.log(receivedUrl ,'Received URL ');
-              const cloudRunURL = `https://${SERVICE_NAME}-${DEPLOYMENT_PROJECTID}.${REGION}.run.app`
-              console.log(`Extracted Cloud Run URL: ${cloudRunURL}`);
-              resolve({ success: true, urlData: cloudRunURL });  // Return the extracted URL here
-            });
+          // return new Promise((resolve, reject) => {
+          //   deployProcess.stdout.on("data", (data) => {
+          //     let receivedUrl = data.toString().trim();
+          //     console.log(receivedUrl ,'Received URL ');
+          //     const cloudRunURL = `https://${SERVICE_NAME}-${DEPLOYMENT_PROJECTID}.${REGION}.run.app`
+          //     console.log(`Extracted Cloud Run URL: ${cloudRunURL}`);
+          //     resolve({ success: true, urlData: cloudRunURL });  // Return the extracted URL here
+          //   });
   
-            deployProcess.stderr.on("data", (data) => {
-              console.error(`Deploy stderr: ${data}`);
-              // resolve({ success: false, error: data }); 
-            });
+          //   deployProcess.stderr.on("data", (data) => {
+          //     console.error(`Deploy stderr: ${data}`);
+          //     // resolve({ success: false, error: data }); 
+          //   });
   
-            deployProcess.on("close", (code) => {
-              if (code !== 0) {
-                console.error(`Deploy process exited with code ${code}`);
-                reject({ success: false, error: "Deployment failed" });
-              }
-            });
-          });
+          //   deployProcess.on("close", (code) => {
+          //     if (code !== 0) {
+          //       console.error(`Deploy process exited with code ${code}`);
+          //       reject({ success: false, error: "Deployment failed" });
+          //     }
+          //   });
+          // });
         } catch (error) {
-          console.error('Deployment failed:', error);
+          // console.error('Deployment failed:', error);
           return { success: false, error: error.message };
         }
       }
