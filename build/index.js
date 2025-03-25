@@ -51,17 +51,17 @@ function setupSwagger(fastifyInstance) {
 }
 function setupCors(fastifyInstance) {
     fastifyInstance.register(cors, {
-        origin: true, // Adjust for production
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+        allowedHeaders: "*",
         credentials: true,
         maxAge: 86400,
-        exposedHeaders: ["set-cookie"],
+        exposedHeaders: "*",
     });
 }
 async function apiKeyValidationHook(request, reply) {
     try {
-        const swaggerRoutes = ["/docs", "/docs/*", '/wopi/*', '/wopi'];
+        const swaggerRoutes = ["/docs", "/docs/*", '/wopi/*', '/wopi', '/save-document', '/save-document/*'];
         if (swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
             request.url === "/") {
             return; // Allow requests to Swagger documentation without API key

@@ -88,6 +88,7 @@ const requestNewAccessToken = async (orgId, userName) => {
         let clientId = await getClientIdFromSecretManager(orgId);
         // clientId = '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6'
         console.log(clientId, "Client ID from requestNewAccessToken updaed value is ");
+        console.log(userName, "userName from requestNewAccessToken");
         if (clientId.success === false) {
             return clientId;
         }

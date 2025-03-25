@@ -4,7 +4,7 @@ import { BASE_URL, DOCGEN_API_KEY, PORT } from "./config/config.js";
 import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
-const Fastify = fastify({ logger: false });
+const Fastify = fastify({ logger: false});
 import Multer from "fastify-multer";
 import multipart from '@fastify/multipart';
 
@@ -63,12 +63,13 @@ function setupSwagger(fastifyInstance) {
 
 function setupCors(fastifyInstance) {
     fastifyInstance.register(cors, {
-        origin: true, // Adjust for production
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-        credentials: true,
-        maxAge: 86400,
-        exposedHeaders: ["set-cookie"],
+        origin: "*", 
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+        allowedHeaders: "*", 
+        credentials: true, 
+        maxAge: 86400, 
+        exposedHeaders: "*",
+
     });
 }
 
@@ -77,7 +78,7 @@ async function apiKeyValidationHook(
     reply: FastifyReply
 ) {
     try {
-        const swaggerRoutes = ["/docs", "/docs/*", '/wopi/*','/wopi'];
+        const swaggerRoutes = ["/docs", "/docs/*", '/wopi/*','/wopi','/save-document','/save-document/*'];
         if (
             swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
             request.url === "/"

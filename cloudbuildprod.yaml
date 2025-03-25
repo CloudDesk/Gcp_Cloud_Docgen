@@ -34,23 +34,23 @@ steps:
 
 
 
-  # Step 5: Deploy the image to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - 'run'
-      - 'deploy'
-      - 'docgen-prod'
-      - '--image'
-      - 'gcr.io/docgen-440809/docgen-prodenv:latest'
-      - '--region'
-      - 'us-central1'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - --update-secrets=DOCGEN_API_KEY=DOCGEN_API_KEY_PROD:latest
-      - '--set-env-vars'
-      - 'BASE_URL=${_BASE_URL},GCP_LOCATION=${_GCP_LOCATION},GCP_PROJECT_ID=${_GCP_PROJECT_ID},GCP_TASK_QUEUE=${_GCP_TASK_QUEUE},GCP_TRIGGER_URL=${_GCP_TRIGGER_URL}'
+  # # Step 5: Deploy the image to Cloud Run
+  # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  #   entrypoint: 'gcloud'
+  #   args:
+  #     - 'run'
+  #     - 'deploy'
+  #     - 'docgen-prod'
+  #     - '--image'
+  #     - 'gcr.io/docgen-440809/docgen-prodenv:latest'
+  #     - '--region'
+  #     - 'us-central1'
+  #     - '--platform'
+  #     - 'managed'
+  #     - '--allow-unauthenticated'
+  #     - --update-secrets=DOCGEN_API_KEY=DOCGEN_API_KEY_PROD:latest
+  #     - '--set-env-vars'
+  #     - 'BASE_URL=${_BASE_URL},GCP_LOCATION=${_GCP_LOCATION},GCP_PROJECT_ID=${_GCP_PROJECT_ID},GCP_TASK_QUEUE=${_GCP_TASK_QUEUE},GCP_TRIGGER_URL=${_GCP_TRIGGER_URL}'
 
 # Substitution variables matched exactly to GitHub Secrets
 substitutions:

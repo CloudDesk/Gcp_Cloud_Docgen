@@ -43,7 +43,7 @@ export const docGenRouter = (fastify, options, done) => {
   // Root route
   fastify.get("/", (request, reply) => {
     console.log("Root route accessed");
-    reply.send("Successfully Worked DocGen with wopi updated !!");
+    reply.send("Initiated Wpi!!");
   });
 
 
@@ -78,23 +78,21 @@ export const docGenRouter = (fastify, options, done) => {
   );
 
 
-
-
   // wopi route
   fastify.get('/wopi', (req, res) => {
-    res.send('Welcome to WPOI Server!');
+    res.send('Welcome to Wopi V2!');
   });
 
   fastify.get('/wopi/test', (req, res) => {
-    res.send('Welcome to WPOI Server Test !');
+    res.send('Welcome to WPOI Server Test updated is  !');
   });
 
   fastify.get("/wopi/files/:fileId", (req, reply) => {
 
     console.log('inside get method wopi');
     console.log(req.query, 'Query inside wopi get mthod');
-    console.log(req.query.sf_org_id , 'inside wopi  ==> ORg id inside wopi');
-    console.log(req.query.sf_user_name , 'inside wopi  ==>  User name inside wopi');
+    console.log(req.query.sf_org_id, 'inside wopi  ==> ORg id inside wopi');
+    console.log(req.query.sf_user_name, 'inside wopi  ==>  User name inside wopi');
     const template = sfAuthService.getAccessToken(req.query.sf_org_id, req.query.sf_user_name).then((sfResult) => {
       console.log(sfResult, "Result is inside route");
       const { instanceUrl, accessToken } = sfResult;
@@ -162,8 +160,17 @@ export const docGenRouter = (fastify, options, done) => {
 
   // app.use('/wopi/files/:fileId/contents', express.raw({ type: '*/*', limit: '50mb' }));
 
+
+
+  // Add a content type parser specifically for application/octet-stream
+  fastify.addContentTypeParser('application/octet-stream', { parseAs: 'buffer', bodyLimit: 50 * 1024 * 1024 }, (req, payload, done) => {
+    console.log('Parsing application/octet-stream');
+    done(null, payload);
+  });
+
+  // Keep the wildcard parser as a fallback for other content types if needed
   fastify.addContentTypeParser('*/*', { parseAs: 'buffer', bodyLimit: 50 * 1024 * 1024 }, (req, payload, done) => {
-    console.log('inside add content type parser');
+    console.log('Parsing fallback content type');
     done(null, payload);
   });
 
@@ -225,19 +232,16 @@ export const docGenRouter = (fastify, options, done) => {
     console.log("Uploaded File Details: latest", req.files);
 
     // console.log("Uploaded File Details: latest", req.file());
+    console.log(req.query, 'inside save mthod');
+    console.log(FIXED_TOKEN, 'inside save mthod fixed token is ');
+    console.log(req.query.access_token = FIXED_TOKEN, 'inside save mthod fixed token comparison');
 
-    console.log(req.query, 'inside wopi  ==>  Query inside wopi save mthod');
-    console.log(req.query.sf_org_id , 'inside wopi  ==> ORg id inside wopi save Method');
-    console.log(req.query.sf_user_name , 'inside wopi  ==>  User name inside wopi save Method');
     try {
-      const sfAuthTokenResult = await sfAuthService.getAccessToken(req.query.sf_org_id,req.query.sf_user_name);
-      console.log(sfAuthTokenResult, "Salesforce connection result is");
-      console.log(sfAuthTokenResult.accessToken, 'accessToken');
+      const sfAuthTokenResult = await sfAuthService.getAccessToken(req.query.sf_org_id, req.query.sf_user_name);
+      console.log(sfAuthTokenResult, "Salesforce connection result inside save document");
       const { instanceUrl, accessToken } = sfAuthTokenResult;
       const { fileName, contentDomcumentId } = await sfAuthService.getTemplateFromSalesforce(instanceUrl, accessToken)
-      // const contentDocumentId = '069WU00000A5AvSYAV';
       console.log(contentDomcumentId, ' Dyanmic contentDocumentId');
-      // console.log(req.files[0].path + 'req.file.path inside save document');
       if (req.files && req.files.length > 0 && req.files[0].path && contentDomcumentId
         && (req.files[0].mimetype == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
           || req.files[0].mimetype == 'application/msword')
