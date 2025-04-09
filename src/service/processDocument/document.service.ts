@@ -79,9 +79,11 @@ export const processDocumentService = {
 
     // Upload the generated document to Salesforce
     try {
+      let restructured = await this.restructureDataById(fieldData);
+      console.log(restructured , 'restructured data');
       const uploadResults = await Promise.all(
         generatedDocument.pdfFilePaths.map((filePath: string) =>
-          uploadFile(sfConn, filePath, recordId)
+          uploadFile(sfConn, filePath, recordId,restructured)
         )
       );
       console.log(
@@ -109,4 +111,28 @@ export const processDocumentService = {
       return { error: "Failed to upload document to Salesforce" };
     }
   },
+
+
+  
+  async restructureDataById(data) {
+    const restructured = {};
+    
+    data.forEach(item => {
+        const id = item.Account.id;
+        // Create a new Account object without the id property
+        const { id: removedId, ...restAccount } = item.Account;
+        
+        restructured[id] = {
+            Account: restAccount,
+            OpportunityLineItems: item.OpportunityLineItems
+        };
+    });
+    console.log(restructured);
+    return restructured;
+}
+  
+
+
+
+ 
 };

@@ -107,7 +107,8 @@ async function createContentDocumentLink(
 export async function uploadFile(
   auth: { instanceUrl: string; accessToken: string },
   filePath: string,
-  recordId: string
+  recordId: string,
+  restructured:any
 ): Promise<
   | {
     success: boolean;
@@ -119,6 +120,8 @@ export async function uploadFile(
   | object
 > {
   try {
+
+console.log(restructured, 'restructured data in uploadFile');
     console.log(auth.accessToken, "Access token in uploadFile");
     const base64FileContent = await readFileAsBase64(filePath);
     const fileName = filePath.split("/").pop() || "unknown";

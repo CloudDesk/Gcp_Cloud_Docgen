@@ -15,17 +15,19 @@ const __dirname = dirname(__filename);
 const parentDir = resolve(__dirname, "..");
 const FIXED_TOKEN = "test-token-123";
 export const docGenRouter = (fastify, options, done) => {
-    const uploadDir = path.join(__dirname, "../uploads");
-    if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir);
-    }
-    let DOCX_FILE = path.join(__dirname, "Template.docx");
-    let fileMap = {
-        "doc-123": DOCX_FILE,
-    };
-    if (!fs.existsSync(fileMap["doc-123"])) {
-        fs.writeFileSync(fileMap["doc-123"], "Initial content", "utf8");
-    }
+    // const uploadDir = path.join(__dirname, "../uploads");
+    // if (!fs.existsSync(uploadDir)) {
+    //   fs.mkdirSync(uploadDir);
+    // }
+    // let DOCX_FILE = path.join(__dirname, "Template.docx");
+    // let fileMap = {
+    //   "doc-123": DOCX_FILE,
+    // };
+    // if (!fs.existsSync(fileMap["doc-123"])) {
+    //   fs.writeFileSync(fileMap["doc-123"], "Initial content", "utf8");
+    // }
+    let fileMap = {};
+    let DOCX_FILE = '';
     // Root route
     fastify.get("/", (request, reply) => {
         console.log("Root route accessed");
@@ -56,20 +58,18 @@ export const docGenRouter = (fastify, options, done) => {
         res.send('Welcome to WPOI Server Test updated is  !');
     });
     fastify.get("/wopi/files/:fileId", (req, reply) => {
-        console.log('inside get method wopi');
         console.log(req.query, 'Query inside wopi get mthod');
-        console.log(req.query.sf_org_id, 'inside wopi  ==> ORg id inside wopi');
-        console.log(req.query.sf_user_name, 'inside wopi  ==>  User name inside wopi');
         const template = sfAuthService.getAccessToken(req.query.sf_org_id, req.query.sf_user_name).then((sfResult) => {
             console.log(sfResult, "Result is inside route");
             const { instanceUrl, accessToken } = sfResult;
-            sfAuthService.getTemplateFromSalesforce(instanceUrl, accessToken).then((templateres) => {
+            sfAuthService.getTemplateFromSalesforce(instanceUrl, accessToken, req.query.templateId).then((templateres) => {
                 console.log(templateres, "Result is inside route after creation");
                 DOCX_FILE = path.join(__dirname, "../Template.docx");
                 console.log(DOCX_FILE, 'DOCX_FILE');
                 fileMap = {
-                    "doc-123": DOCX_FILE,
+                    [req.params.fileId]: DOCX_FILE,
                 };
+                console.log(fileMap, 'fileMap');
                 const fileId = req.params.fileId;
                 const accessToken = req.query.access_token;
                 if (accessToken !== FIXED_TOKEN) {
@@ -95,7 +95,6 @@ export const docGenRouter = (fastify, options, done) => {
             .catch((error) => {
             console.log(error, "Error is ");
         });
-        // console.log(path.join(__dirname, "../Template.docx"), 'DOCX_FILE');
     });
     fastify.get("/wopi/files/:fileId/contents", (req, reply) => {
         const fileId = req.params.fileId;
@@ -177,13 +176,13 @@ export const docGenRouter = (fastify, options, done) => {
             const sfAuthTokenResult = await sfAuthService.getAccessToken(req.query.sf_org_id, req.query.sf_user_name);
             console.log(sfAuthTokenResult, "Salesforce connection result inside save document");
             const { instanceUrl, accessToken } = sfAuthTokenResult;
-            const { fileName, contentDomcumentId } = await sfAuthService.getTemplateFromSalesforce(instanceUrl, accessToken);
-            console.log(contentDomcumentId, ' Dyanmic contentDocumentId');
-            if (req.files && req.files.length > 0 && req.files[0].path && contentDomcumentId
+            const { fileName, contentDocumentId } = await sfAuthService.getTemplateFromSalesforce(instanceUrl, accessToken, req.query.templateId);
+            console.log(contentDocumentId, ' Dyanmic contentDocumentId');
+            if (req.files && req.files.length > 0 && req.files[0].path && contentDocumentId
                 && (req.files[0].mimetype == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                     || req.files[0].mimetype == 'application/msword')
                 && req.files[0].originalname.toLowerCase().endsWith(".docx")) {
-                const result = await sfAuthService.uploadDocumentToSalesforce(instanceUrl, accessToken, req.files[0].path, contentDomcumentId);
+                const result = await sfAuthService.uploadDocumentToSalesforce(instanceUrl, accessToken, req.files[0].path, contentDocumentId);
                 console.log('Salesforce upload completed, Version ID inside docgen:', result);
                 if (result.success) {
                     reply.send({
@@ -204,7 +203,7 @@ export const docGenRouter = (fastify, options, done) => {
                     });
                 }
             }
-            else if (req.files && req.files.length > 0 && req.files[0].path && !contentDomcumentId) {
+            else if (req.files && req.files.length > 0 && req.files[0].path && !contentDocumentId) {
                 reply.send({
                     message: "Failed to upload to Salesforce",
                     error: 'Content Document Id For Template not found.Please Contact support team',
@@ -213,7 +212,7 @@ export const docGenRouter = (fastify, options, done) => {
                     mimetype: req.file.mimetype,
                 });
             }
-            else if (req.files && req.files.length > 0 && req.files[0].path && contentDomcumentId &&
+            else if (req.files && req.files.length > 0 && req.files[0].path && contentDocumentId &&
                 !((req.files[0].mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
                     req.files[0].mimetype === "application/msword") &&
                     req.files[0].originalname.toLowerCase().endsWith(".docx"))) {

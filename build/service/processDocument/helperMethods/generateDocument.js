@@ -16,14 +16,22 @@ const __dirname = path.join(dirname(__filename), '../../../../templates');
  */
 const generateDocxFromTemplate = async (templatePath, fieldData) => {
     try {
+        console.log(templatePath, "Template path inside docx generate");
+        console.log(fieldData, "Field data inside docx generate");
         const templateContent = await fs.readFile(templatePath, "binary");
+        // console.log(templateContent, "Template content inside docx generate");
         const zip = new PizZip(templateContent);
+        // console.log(zip, "Zip object created");
         const doc = new Docxtemplater(zip, {
             paragraphLoop: true,
             linebreaks: true,
         });
-        doc.setData(fieldData);
-        doc.render();
+        // console.log(doc, "Docxtemplater object created");
+        // doc.setData(fieldData);
+        // doc.render();
+        console.log('updated docx generate');
+        await doc.renderAsync(fieldData);
+        // console.log(doc, "Docxtemplater object after render");
         return doc.getZip().generate({ type: "nodebuffer" });
     }
     catch (error) {
