@@ -64,7 +64,14 @@ export const processDocumentService = {
         }
         // Upload the generated document to Salesforce
         try {
-            const uploadResults = await Promise.all(generatedDocument.pdfFilePaths.map((filePath) => uploadFile(sfConn, filePath, recordId)));
+            console.log(generatedDocument.pdfFilePathwithIds, 'pdf file path with ids');
+            // const uploadResults = await Promise.all(
+            //   generatedDocument.pdfFilePaths.map((filePath: string) =>
+            //     uploadFile(sfConn, filePath, recordId,restructured)
+            //   )
+            // );
+            const uploadResults = await Promise.all(Array.from(generatedDocument.pdfFilePathwithIds).map(([id, filePath]) => uploadFile(sfConn, filePath, id)));
+            ;
             console.log(uploadResults, "Document uploaded to Salesforce successfully");
             if (uploadResults.some((result) => result.success === false)) {
                 let errormessage = uploadResults.map((result) => result.message).join(',');

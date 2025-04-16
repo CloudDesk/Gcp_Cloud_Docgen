@@ -80,6 +80,7 @@ async function createContentDocumentLink(auth, contentDocumentId, recordId) {
 export async function uploadFile(auth, filePath, recordId) {
     try {
         console.log(auth.accessToken, "Access token in uploadFile");
+        console.log(recordId, "Record ID in uploadFile");
         const base64FileContent = await readFileAsBase64(filePath);
         const fileName = filePath.split("/").pop() || "unknown";
         console.log(fileName, 'file name in uploadFile');

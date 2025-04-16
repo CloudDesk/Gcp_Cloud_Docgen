@@ -108,7 +108,6 @@ export async function uploadFile(
   auth: { instanceUrl: string; accessToken: string },
   filePath: string,
   recordId: string,
-  restructured:any
 ): Promise<
   | {
     success: boolean;
@@ -121,8 +120,8 @@ export async function uploadFile(
 > {
   try {
 
-console.log(restructured, 'restructured data in uploadFile');
     console.log(auth.accessToken, "Access token in uploadFile");
+    console.log(recordId, "Record ID in uploadFile");
     const base64FileContent = await readFileAsBase64(filePath);
     const fileName = filePath.split("/").pop() || "unknown";
     console.log(fileName, 'file name in uploadFile');

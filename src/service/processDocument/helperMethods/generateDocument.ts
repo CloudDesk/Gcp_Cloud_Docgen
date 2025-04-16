@@ -61,9 +61,16 @@ const convertDocxBufferToPdf = async (
   const tempPdfPath = path.join(outputDir, `${fileName}.pdf`);
   try {
     await fs.writeFile(tempDocxPath, docxBuffer);
+    console.log(`soffice --headless --convert-to pdf "${tempDocxPath}" --outdir "${outputDir}"   (=>> log is) ` );
     await execAsync(
       `soffice --headless --convert-to pdf "${tempDocxPath}" --outdir "${outputDir}"`
     );
+
+    // const sofficePath = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
+    // await execAsync(
+    //   `${sofficePath} --headless --convert-to pdf "${tempDocxPath}" --outdir "${outputDir}"`
+    // );
+
 
     if (!(await fs.stat(tempPdfPath))) {
       throw new Error("PDF file was not created.");
@@ -91,7 +98,7 @@ export const generatePdfsFromTemplate = async (
   templatePath: string,
   fieldsDataArray: any[],
   baseFileName: string
-): Promise<{ pdfFilePaths: string[] }> => {
+): Promise<{ pdfFilePaths: string[],pdfFilePathwithIds: any }> => {
   try {
     const outputDir = path.join(__dirname, '..', "templates");
     console.log(outputDir, "output directory path");
@@ -102,6 +109,7 @@ export const generatePdfsFromTemplate = async (
     }
 
     const pdfFilePaths: string[] = [];
+    const pdfFilePathwithIds: Map<any, any> = new Map();
     const utcSeconds = Math.floor(new Date().getTime() / 1000);
 
     for (let i = 0; i < fieldsDataArray.length; i++) {
@@ -116,11 +124,20 @@ export const generatePdfsFromTemplate = async (
         outputDir,
         `${baseFileName}_${utcSeconds}_${i + 1}`
       );
-
+      console.log(Object.keys(fieldData), 'keys of field data');
+      let objectName: any = Object.keys(fieldData)[0];
+      objectName = fieldData[objectName];
+      console.log(objectName, 'object name');
+      let recorrdId = objectName.id || objectName.Id || '';
+      console.log(recorrdId, 'record id for product is ');
+      // pdfFilePaths.push(pdfRelativePath);
       pdfFilePaths.push(pdfRelativePath);
+    
+      pdfFilePathwithIds.set(recorrdId, pdfRelativePath);
+      console.log(pdfFilePathwithIds, 'pdf file path with ids');
     }
 
-    return { pdfFilePaths };
+    return { pdfFilePaths, pdfFilePathwithIds };
   } catch (error) {
     console.error("Error generating PDFs from template:", error);
     throw error;
