@@ -18,14 +18,14 @@ export const sfValidateTemplateData = {
         minLength: "User Name cannot be empty.",
       },
     },
-    recordId: {
-      type: "string",
-      pattern: "^[A-Za-z0-9]{15,18}$",
-      errorMessage: {
-        type: "Record ID must be a string.",
-        pattern: "Record ID must be 15 or 18 alphanumeric characters.",
-      },
-    },
+    // recordId: {
+    //   type: "string",
+    //   pattern: "^[A-Za-z0-9]{15,18}$",
+    //   errorMessage: {
+    //     type: "Record ID must be a string.",
+    //     pattern: "Record ID must be 15 or 18 alphanumeric characters.",
+    //   },
+    // },
     fileName: {
       type: "string",
       minLength: 1,
@@ -52,7 +52,7 @@ export const sfValidateTemplateData = {
   required: [
     "orgId",
     "userName",
-    "recordId",
+    // "recordId",
     "fileName",
     "contentVersionId",
     "fieldData",
@@ -62,7 +62,7 @@ export const sfValidateTemplateData = {
     required: {
       orgId: "Org ID is required.",
       userName: "User Name is required.",
-      recordId: "Record ID is required.",
+      // recordId: "Record ID is required.",
       fileName: "File Name is required.",
       contentVersionId: "Template URL is required.",
       fieldData: "Field Data is required.",

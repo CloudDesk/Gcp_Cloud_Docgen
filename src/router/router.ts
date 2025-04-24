@@ -23,22 +23,6 @@ const FIXED_TOKEN = "test-token-123";
 export const docGenRouter = (fastify, options, done) => {
 
 
-  // const uploadDir = path.join(__dirname, "../uploads");
-  // if (!fs.existsSync(uploadDir)) {
-  //   fs.mkdirSync(uploadDir);
-  // }
-
-  // let DOCX_FILE = path.join(__dirname, "Template.docx");
-
-
-  // let fileMap = {
-  //   "doc-123": DOCX_FILE,
-  // };
-
-  // if (!fs.existsSync(fileMap["doc-123"])) {
-  //   fs.writeFileSync(fileMap["doc-123"], "Initial content", "utf8");
-  // }
-
   let fileMap = {}
   let DOCX_FILE = ''
 
@@ -66,7 +50,6 @@ export const docGenRouter = (fastify, options, done) => {
       // schema: [processDocumentSwagger],
       preHandler: [validateRequestBody(sfValidateTemplateData)],
     },
-    //create task entry
     documentController.processDocument
   );
 
@@ -76,7 +59,6 @@ export const docGenRouter = (fastify, options, done) => {
       // schema: [processDocumentSwagger],
       preHandler: [validateRequestBody(sfValidateTemplateData)],
     },
-    //create task entry
     documentControllerTask.processDocumentTask
   );
 

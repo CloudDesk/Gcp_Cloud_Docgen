@@ -15,17 +15,6 @@ const __dirname = dirname(__filename);
 const parentDir = resolve(__dirname, "..");
 const FIXED_TOKEN = "test-token-123";
 export const docGenRouter = (fastify, options, done) => {
-    // const uploadDir = path.join(__dirname, "../uploads");
-    // if (!fs.existsSync(uploadDir)) {
-    //   fs.mkdirSync(uploadDir);
-    // }
-    // let DOCX_FILE = path.join(__dirname, "Template.docx");
-    // let fileMap = {
-    //   "doc-123": DOCX_FILE,
-    // };
-    // if (!fs.existsSync(fileMap["doc-123"])) {
-    //   fs.writeFileSync(fileMap["doc-123"], "Initial content", "utf8");
-    // }
     let fileMap = {};
     let DOCX_FILE = '';
     // Root route
@@ -41,15 +30,11 @@ export const docGenRouter = (fastify, options, done) => {
     fastify.post("/api/v1/salesforce/process-document", {
         // schema: [processDocumentSwagger],
         preHandler: [validateRequestBody(sfValidateTemplateData)],
-    }, 
-    //create task entry
-    documentController.processDocument);
+    }, documentController.processDocument);
     fastify.post("/api/v1/task/salesforce/process-document", {
         // schema: [processDocumentSwagger],
         preHandler: [validateRequestBody(sfValidateTemplateData)],
-    }, 
-    //create task entry
-    documentControllerTask.processDocumentTask);
+    }, documentControllerTask.processDocumentTask);
     // wopi route
     fastify.get('/wopi', (req, res) => {
         res.send('Welcome to Wopi V2!');
