@@ -6,6 +6,16 @@ import { uploadFile } from "../sf/fileupload.service.js";
 import { sfAuthService } from "../sf/auth.service.js";
 import { fileFetchService } from "../sf/fileFetch.service.js";
 
+
+interface UploadResult {
+  success: boolean;
+  message: string;
+  contentVersionId: string;
+  contentDocumentId: string;
+  contentDocumentLinkId: string;
+}
+
+
 export const processDocumentService = {
   /**
    * Generates a document based on the provided data and uploads it to Salesforce.
@@ -79,16 +89,27 @@ export const processDocumentService = {
 
     // Upload the generated document to Salesforce
     try {
+  
+      console.log(generatedDocument.pdfFilePathwithIds, 'pdf file path with ids');
+
+
+      // const uploadResults = await Promise.all(
+      //   generatedDocument.pdfFilePaths.map((filePath: string) =>
+      //     uploadFile(sfConn, filePath, recordId,restructured)
+      //   )
+      // );
+
       const uploadResults = await Promise.all(
-        generatedDocument.pdfFilePaths.map((filePath: string) =>
-          uploadFile(sfConn, filePath, recordId)
+        Array.from(generatedDocument.pdfFilePathwithIds).map(([id, filePath] : any) =>
+          uploadFile(sfConn, filePath, id)
         )
-      );
+      )as UploadResult[];;
+
       console.log(
         uploadResults,
         "Document uploaded to Salesforce successfully"
       );
-      if(uploadResults.some((result) => result.success === false)){
+      if (uploadResults.some((result) => result.success === false)) {
         let errormessage = uploadResults.map((result) => result.message).join(',');
         return { error: errormessage };
       }

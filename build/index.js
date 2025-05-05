@@ -5,7 +5,16 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 const Fastify = fastify({ logger: false });
+import multipart from '@fastify/multipart';
+import fastifyStatic from "@fastify/static";
+import formbody from "@fastify/formbody";
+import { fileURLToPath } from "url";
+import { dirname, resolve, join } from "path";
+// import { salesforceTemplate } from "./utils/datatype/template.util.js";
 console.log(DOCGEN_API_KEY, "API key from secret manager DOCGEN_API_KEY");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const parentDir = resolve(__dirname, "..");
 function setupSwagger(fastifyInstance) {
     console.log('inside setupSwagger');
     const SWAGGER_URL = BASE_URL;
@@ -43,17 +52,17 @@ function setupSwagger(fastifyInstance) {
 }
 function setupCors(fastifyInstance) {
     fastifyInstance.register(cors, {
-        origin: true, // Adjust for production
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+        allowedHeaders: "*",
         credentials: true,
         maxAge: 86400,
-        exposedHeaders: ["set-cookie"],
+        exposedHeaders: "*",
     });
 }
 async function apiKeyValidationHook(request, reply) {
     try {
-        const swaggerRoutes = ["/docs", "/docs/*"];
+        const swaggerRoutes = ["/docs", "/docs/*", '/wopi/*', '/wopi', '/save-document', '/save-document/*'];
         if (swaggerRoutes.some((route) => request.url?.startsWith(route)) ||
             request.url === "/") {
             return; // Allow requests to Swagger documentation without API key
@@ -82,7 +91,17 @@ console.log('test');
 Fastify.addHook("onRequest", apiKeyValidationHook);
 setupSwagger(Fastify);
 setupCors(Fastify);
+// salesforceTemplate();
+Fastify.register(formbody);
+// fastify.register(fastifyCookie)
+// Fastify.register(Multer.contentParser);
+Fastify.register(multipart);
 Fastify.register(docGenRouter);
+console.log(join(parentDir, "./src/uploads"), "INDEX PATH");
+console.log(parentDir, "INDEX PATH 2");
+Fastify.register(fastifyStatic, {
+    root: join(parentDir, "./src/uploads"),
+});
 const start = async () => {
     try {
         await Fastify.listen({ port: PORT, host: "0.0.0.0" });

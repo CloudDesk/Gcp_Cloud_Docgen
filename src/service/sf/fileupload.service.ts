@@ -107,7 +107,7 @@ async function createContentDocumentLink(
 export async function uploadFile(
   auth: { instanceUrl: string; accessToken: string },
   filePath: string,
-  recordId: string
+  recordId: string,
 ): Promise<
   | {
     success: boolean;
@@ -119,7 +119,9 @@ export async function uploadFile(
   | object
 > {
   try {
+
     console.log(auth.accessToken, "Access token in uploadFile");
+    console.log(recordId, "Record ID in uploadFile");
     const base64FileContent = await readFileAsBase64(filePath);
     const fileName = filePath.split("/").pop() || "unknown";
     console.log(fileName, 'file name in uploadFile');

@@ -51,7 +51,7 @@ const getClientIdFromSecretManager = async (orgId) => {
 const loadPrivateKey = async () => {
     if (!privateKeyCache) {
         privateKeyCache = await fs.readFile(baseConfig.privateKeyPath, "utf8");
-        console.log(privateKeyCache, "Loading private key from file system");
+        // console.log(privateKeyCache, "Loading private key from file system");
     }
     else {
         console.log("Using cached private key");
@@ -87,7 +87,8 @@ const requestNewAccessToken = async (orgId, userName) => {
     try {
         let clientId = await getClientIdFromSecretManager(orgId);
         // clientId = '3MVG9PwZx9R6_UrcKsn.dhKdoWYbj8AZY5Im_VSx5QB0C32PwXvuJiRaSOetY9cCvvHFEj7tZ2_RtwRcnaGV6'
-        console.log(clientId, "Client ID from requestNewAccessToken");
+        console.log(clientId, "Client ID from requestNewAccessToken updaed value is ");
+        console.log(userName, "userName from requestNewAccessToken");
         if (clientId.success === false) {
             return clientId;
         }
@@ -99,6 +100,7 @@ const requestNewAccessToken = async (orgId, userName) => {
             assertion: jwtToken,
             userName: userName,
         });
+        console.log(params, "params jwt");
         let accessTokenExpiryTime;
         let accessTokenIssuedTime;
         try {
@@ -197,7 +199,108 @@ const introspectAccessToken = async (accessToken, client_id, instance_url) => {
         return { error: error.message };
     }
 };
+export async function uploadDocumentToSalesforce(instanceUrl, accessToken, filePath, contentDocumentId = null) {
+    try {
+        console.log(filePath, 'filePath');
+        const fileBuffer = await fs.readFile(filePath);
+        const base64Data = fileBuffer.toString('base64');
+        const fileName = path.basename(filePath);
+        const requestBody = {
+            ContentDocumentId: contentDocumentId,
+            PathOnClient: fileName,
+            VersionData: base64Data
+        };
+        const response = await axios.post(`${instanceUrl}/services/data/v59.0/sobjects/ContentVersion`, requestBody, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+        });
+        console.log('File updated successfully:', response.data);
+        return { success: true, message: response.data.id };
+    }
+    catch (error) {
+        console.error('Error updating file:', error.response?.data || error.message);
+        if (error.response?.data && Array.isArray(error.response.data) && error.response.data[0].message) {
+            return { success: false, message: error.response.data[0].message };
+        }
+        else if (error.response?.data && !Array.isArray(error.response.data)) {
+            return { success: false, message: error.response.data };
+        }
+        else if (error.message) {
+            return { success: false, message: error.message };
+        }
+        else {
+            return { success: false, message: error };
+        }
+    }
+}
+async function getTemplateFromSalesforce(instanceUrl, accessToken, templateId) {
+    try {
+        console.log(templateId, 'templateId');
+        console.log('inside get template from salesforce');
+        // Query ContentDocumentLink to find the ContentDocument linked to the provided LinkedEntityId (templateId)
+        const query = encodeURIComponent(`SELECT ContentDocumentId, ContentDocument.Title FROM ContentDocumentLink WHERE LinkedEntityId = '${templateId}' and  ContentDocument.Title ='Template'  LIMIT 1`);
+        const response = await axios.get(`${instanceUrl}/services/data/v57.0/query?q=${query}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = response.data;
+        console.log(data, "Query Data inside get template from salesforce");
+        let contentDocumentId;
+        if (data.records && data.records.length > 0) {
+            contentDocumentId = data.records[0].ContentDocumentId;
+        }
+        else {
+            throw new Error('No ContentDocument linked to the provided LinkedEntityId (templateId)');
+        }
+        // Query to fetch ContentDocument details such as Title and FileExtension
+        const documentQuery = encodeURIComponent(`SELECT Id, Title, FileExtension FROM ContentDocument WHERE Id = '${contentDocumentId}' LIMIT 1`);
+        const documentResponse = await axios.get(`${instanceUrl}/services/data/v57.0/query?q=${documentQuery}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const documentData = documentResponse.data;
+        const template = documentData.records[0];
+        // Query to fetch the latest version of the ContentDocument
+        const versionQuery = encodeURIComponent(`SELECT Id, VersionData, PathOnClient FROM ContentVersion WHERE ContentDocumentId = '${template.Id}' ORDER BY CreatedDate DESC LIMIT 1`);
+        const versionResponse = await axios.get(`${instanceUrl}/services/data/v57.0/query?q=${versionQuery}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const versionData = versionResponse.data;
+        if (!versionData.records || versionData.records.length === 0) {
+            throw new Error('No version found for template');
+        }
+        const contentResponse = await axios.get(`${instanceUrl}/services/data/v57.0/sobjects/ContentVersion/${versionData.records[0].Id}/VersionData`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            },
+            responseType: 'arraybuffer'
+        });
+        const fileExtension = template.FileExtension || versionData.records[0].PathOnClient?.split('.').pop() || 'txt';
+        const fileName = `Template.${fileExtension}`;
+        const filePath = path.resolve('src', fileName);
+        const filePathbuild = path.resolve('build', fileName);
+        console.log(filePath, 'filePath');
+        await fs.writeFile(filePath, contentResponse.data);
+        await fs.writeFile(filePathbuild, contentResponse.data);
+        // await fs.writeFile(fileName, contentResponse.data);
+        console.log(`File saved as ${fileName}`);
+        return { fileName, contentDocumentId };
+    }
+    catch (error) {
+        // console.error('Error fetching template:', error.response?.data || error.message);
+        throw error;
+    }
+}
 export const sfAuthService = {
-    getAccessToken,
+    getAccessToken, uploadDocumentToSalesforce, getTemplateFromSalesforce
 };
 //# sourceMappingURL=auth.service.js.map

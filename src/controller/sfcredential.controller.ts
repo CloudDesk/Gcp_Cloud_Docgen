@@ -1,3 +1,4 @@
+// import { salesforceTemplate } from "../utils/datatype/template.util.js";
 import { sfCredentialService } from "../service/sf/sfcredential.service.js";
 import { FastifyReply, FastifyRequest } from "fastify";
 
@@ -28,12 +29,12 @@ export const sfCredentialController = {
       const validationResult =
         await sfCredentialService.validateAndStoreCredentials(payload);
 
-        console.log(validationResult ,' Validation Result => ');
+      console.log(validationResult, ' Validation Result => ');
       // Handle validation errors
       if (validationResult.error) {
         return reply.status(400).send(validationResult);
       }
-
+      // salesforceTemplate();
       // Send success response
       reply.send(validationResult.urlData);
     } catch (error) {
