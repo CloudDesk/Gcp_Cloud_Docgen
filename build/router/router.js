@@ -81,6 +81,7 @@ export const docGenRouter = (fastify, options, done) => {
             console.log(error, "Error is ");
         });
     });
+    //fastify.get("/wopi/files/:fileId", wopiController.getWopi);
     fastify.get("/wopi/files/:fileId/contents", (req, reply) => {
         const fileId = req.params.fileId;
         const accessToken = req.query.access_token;
@@ -95,6 +96,7 @@ export const docGenRouter = (fastify, options, done) => {
         const stream = fs.createReadStream(fileMap[fileId]);
         return reply.send(stream);
     });
+    // fastify.get("/wopi/files/:fileId/contents",wopiController.getWopiContent);
     // app.use('/wopi/files/:fileId/contents', express.raw({ type: '*/*', limit: '50mb' }));
     // Add a content type parser specifically for application/octet-stream
     fastify.addContentTypeParser('application/octet-stream', { parseAs: 'buffer', bodyLimit: 50 * 1024 * 1024 }, (req, payload, done) => {
@@ -106,26 +108,25 @@ export const docGenRouter = (fastify, options, done) => {
         console.log('Parsing fallback content type');
         done(null, payload);
     });
-    fastify.put("/wopi/files/:fileId/contents", (req, res) => {
-        const fileId = req.params.fileId;
-        const accessToken = req.query.access_token;
-        if (accessToken !== FIXED_TOKEN) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-        if (!fileMap[fileId]) {
-            return res.status(404).send("File not found");
-        }
-        try {
-            console.log('Received PUT request body length:', req.body.length);
-            fs.writeFileSync(fileMap[fileId], req.body);
-            console.log('File saved to storage via PUT:', fileMap[fileId]);
-            res.status(200).send();
-        }
-        catch (error) {
-            console.error("Error saving file via PUT:", error);
-            res.status(500).send("Error saving file");
-        }
-    });
+    // fastify.put("/wopi/files/:fileId/contents", (req, res) => {
+    //   const fileId = req.params.fileId;
+    //   const accessToken = req.query.access_token;
+    //   if (accessToken !== FIXED_TOKEN) {
+    //     return res.status(401).json({ error: "Unauthorized" });
+    //   }
+    //   if (!fileMap[fileId]) {
+    //     return res.status(404).send("File not found");
+    //   }
+    //   try {
+    //     console.log('Received PUT request body length:', req.body.length);
+    //     fs.writeFileSync(fileMap[fileId], req.body);
+    //     console.log('File saved to storage via PUT:', fileMap[fileId]);
+    //     res.status(200).send();
+    //   } catch (error) {
+    //     console.error("Error saving file via PUT:", error);
+    //     res.status(500).send("Error saving file");
+    //   }
+    // });
     fastify.post("/wopi/files/:fileId/contents", (req, res) => {
         console.log('inside post method updated');
         const fileId = req.params.fileId;
