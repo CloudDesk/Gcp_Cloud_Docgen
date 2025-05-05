@@ -25,6 +25,9 @@ const generateDocxFromTemplate = async (templatePath, fieldData) => {
         const doc = new Docxtemplater(zip, {
             paragraphLoop: true,
             linebreaks: true,
+            nullGetter: function () {
+                return "";
+            }
         });
         // console.log(doc, "Docxtemplater object created");
         // doc.setData(fieldData);

@@ -10,6 +10,7 @@ const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.join(dirname(__filename), '../../../../templates');
 
+
 /**
  * Generates a DOCX file from a template with provided data.
  * @param templatePath - Path to the DOCX template file.
@@ -30,6 +31,9 @@ const generateDocxFromTemplate = async (
     const doc = new Docxtemplater(zip, {
       paragraphLoop: true,
       linebreaks: true,
+      nullGetter: function () {
+        return "";
+      }
     });
     // console.log(doc, "Docxtemplater object created");
     // doc.setData(fieldData);
