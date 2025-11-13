@@ -1,0 +1,6 @@
+# Dependencies (will be installed in Docker)
+node_modules
+npm-debug.log
+pnpm-lock.yaml
+
+

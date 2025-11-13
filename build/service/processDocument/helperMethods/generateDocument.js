@@ -5,9 +5,14 @@ import { exec } from "child_process";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import { promisify } from "util";
+import expressionParser from "docxtemplater/expressions.js";
+const parser = expressionParser.configure({
+    filters: {}, // optional: define your custom filters here
+});
 const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.join(dirname(__filename), '../../../../templates');
+let templateDoxPath = '';
 /**
  * Generates a DOCX file from a template with provided data.
  * @param templatePath - Path to the DOCX template file.
@@ -27,7 +32,8 @@ const generateDocxFromTemplate = async (templatePath, fieldData) => {
             linebreaks: true,
             nullGetter: function () {
                 return "";
-            }
+            },
+            parser,
         });
         // console.log(doc, "Docxtemplater object created");
         // doc.setData(fieldData);
@@ -60,16 +66,17 @@ const convertDocxBufferToPdf = async (docxBuffer, outputDir, fileName) => {
         // await execAsync(
         //   `${sofficePath} --headless --convert-to pdf "${tempDocxPath}" --outdir "${outputDir}"`
         // );
+        templateDoxPath = tempDocxPath;
         if (!(await fs.stat(tempPdfPath))) {
             throw new Error("PDF file was not created.");
         }
         const pdfRelativePath = path.join("templates", `${fileName}.pdf`);
-        await fs.unlink(tempDocxPath);
+        // await fs.unlink(tempDocxPath);
         return pdfRelativePath;
     }
     catch (error) {
         console.error(`LibreOffice conversion error: ${error.message}`);
-        await fs.unlink(tempDocxPath);
+        // await fs.unlink(tempDocxPath);
         throw new Error(`Error converting DOCX to PDF: ${error.message}`);
     }
 };
@@ -106,7 +113,9 @@ export const generatePdfsFromTemplate = async (templatePath, fieldsDataArray, ba
             console.log(recorrdId, 'record id for product is ');
             // pdfFilePaths.push(pdfRelativePath);
             pdfFilePaths.push(pdfRelativePath);
-            pdfFilePathwithIds.set(recorrdId, pdfRelativePath);
+            console.log(templateDoxPath, 'template path is final ==>>');
+            // pdfFilePathwithIds.set(recorrdId, pdfRelativePath);
+            pdfFilePathwithIds.set(recorrdId, templateDoxPath);
             console.log(pdfFilePathwithIds, 'pdf file path with ids');
         }
         return { pdfFilePaths, pdfFilePathwithIds };
