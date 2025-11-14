@@ -114,6 +114,7 @@ export const generatePdfsFromTemplate = async (templatePath, fieldsDataArray, ba
             // pdfFilePaths.push(pdfRelativePath);
             pdfFilePaths.push(pdfRelativePath);
             console.log(templateDoxPath, 'template path is final ==>>');
+            console.log(templatePath, 'template path is final ==>> direcxt');
             // pdfFilePathwithIds.set(recorrdId, pdfRelativePath);
             pdfFilePathwithIds.set(recorrdId, templateDoxPath);
             console.log(pdfFilePathwithIds, 'pdf file path with ids');
